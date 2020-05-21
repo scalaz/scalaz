@@ -1210,11 +1210,11 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
 }
 
 object ==>> extends MapInstances {
-  private[scalaz] sealed abstract case class Tip[A, B] private () extends (A ==>> B) {
+  private[scalaz] final case class Tip[A, B] private () extends (A ==>> B) {
     val size = 0
   }
   private[scalaz] object Tip {
-    private[this] val value: Tip[Nothing, Nothing] = new Tip[Nothing, Nothing]{}
+    private[this] val value: Tip[Nothing, Nothing] = new Tip[Nothing, Nothing]
     def apply[A, B](): A ==>> B = value.asInstanceOf[A ==>> B]
   }
 
