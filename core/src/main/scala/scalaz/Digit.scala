@@ -53,7 +53,7 @@ object Digit extends DigitInstances {
 
   private val digitsArray: Array[Digit] = Array(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
-  val digits: IList[Digit] = IList.fromSeq(digitsArray)
+  val digits: IList[Digit] = IList.fromSeq(digitsArray.toSeq)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 
