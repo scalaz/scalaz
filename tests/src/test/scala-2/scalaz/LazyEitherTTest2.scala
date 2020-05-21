@@ -1,6 +1,5 @@
 package scalaz
 
-import std.AllInstances._
 
 object LazyEitherTTest2 {
 

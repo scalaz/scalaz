@@ -1,6 +1,5 @@
 package scalaz
 
-import std.AllInstances._
 
 object EitherTTest2 extends SpecLite {
 

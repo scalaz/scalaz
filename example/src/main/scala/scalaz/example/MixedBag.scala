@@ -49,7 +49,6 @@ object MixedBag extends App {
     import syntax.equal._
     import syntax.tree._
     import syntax.traverse._
-    import std.stream._
 
     val tree: Tree[Int] = 1.node(2.node(3.leaf), 4.leaf, 5.leaf)
     val r = tree.foldRight(".")((i, s) => i.toString |+| s)

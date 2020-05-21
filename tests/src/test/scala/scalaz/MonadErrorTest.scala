@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import syntax.either._
 import syntax.monadError._
-import Isomorphism.{ <~>, IsoFunctorTemplate }
+import Isomorphism.<~>
 
 object MonadErrorTest extends SpecLite {
 

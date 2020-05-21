@@ -43,7 +43,7 @@ object SortedMapTest extends SpecLite {
   }
 
   "align" ! forAll { (a: SortedMap[Int, String], b: SortedMap[Int, Long]) =>
-    import std.set._, \&/._
+    import \&/._
     val F = Align[SortedMap[Int, *]]
     val x = F.align(a, b)
     val keysA = a.keySet

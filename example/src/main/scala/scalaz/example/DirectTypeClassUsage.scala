@@ -1,8 +1,5 @@
 package scalaz.example
 
-import scalaz.Semigroup
-
-
 object DirectTypeClassUsage extends App {
 
   val o1: Option[Int] = Some(0)
