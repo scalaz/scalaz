@@ -4,7 +4,9 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
+import scala.annotation.nowarn
 
+@nowarn("since=2.13.0")
 object StreamTest extends SpecLite {
   checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
