@@ -5,7 +5,7 @@ import scalaz._
 object MixedBag extends App {
   monoid()
   traverseBigList()
-  traverseBigStream()
+  traverseBigLazyList()
   tree()
   kleisiArrow()
   dListExample()
@@ -33,12 +33,12 @@ object MixedBag extends App {
     println(xs map (_ take 10))
   }
 
-  def traverseBigStream(): Unit = {
+  def traverseBigLazyList(): Unit = {
     import std.option._
-    import std.stream._
+    import std.lazylist._
     import syntax.traverse._
 
-    (1 to 100000).toStream.traverse(x => none[Int])
+    (1 to 100000).to(LazyList).traverse(x => none[Int])
     //    (1 to 100000).toStream.traverse(x => some(x * 2))
     ()
   }
