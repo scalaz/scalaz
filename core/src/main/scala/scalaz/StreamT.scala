@@ -305,11 +305,11 @@ object StreamT extends StreamTInstances {
   object Skip {
     def apply[A, S](s: => S): Step[A, S] = new Skip(() => s)
   }
-  sealed abstract case class Done[A, S]() extends Step[A, S]
+  sealed case class Done[A, S] private () extends Step[A, S]
   object Done {
     def apply[A, S](): Step[A, S] = done_.asInstanceOf[Done[A, S]]
     // https://github.com/scala/bug/issues/11953
-    private[this] final val done_ : Done[Nothing, Nothing] = new Done[Nothing, Nothing]{}
+    private[this] final val done_ : Done[Nothing, Nothing] = new Done[Nothing, Nothing]()
   }
 }
 

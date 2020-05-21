@@ -504,10 +504,10 @@ sealed abstract class IList[A] extends Product with Serializable {
 
 }
 
-sealed abstract case class INil[A] private() extends IList[A]
+sealed case class INil[A] private() extends IList[A]
 object INil {
   // https://github.com/scala/bug/issues/11953
-  private[this] val value: INil[Nothing] = new INil[Nothing]{}
+  private[this] val value: INil[Nothing] = new INil[Nothing]
   def apply[A](): IList[A] = value.asInstanceOf[IList[A]]
 }
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]

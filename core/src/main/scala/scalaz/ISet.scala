@@ -892,11 +892,11 @@ object ISet extends ISetInstances {
         }
     }
 
-  private[scalaz] sealed abstract case class Tip[A] private() extends ISet[A] {
+  private[scalaz] sealed case class Tip[A] private() extends ISet[A] {
     val size = 0
   }
   private[scalaz] object Tip {
-    private[this] val value: Tip[Nothing] = new Tip[Nothing]{}
+    private[this] val value: Tip[Nothing] = new Tip[Nothing]
     def apply[A](): ISet[A] = value.asInstanceOf[ISet[A]]
   }
 
