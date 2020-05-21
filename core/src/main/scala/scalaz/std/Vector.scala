@@ -74,7 +74,7 @@ trait VectorInstances extends VectorInstances0 {
     def alignWith[A, B, C](f: A \&/ B => C): (Vector[A], Vector[B]) => Vector[C] = { (as, bs) =>
       val sizeA = as.size
       val sizeB = bs.size
-      (as, bs).zipped.map((a, b) => f(\&/.Both(a, b))) ++ {
+      as.lazyZip(bs).map((a, b) => f(\&/.Both(a, b))) ++ {
         if(sizeA > sizeB)
           as.drop(sizeB).map(a => f(\&/.This(a)))
         else
