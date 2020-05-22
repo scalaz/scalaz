@@ -2,7 +2,7 @@ package scalaz.example
 
 object FoldableUsage extends App {
   import scalaz._
-  import scalaz.std.stream._
+  import scalaz.std.lazylist._
   import scalaz.std.list._
   import scalaz.std.string._
   import scalaz.std.option._
@@ -11,19 +11,19 @@ object FoldableUsage extends App {
   import scalaz.syntax.std.option._
   import scalaz.syntax.equal._
 
-  // a continuous stream of true, true, true, true, true, …
-  val trues: Stream[Boolean] = Stream.continually(true)
+  // a continuous LazyList of true, true, true, true, true, …
+  val trues: LazyList[Boolean] = LazyList.continually(true)
 
   // we cannot use foldRight from the standard library with an
   // infinite stream, as it attempts to reverse the stream, causing a infinite loop
   // trues.foldRight(false)(_ || _)
 
   // however, the Foldable typeclass has an implementation named foldr
-  // which traverses the stream from left to right lazily, so, given a
+  // which traverses the LazyList from left to right lazily, so, given a
   // function which is lazy in the right argument, we can use a foldr
-  // on an infinite stream.
+  // on an infinite LazyList.
   def lazyOr(x: Boolean)(y: => Boolean) = x || y
-  assert(Foldable[Stream].foldr(trues, false)(lazyOr))
+  assert(Foldable[LazyList].foldr(trues, false)(lazyOr))
 
   // when we have an available Monoid for the parameterized type, we
   // can collapse the Foldable using the monoid:
@@ -32,8 +32,8 @@ object FoldableUsage extends App {
 
   // we can also map the structure to values for which we have a
   // monoid, we can collapse the list, as we can see, this one is also
-  // properly lazy, allowing us to collapse our infinite stream again
-  assert(Tag.unwrap(Foldable[Stream].foldMap(trues)((b: Boolean) => Tags.Disjunction(b))))
+  // properly lazy, allowing us to collapse our infinite LazyList again
+  assert(Tag.unwrap(Foldable[LazyList].foldMap(trues)((b: Boolean) => Tags.Disjunction(b))))
 
   // We can import syntax for foldable, allowing us to "enhance" the foldable with the new methods:
   import scalaz.syntax.foldable._
@@ -59,8 +59,8 @@ object FoldableUsage extends App {
   assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(listOfOptions.flatten: _*))
 
   // we can go deeeeep:
-  val deepFolder = Foldable[List] compose Foldable[Vector] compose Foldable[Stream] compose Foldable[Option]
-  val deep: List[Vector[Stream[Option[Int]]]] = List(Vector(Stream(1.some, none[Int]), Stream(2.some)), Vector(Stream(3.some)))
+  val deepFolder = Foldable[List] compose Foldable[Vector] compose Foldable[LazyList] compose Foldable[Option]
+  val deep: List[Vector[LazyList[Option[Int]]]] = List(Vector(LazyList(1.some, none[Int]), LazyList(2.some)), Vector(LazyList(3.some)))
   assert(deepFolder.fold(deep) === 6)
   assert(deepFolder.collapse[IList, Int](deep) === IList(1,2,3))
   assert(deepFolder.foldLeft(deep, "")(_ + _.toString) === "123")
