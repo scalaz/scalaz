@@ -78,6 +78,14 @@ lazy val example = Project(
   standardSettings,
   name := "scalaz-example",
   notPublish,
+  TaskKey[Unit]("runAllMain") := {
+    val r = (runner in run).value
+    val classpath = (Compile / fullClasspath).value
+    val log = streams.value.log
+    (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+      r.run(c, classpath.map(_.data), Nil, log)
+    )
+  },
   scalacOptions in (Compile, compile) -= "-Xlint:adapted-args"
 ).dependsOn(
   coreJVM, iterateeJVM

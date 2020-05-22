@@ -18,7 +18,7 @@ script:
   - git show --oneline --check
   - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
-  - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
   - if [[ "${JAVA_HOME}" == $(jdk_switcher home openjdk8) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
     then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver publish ; fi
 
@@ -43,10 +43,10 @@ matrix:
   - scala: 0.24.0-RC1
     jdk: openjdk8
     script:
-    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile rootJVM/publishLocal
+    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile example/runAllMain rootJVM/publishLocal
   - name: dotty-nightly
     jdk: openjdk8
     script:
-    - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/compile rootJVM/publishLocal
+    - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/compile example/runAllMain rootJVM/publishLocal
   allow_failures:
   - name: dotty-nightly
