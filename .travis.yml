@@ -8,19 +8,17 @@ cache:
     - $HOME/.cache/coursier/v1
 
 language: scala
-scala:
-  - 2.13.2
 jdk:
   - openjdk8
 
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+  - sbt -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
-  - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
+  - sbt "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
   - if [[ "${JAVA_HOME}" == $(jdk_switcher home openjdk8) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
-    then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver publish ; fi
+    then sbt setVersionUseDynver publish ; fi
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -37,8 +35,7 @@ env:
 
 matrix:
   include:
-  - scala: 2.13.2
-    jdk: openjdk11
+  - jdk: openjdk11
     env: TEST_PROJECT="rootJVM"
   - scala: 0.24.0-RC1
     jdk: openjdk8
