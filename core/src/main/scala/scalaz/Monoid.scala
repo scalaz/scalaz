@@ -82,7 +82,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
     def leftIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(zero, a))
     def rightIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(a, zero))
   }
-  def monoidLaw = new MonoidLaw {}
+  def monoidLaw: MonoidLaw = new MonoidLaw {}
 
   ////
   val monoidSyntax: scalaz.syntax.MonoidSyntax[F] =

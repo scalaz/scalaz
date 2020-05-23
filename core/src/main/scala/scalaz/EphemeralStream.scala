@@ -66,7 +66,7 @@ sealed abstract class EphemeralStream[A] {
   def map[B](f: A => B): EphemeralStream[B] =
     foldRight[EphemeralStream[B]](emptyEphemeralStream)((h, t) => cons(f(h), t))
 
-  def length =
+  def length: Int =
     foldLeft(0)((c, _) => 1 + c)
 
   def tails: EphemeralStream[EphemeralStream[A]] =

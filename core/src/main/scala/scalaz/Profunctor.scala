@@ -44,7 +44,7 @@ trait Profunctor[=>:[_, _]]  { self =>
     }
   }
 
-  def profunctorLaw = new ProfunctorLaw {}
+  def profunctorLaw: ProfunctorLaw = new ProfunctorLaw {}
 
   ////
   val profunctorSyntax: scalaz.syntax.ProfunctorSyntax[=>:] =

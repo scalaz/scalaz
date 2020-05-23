@@ -131,7 +131,7 @@ trait Semigroup[F]  { self =>
       Equal[Maybe[F]].equal(unfoldrSumOpt((limit, s))(g), defaultUnfoldrSumOpt((limit, s))(g))
     }
   }
-  def semigroupLaw = new SemigroupLaw {}
+  def semigroupLaw: SemigroupLaw = new SemigroupLaw {}
 
 
   ////

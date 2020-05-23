@@ -98,7 +98,7 @@ object StepT extends StepTFunctions with EnumeratorTInstances {
   }
 
   object Done {
-    def apply[E, F[_], A](d: => A, r: => Input[E]) = new StepT[E, F, A] {
+    def apply[E, F[_], A](d: => A, r: => Input[E]): StepT[E, F, A] = new StepT[E, F, A] {
       def fold[Z](
                    cont: (Input[E] => IterateeT[E, F, A]) => Z
                    , done: (=> A, => Input[E]) => Z

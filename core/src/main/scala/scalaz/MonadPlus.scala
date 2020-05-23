@@ -58,8 +58,8 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
       FA.equal(bind(f)(_ => empty[A]), empty[A])
     }
   }
-  def monadPlusLaw = new MonadPlusLaw {}
-  def strongMonadPlusLaw = new StrongMonadPlusLaw {}
+  def monadPlusLaw: MonadPlusLaw = new MonadPlusLaw {}
+  def strongMonadPlusLaw: StrongMonadPlusLaw = new StrongMonadPlusLaw {}
   ////
   val monadPlusSyntax: scalaz.syntax.MonadPlusSyntax[F] =
     new scalaz.syntax.MonadPlusSyntax[F] { def F = MonadPlus.this }

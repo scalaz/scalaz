@@ -15,7 +15,7 @@ trait ApplicativeError[F[_], S] extends Applicative[F] { self =>
       FEA.equal(handleError(raiseError(e))(f), f(e))
   }
 
-  def applicativeErrorLaws = new ApplicativeErrorLaws {}
+  def applicativeErrorLaws: ApplicativeErrorLaws = new ApplicativeErrorLaws {}
   ////
   val applicativeErrorSyntax: scalaz.syntax.ApplicativeErrorSyntax[F, S] =
     new scalaz.syntax.ApplicativeErrorSyntax[F, S] { def F = ApplicativeError.this }

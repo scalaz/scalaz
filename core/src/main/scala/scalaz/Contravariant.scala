@@ -70,7 +70,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
      */
     def composite[A, B, C](fa: F[A], f1: B => A, f2: C => B)(implicit FC: Equal[F[C]]): Boolean = FC.equal(contramap(contramap(fa)(f1))(f2), contramap(fa)(f1 compose f2))
   }
-  def contravariantLaw = new ContravariantLaw {}
+  def contravariantLaw: ContravariantLaw = new ContravariantLaw {}
 
   ////
   val contravariantSyntax: scalaz.syntax.ContravariantSyntax[F] =

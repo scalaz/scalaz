@@ -195,7 +195,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
       Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
                              foldMapRight1(fa)(Vector(_))(_ +: _))
   }
-  def foldable1Law = new Foldable1Law {}
+  def foldable1Law: Foldable1Law = new Foldable1Law {}
 
   ////
   val foldable1Syntax: scalaz.syntax.Foldable1Syntax[F] =

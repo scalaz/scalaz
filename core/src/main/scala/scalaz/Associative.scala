@@ -25,7 +25,7 @@ trait Associative[=>:[_, _]]  { self =>
       FL.equal(reassociateLeft(reassociateRight(fa)), fa)
   }
 
-  def associativeLaw = new AssociativeLaw {}
+  def associativeLaw: AssociativeLaw = new AssociativeLaw {}
   ////
   val associativeSyntax: scalaz.syntax.AssociativeSyntax[=>:] =
     new scalaz.syntax.AssociativeSyntax[=>:] { def F = Associative.this }

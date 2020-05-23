@@ -33,7 +33,7 @@ trait Compose[=>:[_, _]]  { self =>
     }
   }
 
-  def composeLaw = new ComposeLaw {}
+  def composeLaw: ComposeLaw = new ComposeLaw {}
 
   ////
   val composeSyntax: scalaz.syntax.ComposeSyntax[=>:] =

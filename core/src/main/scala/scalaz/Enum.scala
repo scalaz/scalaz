@@ -214,7 +214,7 @@ trait Enum[F] extends Order[F] { self =>
       (min exists (equal(_, x))) || lessThanOrEqual(pred(x), x)
   }
 
-  def enumLaw = new EnumLaw {}
+  def enumLaw: EnumLaw = new EnumLaw {}
 
   ////
   val enumSyntax: scalaz.syntax.EnumSyntax[F] =

@@ -22,7 +22,7 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
       F.equal(copoint(cobind(fa)(f)), f(fa))
   }
 
-  def comonadLaw = new ComonadLaws {}
+  def comonadLaw: ComonadLaws = new ComonadLaws {}
 
   ////
   val comonadSyntax: scalaz.syntax.ComonadSyntax[F] =

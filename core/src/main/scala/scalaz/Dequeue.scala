@@ -211,16 +211,16 @@ private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[
   */
 private[scalaz] final case class FullDequeue[A](front: NonEmptyList[A], fsize: Int, back: NonEmptyList[A], backSize: Int) extends Dequeue[A]  {
   override def isEmpty = false
-  override def frontMaybe = Maybe.just(front.head)
-  override def backMaybe = Maybe.just(back.head)
+  override def frontMaybe: Maybe[A] = Maybe.just(front.head)
+  override def backMaybe: Maybe[A] = Maybe.just(back.head)
 }
 /**
   * a queue which has no elements
   */
 private[scalaz] final case class EmptyDequeue[A] private() extends Dequeue[A] {
   override val isEmpty = true
-  override val frontMaybe = Maybe.empty[A]
-  override val backMaybe = Maybe.empty[A]
+  override val frontMaybe: Maybe[A] = Maybe.empty[A]
+  override val backMaybe: Maybe[A] = Maybe.empty[A]
 }
 object EmptyDequeue {
   private[this] val value: Dequeue[Nothing] = new EmptyDequeue[Nothing]

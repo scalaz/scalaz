@@ -59,7 +59,7 @@ trait Zip[F[_]]  { self =>
     def zipSymmetric[A, B](fa: F[A], fb: F[B])(implicit FA: Equal[F[A]], F: Functor[F]): Boolean =
       FA.equal(F.map(zip(fa, fb))(_._1), F.map(zip(fb, fa))(_._2))
   }
-  def zipLaw = new ZipLaw {}
+  def zipLaw: ZipLaw = new ZipLaw {}
 
   ////
   val zipSyntax: scalaz.syntax.ZipSyntax[F] =

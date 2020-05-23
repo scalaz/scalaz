@@ -25,9 +25,9 @@ trait Band[F] extends Semigroup[F] { self =>
     *  - '''idempotency''': `forall a. append(a, a) == a`
     */
   trait BandLaw extends SemigroupLaw {
-    def idempotency(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, a))
+    def idempotency(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(a, a))
   }
-  def bandLaw = new BandLaw {}
+  def bandLaw: BandLaw = new BandLaw {}
 
   ////
   val bandSyntax: scalaz.syntax.BandSyntax[F] =

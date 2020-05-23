@@ -105,7 +105,7 @@ trait Reducer[C, M] {
       Equal[Maybe[M]].equal(unfoldrOpt((limit, seed))(g), defaultUnfoldrOpt((limit, seed))(g))
     }
   }
-  def reducerLaw = new ReducerLaw {}
+  def reducerLaw: ReducerLaw = new ReducerLaw {}
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def semigroup: Semigroup[M]

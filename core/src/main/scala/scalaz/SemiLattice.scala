@@ -12,11 +12,11 @@ trait SemiLattice[F] extends Band[F] { self =>
 
 
   trait SemiLatticeLaw extends BandLaw {
-    def commutative(a: F, b: F)(implicit F: Equal[F]) =
+    def commutative(a: F, b: F)(implicit F: Equal[F]): Boolean =
       F.equal(append(a, b), append(b, a))
   }
 
-  def semiLatticeLaw = new SemiLatticeLaw {}
+  def semiLatticeLaw: SemiLatticeLaw = new SemiLatticeLaw {}
 
   ////
   val semiLatticeSyntax: scalaz.syntax.SemiLatticeSyntax[F] =
