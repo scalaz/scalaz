@@ -74,7 +74,7 @@ trait Alt[F[_]] extends Applicative[F] with InvariantAlt[F] { self =>
     // <!> is associative:             (a <!> b) <!> c = a <!> (b <!> c)
     // <$> left-distributes over <!>:  f <$> (a <!> b) = (f <$> a) <!> (f <$> b)
   }
-  def altLaw = new AltLaw {}
+  def altLaw: AltLaw = new AltLaw {}
 
   ////
   val altSyntax: scalaz.syntax.AltSyntax[F] =

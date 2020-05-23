@@ -18,7 +18,7 @@ abstract class Representable[F[_], X](implicit val F: Functor[F]) {
       E.equal(unrep(rep(f))(x), f(x))
   }
 
-  def representableLaw = new RepresentableLaw {}
+  def representableLaw: RepresentableLaw = new RepresentableLaw {}
 }
 
 sealed abstract class RepresentableInstances {
@@ -52,11 +52,11 @@ abstract class Corepresentable[F[_]: Contravariant, X]() {
   def uncorep[A](f: F[A]): A => X
 
   trait CorepresentableLaw {
-    def corepUncorep[A](f: F[A])(implicit E: Equal[F[A]]) =
+    def corepUncorep[A](f: F[A])(implicit E: Equal[F[A]]): Boolean =
       E.equal(corep(uncorep(f)), f)
-    def uncorepCorep[A](f: A => X, a: A)(implicit E: Equal[X]) =
+    def uncorepCorep[A](f: A => X, a: A)(implicit E: Equal[X]): Boolean =
       E.equal(uncorep(corep(f))(a), f(a))
   }
 
-  def corepresentableLaw = new CorepresentableLaw {}
+  def corepresentableLaw: CorepresentableLaw = new CorepresentableLaw {}
 }

@@ -412,7 +412,7 @@ trait Foldable[F[_]]  { self =>
       Equal[Vector[A]].equal(foldMap(fa)(Vector(_)),
                              foldRight(fa, Vector.empty[A])(_ +: _))
   }
-  def foldableLaw = new FoldableLaw {}
+  def foldableLaw: FoldableLaw = new FoldableLaw {}
 
   ////
   val foldableSyntax: scalaz.syntax.FoldableSyntax[F] =

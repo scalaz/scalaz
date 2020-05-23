@@ -66,7 +66,7 @@ trait Order[F] extends Equal[F] { self =>
     }
   }
 
-  def orderLaw = new OrderLaw {}
+  def orderLaw: OrderLaw = new OrderLaw {}
 
   ////
   val orderSyntax: scalaz.syntax.OrderSyntax[F] =

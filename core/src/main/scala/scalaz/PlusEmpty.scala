@@ -47,7 +47,7 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
       FA.equal(plus(empty[A], f1), f1)
   }
 
-  def plusEmptyLaw =
+  def plusEmptyLaw: EmptyLaw =
     new EmptyLaw {}
 
   ////

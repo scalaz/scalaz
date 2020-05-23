@@ -41,7 +41,7 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
     }
   }
 
-  def categoryLaw = new CategoryLaw {}
+  def categoryLaw: CategoryLaw = new CategoryLaw {}
 
   ////
   val categorySyntax: scalaz.syntax.CategorySyntax[=>:] =

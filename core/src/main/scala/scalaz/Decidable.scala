@@ -70,7 +70,7 @@ trait Decidable[F[_]] extends Divisible[F] with InvariantAlt[F] { self =>
     // choose f (choose g m n) o = divide f' m (divide id n o) where
     //   f' bcd = either (either id (Right . Left) . g) (Right . Right) . f
   }
-  def decidableLaw = new DecidableLaw {}
+  def decidableLaw: DecidableLaw = new DecidableLaw {}
 
   ////
   val decidableSyntax: scalaz.syntax.DecidableSyntax[F] =

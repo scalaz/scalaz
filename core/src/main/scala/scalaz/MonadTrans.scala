@@ -27,7 +27,7 @@ trait MonadTrans[F[_[_], _]] {
     def composition[G[_], A, B](ga: G[A], f: A => G[B])(implicit G: Monad[G], FB: Equal[F[G, B]]): Boolean =
       FB.equal(liftM(Monad[G].bind(ga)(f)), Monad[F[G, *]].bind(liftM(ga))(a => liftM(f(a))))
   }
-  def monadTransLaw = new MonadTransLaw {}
+  def monadTransLaw: MonadTransLaw = new MonadTransLaw {}
 }
 
 object MonadTrans {

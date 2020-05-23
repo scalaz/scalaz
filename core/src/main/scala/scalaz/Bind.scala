@@ -71,7 +71,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
     def apLikeDerived[A, B](fa: F[A], f: F[A => B])(implicit FB: Equal[F[B]]): Boolean =
       FB.equal(ap(fa)(f), bind(f)(f => map(fa)(f)))
   }
-  def bindLaw = new BindLaw {}
+  def bindLaw: BindLaw = new BindLaw {}
 
   ////
   val bindSyntax: scalaz.syntax.BindSyntax[F] =

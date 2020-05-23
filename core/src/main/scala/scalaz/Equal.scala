@@ -31,7 +31,7 @@ trait Equal[F]  { self =>
       conditional(equalIsNatural, equal(f1, f2) == (f1 == f2))
     }
   }
-  def equalLaw = new EqualLaw {}
+  def equalLaw: EqualLaw = new EqualLaw {}
   ////
   val equalSyntax: scalaz.syntax.EqualSyntax[F] =
     new scalaz.syntax.EqualSyntax[F] { def F = Equal.this }

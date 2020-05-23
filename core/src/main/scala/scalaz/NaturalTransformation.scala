@@ -75,7 +75,7 @@ trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
   self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
-  def compose[E[_, _]](f: BiNaturalTransformation[E, F]) =
+  def compose[E[_, _]](f: BiNaturalTransformation[E, F]): BiNaturalTransformation[E,G] =
     new BiNaturalTransformation[E, G] {
       def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
     }

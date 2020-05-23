@@ -56,7 +56,7 @@ trait Align[F[_]] extends Functor[F] { self =>
       E.equal(map(a)(x => Both(x, x): A \&/ A), align(a, a))
   }
 
-  def alignLaw = new AlignLaw {}
+  def alignLaw: AlignLaw = new AlignLaw {}
 
   ////
   val alignSyntax: scalaz.syntax.AlignSyntax[F] =

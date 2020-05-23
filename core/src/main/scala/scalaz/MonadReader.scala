@@ -33,7 +33,7 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
       FA.equal(apply2(fa, ask)((a, _) => a), fa)
   }
 
-  def monadReaderLaw = new MonadReaderLaw {}
+  def monadReaderLaw: MonadReaderLaw = new MonadReaderLaw {}
 
   ////
 

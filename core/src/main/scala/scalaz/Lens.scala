@@ -212,7 +212,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     }
   }
 
-  def lensLaw = new LensLaw {}
+  def lensLaw: LensLaw = new LensLaw {}
 
   /** A homomorphism of lens categories */
   def partial: PLensFamily[A1, A2, B1, B2] =

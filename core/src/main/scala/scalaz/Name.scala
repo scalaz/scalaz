@@ -20,7 +20,7 @@ final class Need[A] private(private[this] var eval: () => A) extends Name[A] {
 final case class Value[A](value: A) extends Name[A]
 
 object Name {
-  def apply[A](a: => A) = new Name[A] {
+  def apply[A](a: => A): Name[A] = new Name[A] {
     def value = a
   }
   def unapply[A](v: Name[A]): Option[A] = Some(v.value)

@@ -38,7 +38,7 @@ trait Divisible[F[_]] extends Divide[F] with InvariantApplicative[F] { self =>
       E.equal(divide(conquer[A], fa)(delta), fa)
   }
 
-  def divisibleLaw = new DivisibleLaw {}
+  def divisibleLaw: DivisibleLaw = new DivisibleLaw {}
 
   ////
   val divisibleSyntax: scalaz.syntax.DivisibleSyntax[F] =

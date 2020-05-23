@@ -93,7 +93,7 @@ trait Bifoldable[F[_, _]]  { self =>
                                   bifoldRight(fa, Vector.empty[B \/ A])(_.right[B] +: _)(_.left[A] +: _))
   }
 
-  def bifoldableLaw = new BifoldableLaw {}
+  def bifoldableLaw: BifoldableLaw = new BifoldableLaw {}
   ////
   val bifoldableSyntax: scalaz.syntax.BifoldableSyntax[F] =
     new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }

@@ -93,7 +93,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
       MN.equal(t1, t2)
     }
   }
-  def traverse1Law = new Traverse1Law {}
+  def traverse1Law: Traverse1Law = new Traverse1Law {}
 
   ////
   val traverse1Syntax: scalaz.syntax.Traverse1Syntax[F] =

@@ -41,7 +41,7 @@ trait InvariantFunctor[F[_]]  { self =>
       FC.equal(xmap(xmap(fa, f1, g1), f2, g2), xmap(fa, f2 compose f1, g1 compose g2))
   }
 
-  def invariantFunctorLaw = new InvariantFunctorLaw {}
+  def invariantFunctorLaw: InvariantFunctorLaw = new InvariantFunctorLaw {}
   ////
   val invariantFunctorSyntax: scalaz.syntax.InvariantFunctorSyntax[F] =
     new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }

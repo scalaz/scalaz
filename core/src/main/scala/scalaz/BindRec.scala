@@ -43,7 +43,7 @@ trait BindRec[F[_]] extends Bind[F] { self =>
       FA.equal(result, expected)
     }
   }
-  def bindRecLaw = new BindRecLaw {}
+  def bindRecLaw: BindRecLaw = new BindRecLaw {}
 
   ////
   val bindRecSyntax: scalaz.syntax.BindRecSyntax[F] =

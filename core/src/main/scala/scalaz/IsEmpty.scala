@@ -19,7 +19,7 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
       (isEmpty(f1) && isEmpty(f2)) == isEmpty(plus(f1, f2))
   }
 
-  def isEmptyLaw = new IsEmptyLaw {}
+  def isEmptyLaw: IsEmptyLaw = new IsEmptyLaw {}
 
   ////
   val isEmptySyntax: scalaz.syntax.IsEmptySyntax[F] =

@@ -135,7 +135,7 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
     def mapLikeDerived[A, B](f: A => B, fa: F[A])(implicit FB: Equal[F[B]]): Boolean =
       FB.equal(map(fa)(f), ap(fa)(point(f)))
   }
-  def applicativeLaw = new ApplicativeLaw {}
+  def applicativeLaw: ApplicativeLaw = new ApplicativeLaw {}
 
   ////
   val applicativeSyntax: scalaz.syntax.ApplicativeSyntax[F] =
