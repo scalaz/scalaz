@@ -38,6 +38,7 @@ matrix:
   - jdk: openjdk11
     env: TEST_PROJECT="rootJVM"
   - scala: 0.24.0-RC1
+    name: dotty
     jdk: openjdk8
     script:
     - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile example/runAllMain rootJVM/publishLocal
@@ -47,3 +48,4 @@ matrix:
     - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/compile example/runAllMain rootJVM/publishLocal
   allow_failures:
   - name: dotty-nightly
+  - name: dotty
