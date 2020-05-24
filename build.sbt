@@ -128,7 +128,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
       val exclude = Set(
         "LeibnizTest.scala",
         "MonadErrorTest.scala",
-        "TraverseTest.scala",
         "UnapplyTest.scala",
       )
       val list = (Test / sources).value

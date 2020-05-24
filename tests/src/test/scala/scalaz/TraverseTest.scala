@@ -17,7 +17,7 @@ object TraverseTest extends SpecLite {
     // ghci> traverse (\x -> writer (x, x)) ["1", "2", "3"] |> runWriter
     // (["1","2","3"],"123")
     "apply effects in order" in {
-      val s: Writer[String, List[Int]] = List(1, 2, 3).traverseU(x => Writer(x.toString, x))
+      val s: Writer[String, List[Int]] = List(1, 2, 3).traverse(x => Writer(x.toString, x))
       s.run must_===(("123", List(1, 2, 3)))
     }
 
@@ -26,17 +26,18 @@ object TraverseTest extends SpecLite {
     }
 
     "traverse through option effect" in {
-      val s: Option[List[Int]] = List(1, 2, 3).traverseU((x: Int) => if (x < 3) some(x) else none)
+      val s: Option[List[Int]] = List(1, 2, 3).traverse((x: Int) => if (x < 3) some(x) else none)
       s must_===(none[List[Int]])
     }
 
     "traverse int function as monoidal applicative" in {
-      val s: Const[Int, _] = List(1, 2, 3) traverseU {a => Const(a + 1)}
+      import scalaz.syntax.const._
+      val s: Const[Int, List[String]] = List(1, 2, 3) traverse {a => (a + 1).const[String]}
       s.getConst must_===(9)
     }
 
     "not blow the stack" in {
-      val s: Option[List[Int]] = List.range(0, 32 * 1024).traverseU(x => some(x))
+      val s: Option[List[Int]] = List.range(0, 32 * 1024).traverse(x => some(x))
       s.map(_.take(3)) must_===(some(List(0, 1, 2)))
     }
 
@@ -53,7 +54,7 @@ object TraverseTest extends SpecLite {
     "state traverse agrees with regular traverse" in {
       val N = 10
       List.range(0,N).traverseS(x => modify((x: Int) => x+1))(0) must_=== (
-      List.range(0,N).traverseU(x => modify((x: Int) => x+1)).apply(0))
+      List.range(0,N).traverse(x => modify((x: Int) => x+1)).apply(0))
     }
 
     "state traverse does not blow stack" in {
@@ -78,7 +79,7 @@ object TraverseTest extends SpecLite {
 
   "stream" should {
     "apply effects in order" in {
-      val s: Writer[String, LazyList[Int]] = LazyList(1, 2, 3).traverseU(x => Writer(x.toString, x))
+      val s: Writer[String, LazyList[Int]] = LazyList(1, 2, 3).traverse(x => Writer(x.toString, x))
       s.run must_===(("123", LazyList(1, 2, 3)))
     }
 
@@ -135,7 +136,7 @@ object TraverseTest extends SpecLite {
           i <- State.get[Int]
           _ <- State.put(i + 1)
         } yield i)
-      val state: State[Int, List[Int]] = states.sequenceU
+      val state: State[Int, List[Int]] = Traverse[List].sequence(states)
       state.run(0) must_===(2 -> List(0, 1))
 
       List(some(List(1, 2)), some(List(3, 4, 5))).sequenceM must_===(some(List(1, 2, 3, 4, 5)))
