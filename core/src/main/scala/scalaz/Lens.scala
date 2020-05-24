@@ -469,7 +469,7 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem1 + elem2 ++ elems)
 
     def ++=(xs: IterableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ ++ xs.iterator.toIterable)
+      lens %= (_ ++ xs)
 
     def -=(elem: K): IndexedState[S1, S2, Set[K]] =
       lens %= (_ - elem)
@@ -508,7 +508,7 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem)
 
     def ++=(xs: IterableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
-      lens %= (_ ++ xs.iterator.toIterable)
+      lens %= (_ ++ xs)
 
     def update(key: K, value: V): IndexedState[S1, S2, Unit] =
       lens %== (_.updated(key, value))
