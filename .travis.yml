@@ -1,6 +1,6 @@
 # Use Docker-based container (instead of OpenVZ)
 sudo: false
-
+dist: trusty
 cache:
   directories:
     - $HOME/.ivy2/cache
