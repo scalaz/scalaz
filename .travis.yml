@@ -37,7 +37,7 @@ matrix:
   include:
   - jdk: openjdk11
     env: TEST_PROJECT="rootJVM"
-  - scala: 0.24.0-RC1
+  - scala: 0.25.0-RC1
     name: dotty
     jdk: openjdk8
     script:
