@@ -608,6 +608,12 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 }
 
 sealed abstract class DisjunctionInstances2 {
+  implicit def DisjunctionIsCovariantRight[A]: IsCovariant[\/[A, *]] =
+    IsCovariant.force[\/[A, *]]
+
+  implicit def DisjunctionIsCovariantLeft[A]: IsCovariant[\/[*, A]] =
+    IsCovariant.force[\/[*, A]]
+
   implicit val DisjunctionInstances2 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)

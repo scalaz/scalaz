@@ -169,6 +169,9 @@ sealed abstract class NonEmptyListInstances0 {
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
+  implicit val nonEmptyListIsCovariant: IsCovariant[NonEmptyList] =
+    IsCovariant.force[NonEmptyList]
+
   implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =

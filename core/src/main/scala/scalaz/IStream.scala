@@ -93,6 +93,9 @@ object IStream {
   def fromFoldable[F[_]: Foldable, A](fa: F[A]): IStream[A] =
     Foldable[F].foldRight(fa, empty[A])((h, t) => Lazy.cons(h, t))
 
+  implicit val iStreamIsCovariant: IsCovariant[IStream] =
+    IsCovariant.force[IStream]
+
   // more efficient allocations
   private[this] final val __empty = Value(_empty)
   private[this] final def nil[A]  = __empty.asInstanceOf[Name[IStream[A]]]
