@@ -108,6 +108,9 @@ private final case class LazyNone[A] private() extends LazyOption[A]
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
+  implicit val lazyOptionIsCovariant: IsCovariant[LazyOption] =
+    IsCovariant.force[LazyOption]
+
   implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
     new Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
       def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)

@@ -300,6 +300,9 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
+  implicit def maybeIsCovariant: IsCovariant[Maybe] =
+    IsCovariant.force[Maybe]
+
   implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
     new Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 

@@ -545,6 +545,12 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
 }
 
 sealed abstract class ValidationInstances3 {
+  implicit def ValidationIsCovariantRight[A]: IsCovariant[Validation[A, *]] =
+    IsCovariant.force[Validation[A, *]]
+
+  implicit def ValidationIsCovariantLeft[A]: IsCovariant[Validation[*, A]] =
+    IsCovariant.force[Validation[*, A]]
+
   implicit val ValidationInstances0 : Bitraverse[Validation] =
     new Bitraverse[Validation] {
       override def bimap[A, B, C, D](fab: Validation[A, B])

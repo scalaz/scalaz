@@ -148,6 +148,9 @@ sealed abstract class EphemeralStream[A] {
 }
 
 sealed abstract class EphemeralStreamInstances {
+  implicit val ephemeralStreamIsCovariant: IsCovariant[EphemeralStream] =
+    IsCovariant.force[EphemeralStream]
+
   // TODO more instances
   implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with scalaz.Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
   

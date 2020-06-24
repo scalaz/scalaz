@@ -355,6 +355,12 @@ sealed abstract class TheseInstances extends TheseInstances0 {
 
 sealed abstract class TheseInstances0 extends TheseInstances1 {
 
+  implicit def TheseIsCovariantRight[A]: IsCovariant[\&/[A, *]] =
+    IsCovariant.force[\&/[A, *]]
+
+  implicit def TheseIsCovariantLeft[A]: IsCovariant[\&/[*, A]] =
+    IsCovariant.force[\&/[*, A]]
+
   implicit def TheseInstance0[L: Semigroup]: Monad[\&/[L, *]] with BindRec[\&/[L, *]] =
     new Monad[\&/[L, *]] with BindRec[\&/[L, *]] {
       def tailrecM[A, B](a: A)(f: A => L \&/ (A \/ B)): L \&/ B =
