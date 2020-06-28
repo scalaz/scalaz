@@ -423,7 +423,7 @@ object ContravariantCoyonedaUsage extends App {
   // those two functions.
 
   implicit def ctCoyoOrdMonoid[A]: Monoid[CtCoyo[Order, A]] =
-    Monoid instance (ordFanout(_, _), unitOrd)
+    Monoid.instance(ordFanout(_, _), unitOrd)
 
   // And now we can build one more version of `sortSpecOrd' that has
   // cleaned up quite nicely.
@@ -531,7 +531,7 @@ object ContravariantCoyonedaUsage extends App {
   // kind of abstracting, though.
 
   implicit def ctCoyoBinOrdMonoid[A]: Monoid[CtCoyo[BinOrd, A]] =
-    Monoid instance (binOrdFanout(_, _), unitBinOrd)
+    Monoid.instance(binOrdFanout(_, _), unitBinOrd)
 
   def sortSpecBinOrdF(s: SortSpec): CtCoyo[BinOrd, Vector[String]] =
     s.foldMap{case (st, i) => recItem[BinOrd](i, sortTypeBinOrd(st))}

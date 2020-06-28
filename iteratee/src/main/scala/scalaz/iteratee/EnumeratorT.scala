@@ -147,7 +147,7 @@ trait EnumeratorTFunctions {
           if(xs.isEmpty) s.pointI
           else {
             s mapCont { k =>
-              val next = xs.next
+              val next = xs.next()
               k(elInput(next)) >>== go(xs)
             }
           }
