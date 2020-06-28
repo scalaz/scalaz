@@ -130,7 +130,7 @@ private trait LazyOptionTMonad[F[_]] extends MonadPlus[LazyOptionT[F, ?]] with L
   implicit def F: Monad[F]
 
   override def ap[A, B](fa: => LazyOptionT[F, A])(f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
-    LazyOptionT(F.bind(f.run)(_ fold (ff => F.map(fa.run)(_ map ((ff:A=>B)(_))),
+    LazyOptionT(F.bind(f.run)(_.fold(ff => F.map(fa.run)(_ map ((ff:A=>B)(_))),
                                       F.point(LazyOption.lazyNone))))
 
   def point[A](a: => A): LazyOptionT[F, A] =

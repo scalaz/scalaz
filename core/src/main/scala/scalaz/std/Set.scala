@@ -18,7 +18,7 @@ trait SetInstances {
       while (!s.isEmpty) {
         // Fixes stack overflow issue (#866)
         val w = r
-        r = f(s.pop, w)
+        r = f(s.pop(), w)
       }
       r
     }

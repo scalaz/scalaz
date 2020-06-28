@@ -371,7 +371,7 @@ trait LensFunctions extends LensFamilyFunctions {
       val x = Need(q.pos)
       val y = Need(q put x.value)
       Store(b =>
-        Store(w => if(e equal (x.value, w)) b else y.value, x.value), y.value)
+        Store(w => if(e.equal(x.value, w)) b else y.value, x.value), y.value)
     })
 
   def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =

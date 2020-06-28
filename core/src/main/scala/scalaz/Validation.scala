@@ -517,7 +517,7 @@ sealed abstract class ValidationInstances3 {
   implicit val ValidationInstances0 : Bitraverse[Validation] =
     new Bitraverse[Validation] {
       override def bimap[A, B, C, D](fab: Validation[A, B])
-                                    (f: A => C, g: B => D) = fab bimap (f, g)
+                                    (f: A => C, g: B => D) = fab.bimap(f, g)
 
       def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])
                                                     (f: A => G[C], g: B => G[D]) =

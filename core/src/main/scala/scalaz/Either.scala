@@ -366,7 +366,7 @@ object \/ extends DisjunctionInstances {
 
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
-    e fold (left, right)
+    e.fold(left, right)
 
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
@@ -536,7 +536,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 sealed abstract class DisjunctionInstances2 {
   implicit val DisjunctionInstances2 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
-                                  (f: A => C, g: B => D) = fab bimap (f, g)
+                                  (f: A => C, g: B => D) = fab.bimap(f, g)
 
     def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
