@@ -157,13 +157,13 @@ trait Foldable[F[_]]  { self =>
     index(fa, i) getOrElse default
 
   def toList[A](fa: F[A]): List[A] = {
-    foldLeft(fa, List.newBuilder[A])(_ += _).result
+    foldLeft(fa, List.newBuilder[A])(_ += _).result()
   }
   def toVector[A](fa: F[A]): Vector[A] = {
-    foldLeft(fa, Vector.newBuilder[A])(_ += _).result
+    foldLeft(fa, Vector.newBuilder[A])(_ += _).result()
   }
   def toSet[A](fa: F[A]): Set[A] = {
-    foldLeft(fa, Set.newBuilder[A])(_ += _).result
+    foldLeft(fa, Set.newBuilder[A])(_ += _).result()
   }
   @nowarn("since=2.13.0")
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
