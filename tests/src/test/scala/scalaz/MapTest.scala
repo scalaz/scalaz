@@ -269,7 +269,7 @@ object MapTest extends SpecLite {
     }
 
     "insert sound" ! forAll {(m: Int ==>> Int, a: Int, b: Int) =>
-      val c = m insert (a, b)
+      val c = m.insert(a, b)
       structurallySound(c)
       if(m member a)
         m.size must_=== c.size
@@ -294,7 +294,7 @@ object MapTest extends SpecLite {
     }
 
     "insertWithKey sound" ! forAll {(m: Int ==>> Int, a: Int, b: Int) =>
-      structurallySound(m insertWithKey ((_, _, b) => b, a, b))
+      structurallySound(m.insertWithKey((_, _, b) => b, a, b))
     }
   }
 

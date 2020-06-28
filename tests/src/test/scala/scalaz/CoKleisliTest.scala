@@ -7,7 +7,7 @@ object CokleisliTest extends SpecLite {
 
   implicit val cokleisliEqual: Equal[Cokleisli[Option, Int, Int]] =
     Equal.equal{ (a, b) =>
-      a(None) == b(None) && Iterator.fill(20)(util.Random.nextInt).map(Option(_)).forall(n => a(n) == b(n))
+      a(None) == b(None) && Iterator.fill(20)(util.Random.nextInt()).map(Option(_)).forall(n => a(n) == b(n))
     }
 
   checkAll(bindRec.laws[Cokleisli[Option, Int, ?]])
