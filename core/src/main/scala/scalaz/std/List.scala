@@ -89,7 +89,7 @@ trait ListInstances extends ListInstances0 {
         while (!s.isEmpty) {
           // force and copy the value of r to ensure correctness
           val w = r
-          r = f(s.pop, w)
+          r = f(s.pop(), w)
         }
         r
       }

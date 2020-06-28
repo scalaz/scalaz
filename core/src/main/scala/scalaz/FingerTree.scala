@@ -575,7 +575,7 @@ sealed abstract class FingerTreeInstances {
     UnitReducer((a: Finger[V, A]) => a.measure)
 
   implicit def nodeMeasure[A, V: Semigroup]: Reducer[Node[V, A], V] =
-    UnitReducer((a: Node[V, A]) => a fold (
+    UnitReducer((a: Node[V, A]) => a.fold(
             (v, _, _) => v,
             (v, _, _, _) => v))
 

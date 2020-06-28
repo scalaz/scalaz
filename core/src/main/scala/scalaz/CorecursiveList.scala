@@ -62,7 +62,7 @@ object CorecursiveList extends CorecursiveListInstances {
 
       def from[A](ga: CorecursiveList[A]) = {
         def rec(s: ga.S): Stream[A] =
-          ga.step(s) cata ({case (s, a) => a #:: rec(s)}, Stream())
+          ga.step(s).cata({case (s, a) => a #:: rec(s)}, Stream())
         rec(ga.init)
       }
     }
@@ -119,7 +119,7 @@ object CorecursiveList extends CorecursiveListInstances {
     */
   def cons[A](a: A, fa: CorecursiveList[A]): CorecursiveList[A] =
     CorecursiveList(Empty(): Maybe[fa.S]){ms =>
-      ms cata (s => fa.step(s) map {case (fas, a) => (just(fas), a)},
+      ms.cata(s => fa.step(s) map {case (fas, a) => (just(fas), a)},
                just((just(fa.init), a)))
     }
 
@@ -180,7 +180,7 @@ object CorecursiveList extends CorecursiveListInstances {
 
       override def foldRight[A, B](fa: CorecursiveList[A], z: => B)(f: (A, => B) => B) = {
         def rec(s: fa.S): B =
-          fa.step(s) cata ({case (s, a) => f(a, rec(s))}, z)
+          fa.step(s).cata({case (s, a) => f(a, rec(s))}, z)
         rec(fa.init)
       }
 
@@ -220,7 +220,7 @@ object CorecursiveList extends CorecursiveListInstances {
         CorecursiveList(Both(fa.init, fb.init): fa.S \&/ fb.S){
           case Both(sa, sb) =>
             Align[Maybe].align(fa.step(sa), fb.step(sb)).map(sasb =>
-              (sasb bimap (_._1, _._1), f(sasb bimap (_._2, _._2))))
+              (sasb.bimap(_._1, _._1), f(sasb.bimap(_._2, _._2))))
           case This(sa) =>
             fa.step(sa) map {case (sa, a) => (This(sa), f(This(a)))}
           case That(sb) =>
