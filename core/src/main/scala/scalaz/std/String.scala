@@ -49,55 +49,44 @@ trait StringFunctions {
   // Parsing functions.
   private def intChars(s: String): Boolean = s.length == 1 && s.charAt(0).isDigit || ((s.length > 1) && s.stripPrefix("-").forall(_.isDigit))
 
-  private def asNumber[T](f: String => T, lowerBound: T, upperBound: T, s: String)(implicit t: ClassTag[T]): Validation[String, T] =
-    try {
-      Success(f(s))
-    } catch {
-      case _: NumberFormatException if intChars(s) => Failure(s"${s} is outside of range for ${t} (${lowerBound} - ${upperBound})")
-      case _: NumberFormatException => Failure(s"${s} does not represent a valid ${t}")
-      case NonFatal(e) => Failure(e.getMessage)
-    }
-
-  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, Long.MinValue, Long.MaxValue, s)
-  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, Int.MinValue, Int.MaxValue, s)
-  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, Byte.MinValue, Byte.MaxValue, s)
-  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, Short.MinValue, Short.MaxValue, s)
-
-  def parseDouble(s: String): Validation[String, Double] =
-    asNumber(_.toDouble, Double.MinValue, Double.MaxValue, s)
-      .filter(_ != Double.NegativeInfinity)
-      .filter(_ != Double.PositiveInfinity)
-      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Double" else e)
-
-  def parseFloat(s: String): Validation[String, Float] =
-    asNumber(_.toFloat, Float.MinValue, Float.MaxValue, s)
-      .filter(_ != Float.NegativeInfinity)
-      .filter(_ != Float.PositiveInfinity)
-      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Float" else e)
-
-  def parseBigInt(s: String): Validation[String, BigInteger] =
-    try {
-      Success(new BigInteger(s))
-    } catch {
-      case _: NumberFormatException => Failure(s"${s} does not represent a valid BigInteger")
-      case NonFatal(e) => Failure(e.getMessage)
-    }
-
-  def parseBigDecimal(s: String): Validation[String, BigDecimal] =
-    try {
-      Success(new BigDecimal(s))
-    } catch {
-      case _: NumberFormatException => Failure(s"${s} does not represent a valid BigDecimal")
-      case NonFatal(e) => Failure(e.getMessage)
-    }
+  // everything boxes... :-(
+  def parseByte(s: String): Validation[String, Byte] = SafeNumbers.byte(s) match {
+    case ByteNone => Failure(s"${s} does not represent a valid Byte")
+    case ByteSome(i) => Success(i)
+  }
+  def parseShort(s: String): Validation[String, Short] = SafeNumbers.short(s) match {
+    case ShortNone => Failure(s"${s} does not represent a valid Short")
+    case ShortSome(i) => Success(i)
+  }
+  def parseInt(s: String): Validation[String, Int] = SafeNumbers.int(s) match {
+    case IntNone => Failure(s"${s} does not represent a valid Int")
+    case IntSome(i) => Success(i)
+  }
+  def parseLong(s: String): Validation[String, Long] = SafeNumbers.long(s) match {
+    case LongNone => Failure(s"${s} does not represent a valid Long")
+    case LongSome(i) => Success(i)
+  }
+  def parseBigInt(s: String): Validation[String, BigInteger] = SafeNumbers.biginteger(s) match {
+    case None => Failure(s"${s} does not represent a valid BigInteger")
+    case Some(i) => Success(i)
+  }
+  def parseFloat(s: String): Validation[String, Float] = SafeNumbers.float(s) match {
+    case FloatNone => Failure(s"${s} does not represent a valid Float")
+    case FloatSome(i) => Success(i)
+  }
+  def parseDouble(s: String): Validation[String, Double] = SafeNumbers.double(s) match {
+    case DoubleNone => Failure(s"${s} does not represent a valid Double")
+    case DoubleSome(i) => Success(i)
+  }
+  def parseBigDecimal(s: String): Validation[String, BigDecimal] = SafeNumbers.bigdecimal(s) match {
+    case None => Failure(s"${s} does not represent a valid BigDecimal")
+    case Some(i) => Success(i)
+  }
 
   def parseBoolean(s: String): Validation[String, Boolean] =
-    try {
-      Success(s.toBoolean)
-    } catch {
-      case _: IllegalArgumentException => Failure(s"${s} must be either 'true' or 'false'")
-      case NonFatal(e) => Failure(e.getMessage)
-    }
+    if (s.equalsIgnoreCase("true")) Success(true)
+    else if (s.equalsIgnoreCase("false")) Success(false)
+    else Failure(s"${s} must be either 'true' or 'false'")
 }
 
 object string extends StringInstances with StringFunctions {
