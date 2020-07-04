@@ -12,7 +12,7 @@ addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "3.0.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.5")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.3")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.4")
 addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.1")
 
 // https://github.com/sbt/sbt/issues/2217
