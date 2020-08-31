@@ -41,11 +41,33 @@ matrix:
     name: dotty
     jdk: openjdk8
     script:
-    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile rootJVM/test:compile rootJVM/test example/runAllMain rootJVM/publishLocal
+    - sbt
+      "++$TRAVIS_SCALA_VERSION!"
+      -J-Xmx3784m
+      checkGenTypeClasses
+      rootJVM/compile
+      rootJVM/test:compile
+      rootJVM/test
+      example/runAllMain
+      rootJVM/publishLocal
+      rootJS/compile
+      rootJS/test:compile
+      # TODO rootJS/test
   - name: dotty-nightly
     jdk: openjdk8
     script:
-    - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/compile rootJVM/test:compile rootJVM/test example/runAllMain rootJVM/publishLocal
+    - sbt
+      -J-Xmx3784m
+      checkGenTypeClasses
+      SetDottyNightlyVersion
+      rootJVM/compile
+      rootJVM/test:compile
+      rootJVM/test
+      example/runAllMain
+      rootJVM/publishLocal
+      rootJS/compile
+      rootJS/test:compile
+      # TODO rootJS/test
   allow_failures:
   - name: dotty-nightly
   - name: dotty

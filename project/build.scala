@@ -24,7 +24,7 @@ import sbtdynver.DynVerPlugin.autoImport._
 
 import xerial.sbt.Sonatype.autoImport._
 
-import dotty.tools.sbtplugin.DottyPlugin.autoImport.{isDotty, dottyLatestNightlyBuild}
+import dotty.tools.sbtplugin.DottyPlugin.autoImport.{isDotty, isDottyJS, dottyLatestNightlyBuild}
 
 object build {
   type Sett = Def.Setting[_]
@@ -58,11 +58,17 @@ object build {
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
-  val scalajsProjectSettings = Seq[Sett](
-    scalacOptions += {
+  val scalajsProjectSettings = Def.settings(
+    scalacOptions ++= {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
-      s"-P:scalajs:mapSourceURI:$a->$g/"
+      if (isDottyJS.value) {
+        // TODO
+        // https://github.com/lampepfl/dotty/blob/4c99388e77be12ee6cc/compiler/src/dotty/tools/backend/sjs/JSPositions.scala#L64-L69
+        Nil
+      } else {
+        Seq(s"-P:scalajs:mapSourceURI:$a->$g/")
+      }
     }
   )
 

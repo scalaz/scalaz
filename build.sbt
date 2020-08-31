@@ -120,10 +120,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
       )
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test").withDottyCompat(scalaVersion.value)
-  )
-  .jvmSettings(
-    minSuccessfulTests := 33,
+    libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test").withDottyCompat(scalaVersion.value),
     (Test / sources) := {
       val exclude = Set(
         "LeibnizTest.scala",
@@ -139,6 +136,9 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
         list
       }
     },
+  )
+  .jvmSettings(
+    minSuccessfulTests := 33,
   )
   .jsSettings(
     sources in Test ~= { values =>
