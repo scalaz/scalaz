@@ -106,7 +106,7 @@ private final case class LazySome[A](a: () => A) extends LazyOption[A]
 private final case class LazyNone[A] private() extends LazyOption[A]
 
 private object LazyNone {
-  private[scalaz] val none = LazyNone[Any]
+  private[scalaz] val none = LazyNone[Any]()
 }
 
 sealed abstract class LazyOptionInstances {
