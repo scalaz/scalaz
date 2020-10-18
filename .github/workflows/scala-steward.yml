@@ -7,11 +7,8 @@ jobs:
   scala-steward:
     runs-on: ubuntu-latest
     steps:
-    - uses: olafurpg/setup-scala@v10
-      with:
-        java-version: "adopt@1.8"
-    - uses: coursier/cache-action@v5
     - name: Launch Scala Steward
+      if: ${{ github.repository_owner == 'scalaz' }}
       uses: xuwei-k/scala-steward-action@65461e9a57695ac4522cd0fb36ffa0596beab835
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
