@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Launch Scala Steward
-      if: ${{ github.repository_owner == 'scalaz' }}
+      if: ${{ !github.event.repository.fork }}
       uses: xuwei-k/scala-steward-action@65461e9a57695ac4522cd0fb36ffa0596beab835
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
