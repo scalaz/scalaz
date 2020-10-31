@@ -13,7 +13,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.6")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.4")
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.4")
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.5")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
