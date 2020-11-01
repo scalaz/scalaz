@@ -75,10 +75,10 @@ class FutureTest extends SpecLite {
   }
  }
 
-  "Nondeterminism[Future]" should {
+  {
     implicit val es: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
-    "fetch first completed future in chooseAny" ! forAll { (xs: Vector[Int]) =>
+    "Nondeterminism[Future] fetch first completed future in chooseAny" ! forAll { (xs: Vector[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       def loop(is: List[Int], fs: Seq[Future[Int]], acc: Vector[Int]): Future[Vector[Int]] =
         is match {
@@ -96,7 +96,7 @@ class FutureTest extends SpecLite {
       Await.result(sortedF, duration) must_== sorted.map(_._1)
     }
 
-    "gather maintains order" ! forAll { (xs: List[Int]) =>
+    "Nondeterminism[Future] gather maintains order" ! forAll { (xs: List[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       val f = Nondeterminism[Future].gather(promises.map(_.future))
       (promises zip xs).reverseIterator.foreach { case (p, x) =>

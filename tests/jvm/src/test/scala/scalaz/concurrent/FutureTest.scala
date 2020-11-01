@@ -15,41 +15,37 @@ object FutureTest extends SpecLite {
 
   val non = Nondeterminism[Future]
 
-  "Future" should {
-    "not deadlock when using Nondeterminism#chooseAny" in {
-      withTimeout(2000) {
-        deadlocks(3).unsafePerformSync.length must_== 4
-      }
-    }
-    "have a run method that returns" in {
-      "when constructed from Future.now" in prop{(n: Int) =>
-        Future.now(n).unsafePerformSync must_== n
-      }
-      "when constructed from Future.delay" in prop{(n: Int) =>
-        Future.delay(n).unsafePerformSync must_== n
-      }
-      "when constructed from Future.fork" in prop{(n: Int) =>
-        Future.fork(Future.now(n)).unsafePerformSync must_== n
-      }
-      "when constructed from Future.suspend" ! prop{(n: Int) =>
-        Future.suspend(Future.now(n)).unsafePerformSync must_== n
-      }
-      "when constructed from Future.async" ! prop{(n: Int) =>
-        def callback(call: Int => Unit): Unit = call(n)
-        Future.async(callback).unsafePerformSync must_== n
-      }
-      "when constructed from Future.apply" ! prop{(n: Int) =>
-        Future.apply(n).unsafePerformSync must_== n
-      }
+  "not deadlock when using Nondeterminism#chooseAny" in {
+    withTimeout(2000) {
+      deadlocks(3).unsafePerformSync.length must_== 4
     }
   }
+  "when constructed from Future.now" in prop{(n: Int) =>
+    Future.now(n).unsafePerformSync must_== n
+  }
+  "when constructed from Future.delay" in prop{(n: Int) =>
+    Future.delay(n).unsafePerformSync must_== n
+  }
+  "when constructed from Future.fork" in prop{(n: Int) =>
+    Future.fork(Future.now(n)).unsafePerformSync must_== n
+  }
+  "when constructed from Future.suspend" ! prop{(n: Int) =>
+    Future.suspend(Future.now(n)).unsafePerformSync must_== n
+  }
+  "when constructed from Future.async" ! prop{(n: Int) =>
+    def callback(call: Int => Unit): Unit = call(n)
+    Future.async(callback).unsafePerformSync must_== n
+  }
+  "when constructed from Future.apply" ! prop{(n: Int) =>
+    Future.apply(n).unsafePerformSync must_== n
+  }
 
-  "Nondeterminism[Future]" should {
+  {
     import scalaz.concurrent.Future._
     implicit val es = Executors.newFixedThreadPool(1)
     val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
-    "correctly process reduceUnordered for >1 futures in non-blocking way" in {
+    "Nondeterminism[Future] correctly process reduceUnordered for >1 futures in non-blocking way" in {
       val f1 = fork(now(1))(es)
       val f2 = delay(7).flatMap(_=>fork(now(2))(es))
       val f3 = fork(now(3))(es)
@@ -60,7 +56,7 @@ object FutureTest extends SpecLite {
     }
 
 
-    "correctly process reduceUnordered for 1 future in non-blocking way" in {
+    "Nondeterminism[Future] correctly process reduceUnordered for 1 future in non-blocking way" in {
       val f1 = fork(now(1))(es)
 
       val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
@@ -68,28 +64,26 @@ object FutureTest extends SpecLite {
       f.unsafePerformSync must_== Set(1)
     }
 
-    "correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
+    "Nondeterminism[Future] correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
       val f = fork(Future.reduceUnordered(Seq())(intSetReducer))(es)
 
       f.unsafePerformSync must_== Set()
     }
   }
 
-  "Timed Future" should {
-    "not run futures sequentially" in {
-      val times = Stream.iterate(100)(_ + 100).take(10)
+  "Timed Future should not run futures sequentially" in {
+    val times = Stream.iterate(100)(_ + 100).take(10)
 
-      val start  = System.currentTimeMillis()
-      val result = Future.fork(Future.gatherUnordered(times.map { time =>
-        Future.fork {
-          Thread.sleep(time)
-          Future.now(time)
-        }
-      })).unsafePerformSync
-      val duration = System.currentTimeMillis() - start
+    val start  = System.currentTimeMillis()
+    val result = Future.fork(Future.gatherUnordered(times.map { time =>
+      Future.fork {
+        Thread.sleep(time)
+        Future.now(time)
+      }
+    })).unsafePerformSync
+    val duration = System.currentTimeMillis() - start
 
-      result.length must_== times.size and duration.toInt mustBe_< times.foldLeft(0)(_ + _)
-    }
+    result.length must_== times.size and duration.toInt mustBe_< times.foldLeft(0)(_ + _)
   }
 
   /*

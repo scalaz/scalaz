@@ -15,10 +15,8 @@ object ConstTest extends SpecLite {
   checkAll(traverse.laws[Const[Int, ?]])
   checkAll(contravariant.laws[Const[Int, ?]])
 
-  "const functions" in {
-    "const" ! forAll { (x: Int, y: Function0[String]) =>
-      const(x)(y) == x
-    }
+  "const function" ! forAll { (x: Int, y: Function0[String]) =>
+    const(x)(y) == x
   }
 
   object instances {
