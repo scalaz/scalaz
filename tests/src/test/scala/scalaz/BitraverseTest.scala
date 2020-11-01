@@ -29,7 +29,7 @@ object BitraverseTest extends SpecLite {
     Bifoldable[\/].rightFoldable[Int].foldMap(42.left[Int])(identity) must_===(0)
   }
 
-  "both sides, left and right embedding" in {
+  {
     implicit val L_E_LO_RL: Traverse[λ[α => Option[α] \/ List[Int]]] = Bitraverse[\/].embed[Option,List].leftTraverse[Int]
     implicit val R_E_LO_RL: Traverse[λ[α => Option[Int] \/ List[α]]] = Bitraverse[\/].embed[Option,List].rightTraverse[Int]
     checkAll("Left-biased Bitraverse for Either[Option,List[_]]", traverse.laws[λ[α => Option[α] \/ List[Int]]])
