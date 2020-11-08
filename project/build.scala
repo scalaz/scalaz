@@ -139,7 +139,7 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.15.0",
+    scalaCheckVersion := "1.15.1",
     Seq(Compile, Test).map { scope =>
       unmanagedSourceDirectories in scope ++= {
         val dir = Defaults.nameForSrc(scope.name)
