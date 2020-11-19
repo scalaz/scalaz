@@ -11,6 +11,6 @@ jobs:
     - run: cs install scalafmt
     - name: Launch Scala Steward
       if: ${{ !github.event.repository.fork }}
-      uses: xuwei-k/scala-steward-action@e6f6760c01214a4735a4c8a025b9350cee040a11
+      uses: scala-steward-org/scala-steward-action@8e358d73d042a351ee010a74882ad0edf7070512
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
