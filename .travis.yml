@@ -38,7 +38,7 @@ matrix:
   - jdk: openjdk11
     env: TEST_PROJECT="rootJVM"
   - scala: 3.0.0-M1
-    name: dotty
+    name: scala-3
     jdk: openjdk8
     script:
     - sbt
@@ -54,13 +54,13 @@ matrix:
       rootJS/test:compile
       rootJS/test
       rootJS/publishLocal
-  - name: dotty-nightly
+  - name: scala-3-nightly
     jdk: openjdk8
     script:
     - sbt
       -J-Xmx3784m
       checkGenTypeClasses
-      SetDottyNightlyVersion
+      SetScala3NightlyVersion
       rootJVM/compile
       rootJVM/test:compile
       rootJVM/test
@@ -71,5 +71,5 @@ matrix:
       rootJS/test
       rootJS/publishLocal
   allow_failures:
-  - name: dotty-nightly
-  - name: dotty
+  - name: scala-3-nightly
+  - name: scala-3

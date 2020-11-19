@@ -126,7 +126,7 @@ object build {
       }
       (f, path)
     },
-    commands += Command.command("SetDottyNightlyVersion") {
+    commands += Command.command("SetScala3NightlyVersion") {
       s"""++ ${dottyLatestNightlyBuild.get}!""" :: _
     },
     scalaVersion := Scala213,
