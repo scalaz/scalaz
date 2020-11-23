@@ -9,6 +9,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Generate token
+      if: ${{ !github.event.repository.fork }}
       id: generate_token
       uses: tibdex/github-app-token@v1
       with:
