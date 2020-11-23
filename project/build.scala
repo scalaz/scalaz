@@ -127,7 +127,10 @@ object build {
       (f, path)
     },
     commands += Command.command("SetScala3NightlyVersion") {
-      s"""++ ${dottyLatestNightlyBuild.get}!""" :: _
+      s"""++ ${dottyLatestNightlyBuild.get}! -v""" :: _
+    },
+    commands += Command.command("SetScala3") {
+      s"""++ 3.0.0-M1! -v""" :: _
     },
     scalaVersion := Scala213,
     crossScalaVersions := Seq(Scala213),

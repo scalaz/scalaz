@@ -38,6 +38,15 @@ lazy val scalaz = Project(
     }
     new RuleTransformer(rule).transform(node)(0)
   },
+  publish / skip := {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((3, _)) =>
+        // TODO: Unidoc does not work with Scala 3
+        true
+      case _ =>
+        false
+    }
+  },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
     (jsProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },

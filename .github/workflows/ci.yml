@@ -1,0 +1,58 @@
+name: CI
+on:
+  pull_request:
+  push:
+  schedule:
+  - cron: '0 7 * * *'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - java: 8
+            scala: 2
+            project: rootJVM
+          - java: 8
+            scala: 2
+            project: rootJS
+
+          - java: 11
+            scala: 2
+            project: rootJVM
+
+          - java: 8
+            scala: 3
+            project: rootJVM
+          - java: 8
+            scala: 3
+            project: rootJS
+
+          - java: 8
+            scala: nightly
+            project: rootJVM
+          - java: 8
+            scala: nightly
+            project: rootJS
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - uses: olafurpg/setup-scala@v10
+      with:
+        java-version: "adopt@1.${{ matrix.java }}"
+    - uses: coursier/cache-action@v5
+    - run: sbt -v
+           checkGenTypeClasses
+           $(if [[ "${{ matrix.scala }}" == "nightly" ]]; then echo SetScala3NightlyVersion; fi)
+           $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
+           "project ${{ matrix.project }}"
+           test:compile
+           $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+    - run: sbt -v
+           $(if [[ "${{ matrix.scala }}" == "nightly" ]]; then echo SetScala3NightlyVersion; fi)
+           $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
+           "project ${{ matrix.project }}"
+           test
+           "project /"
+           $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
