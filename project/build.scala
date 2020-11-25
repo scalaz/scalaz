@@ -169,8 +169,8 @@ object build {
         case Some((0 | 3, _)) =>
           Seq(
             "-Ykind-projector",
-            s"-language:Scala2Compat,$common",
-            "-rewrite",
+            s"-language:$common",
+            "-source", "3.0-migration",
           )
         case _ =>
           Seq(
