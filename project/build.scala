@@ -106,6 +106,7 @@ object build {
   }
 
   private def Scala213 = "2.13.4"
+  private def Scala30 = "3.0.0-M2"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -125,10 +126,10 @@ object build {
       s"""++ ${dottyLatestNightlyBuild.get}! -v""" :: _
     },
     commands += Command.command("SetScala3") {
-      s"""++ 3.0.0-M2! -v""" :: _
+      s"""++ ${Scala30}! -v""" :: _
     },
     scalaVersion := Scala213,
-    crossScalaVersions := Seq(Scala213),
+    crossScalaVersions := Seq(Scala213, Scala30),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
