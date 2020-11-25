@@ -59,16 +59,11 @@ object build {
   }
 
   val scalajsProjectSettings = Def.settings(
-    scalacOptions ++= {
+    scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
-      if (isDottyJS.value) {
-        // TODO
-        // https://github.com/lampepfl/dotty/blob/4c99388e77be12ee6cc/compiler/src/dotty/tools/backend/sjs/JSPositions.scala#L64-L69
-        Nil
-      } else {
-        Seq(s"-P:scalajs:mapSourceURI:$a->$g/")
-      }
+      val key = if (isDottyJS.value) "-scalajs-mapSourceURI" else "-P:scalajs:mapSourceURI"
+      s"${key}:$a->$g/"
     }
   )
 
