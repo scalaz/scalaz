@@ -256,7 +256,7 @@ object StrictTree extends StrictTreeInstances {
       StrictTree[A](root, forest)
     }
 
-    def unapply[A](t: StrictTree[A]): Option[(A, Vector[StrictTree[A]])] = Some((t.rootLabel, t.subForest))
+    def unapply[A](t: StrictTree[A]): Some[(A, Vector[StrictTree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
   /**

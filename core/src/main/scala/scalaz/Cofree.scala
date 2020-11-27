@@ -83,7 +83,7 @@ object Cofree extends CofreeInstances {
 
   def delay[S[_], A](h: A, t: => S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.delay(t))
 
-  def unapply[S[_], A](c: Cofree[S, A]): Option[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
+  def unapply[S[_], A](c: Cofree[S, A]): Some[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
 
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
   def applyT[S[_],A](a: A, tf: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[λ[a => Free[Function0, a]]]): Cofree[S, A] =

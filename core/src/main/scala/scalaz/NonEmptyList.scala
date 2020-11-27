@@ -152,7 +152,7 @@ object NonEmptyList extends NonEmptyListInstances {
   def fromSeq[A](h: A, t: Seq[A]): NonEmptyList[A] =
     nel(h, IList.fromSeq(t))
 
-  def unapply[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
+  def unapply[A](v: NonEmptyList[A]): Some[(A, IList[A])] =
     Some((v.head, v.tail))
 
   def nel[A](h: A, t: IList[A]): NonEmptyList[A] =

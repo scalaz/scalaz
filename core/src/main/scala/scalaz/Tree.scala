@@ -245,7 +245,7 @@ object Tree extends TreeInstances {
       }
     }
 
-    def unapply[A](t: Tree[A]): Option[(A, EStream[Tree[A]])] = Some((t.rootLabel, t.subForest))
+    def unapply[A](t: Tree[A]): Some[(A, EStream[Tree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
   /**

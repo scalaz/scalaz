@@ -80,7 +80,7 @@ object Tag {
     def unsubst[F[_], A](fa: F[A @@ T]): F[A] = Tag.unsubst(fa)
 
     /** Pattern match on a tagged value */
-    def unapply[A](a: A @@ T): Option[A] = Some(unwrap(a))
+    def unapply[A](a: A @@ T): Some[A] = Some(unwrap(a))
   }
 
   /** Variants of `apply`, `subst`, and `unsubst` that require

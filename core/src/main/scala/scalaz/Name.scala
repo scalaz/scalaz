@@ -23,7 +23,7 @@ object Name {
   def apply[A](a: => A): Name[A] = new Name[A] {
     def value = a
   }
-  def unapply[A](v: Name[A]): Option[A] = Some(v.value)
+  def unapply[A](v: Name[A]): Some[A] = Some(v.value)
 
   implicit val name: Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] =
     new Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] {
@@ -62,7 +62,7 @@ object Name {
 object Need {
   def apply[A](a: => A): Need[A] = new Need(() => a)
 
-  def unapply[A](x: Need[A]): Option[A] = Some(x.value)
+  def unapply[A](x: Need[A]): Some[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
     new Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] {
