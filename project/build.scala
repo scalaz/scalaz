@@ -148,8 +148,8 @@ object build {
   )
 
   private def Scala211 = "2.11.12"
-  private def Scala212 = "2.12.11"
-  private def Scala213 = "2.13.2"
+  private def Scala212 = "2.12.12"
+  private def Scala213 = "2.13.4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -343,7 +343,7 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    kindProjectorVersion := "0.11.0",
+    kindProjectorVersion := "0.11.2",
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, _)) =>
         Seq(
