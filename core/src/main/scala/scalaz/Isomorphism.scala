@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.language.experimental.macros
+
 sealed abstract class Isomorphisms {
 
   /**Isomorphism for arrows of kind * -> * -> * */
@@ -181,7 +183,10 @@ sealed abstract class Isomorphisms {
 
 }
 
-object Isomorphism extends Isomorphisms
+object Isomorphism extends Isomorphisms {
+  implicit def genProd[CC <: Product, T <: Product]: Isomorphism.Iso[Function1, CC, T] = macro IsomorphismMacro.genProdImpl[CC, T]
+  implicit def genCop[ST <: AnyRef, OO <: OneOf]: Isomorphism.Iso[Function1, ST, OO] = macro IsomorphismMacro.genCopImpl[ST, OO]
+}
 
 import Isomorphism._
 
@@ -195,4 +200,122 @@ trait IsomorphismAssociative[F[_, _], G[_, _]] extends Associative[F] {
 
   override def reassociateRight[A, B, C](f: F[F[A, B], C]): F[A, F[B, C]] =
     iso.from(G.rightMap(G.reassociateRight(G.leftMap(iso.to(f))(iso.to.apply _)))(iso.from.apply _))
+}
+
+object IsomorphismMacro {
+  // TODO is there a way to do this with blackbox? Things don't get materialised without whitebox
+  import scala.reflect.macros.whitebox.Context
+
+  // Copyright 2020 Daniel Vigovszky (vigoo)
+  def genProdImpl[Prod: c.WeakTypeTag, Tup: c.WeakTypeTag](c: Context): c.Expr[Isomorphism.Iso[Function1, Prod, Tup]] = {
+    import c.universe._
+
+    val prodTpe = c.weakTypeOf[Prod]
+
+    if (!prodTpe.typeSymbol.isClass ||
+      !prodTpe.typeSymbol.asClass.isCaseClass) {
+      c.abort(c.enclosingPosition, s"Type ${prodTpe.typeSymbol} is not a case class")
+    }
+
+    val paramLists = prodTpe.typeSymbol.asClass.primaryConstructor.asMethod.typeSignatureIn(prodTpe).paramLists
+    val result = paramLists match {
+      case List(params) =>
+        val tupleName = definitions.TupleClass(params.size).name.toTypeName
+        val tupleParams = params.map { sym =>
+          val symLit = Literal(Constant(sym.name.toString))
+          tq"_root_.scalaz.@@[${sym.typeSignatureIn(prodTpe).finalResultType}, $symLit]"
+        }
+        val tup = tq"$tupleName[..$tupleParams]"
+        val packers =
+          params.map { sym =>
+            val symLit = Literal(Constant(sym.name.toString))
+            val symTerm = sym.name.toTermName
+            q"_root_.scalaz.Tag.apply[${sym.typeSignatureIn(prodTpe).finalResultType}, $symLit](a.$symTerm)"
+          }
+
+        val unpackers =
+          params.indices.map { idx =>
+            val accessor = TermName(s"_${idx+1}")
+            q"b.$accessor.value"
+          }
+
+        q"""new _root_.scalaz.Isomorphism.Iso[Function1, $prodTpe, $tup] {
+              override val to: ($prodTpe => $tup) = a => (..$packers)
+              override val from: ($tup => $prodTpe) = b => ${prodTpe.typeSymbol.companion}.apply(..$unpackers)
+            }"""
+
+      case Nil =>
+        q"""new _root_.scalaz.Isomorphism.Iso[Function1, $prodTpe, Unit] {
+              override val to: ($prodTpe => Unit) = _ => ()
+              override val from: (Unit => $prodTpe) = _ => $prodTpe()
+            }"""
+
+      case _ => c.abort(c.enclosingPosition, s"Type ${prodTpe.typeSymbol} has multiple parameter lists which is currently not supported")
+    }
+
+    println(result)
+    c.Expr(result)
+  }
+
+  // NOTE these don't have tagged types because that works ok via other type name providers
+  def genCopImpl[ST: c.WeakTypeTag, OO: c.WeakTypeTag](c: Context): c.Expr[Isomorphism.Iso[Function1, ST, OO]] = {
+    import c.universe._
+
+    val ST = c.weakTypeOf[ST]
+    val cls = ST.typeSymbol.asClass
+
+    if (!cls.isSealed)
+      c.abort(c.enclosingPosition, s"${ST.typeSymbol} is not a sealed trait")
+
+    // ordering is ill-defined, we use source ordering
+    val parts =
+        cls.knownDirectSubclasses.toList
+          .map(_.asClass)
+          .sortBy(_.pos.start)
+          .map { cl =>
+            if (cl.isModuleClass)
+              internal.singleType(cl.thisPrefix, cl.module)
+            else {
+              val t    = cl.toType
+              val args = t.typeArgs.map { a =>
+                val sym  = a.typeSymbol
+                val tSym = ST
+                  .find(_.typeSymbol.name == sym.name)
+                  .getOrElse(
+                    c.abort(
+                      c.enclosingPosition,
+                      s"type parameters on case classes ($t[${t.typeArgs}]) are not supported unless they are on the sealed trait ($ST)"
+                    )
+                  )
+                a.substituteTypes(List(sym), List(tSym))
+              }
+              appliedType(t, args)
+            }
+          }
+
+    val oneof_cls = c.mirror.staticClass(s"_root_.scalaz.OneOf${parts.length}")
+    val oneof = appliedType(oneof_cls, parts) // == OO.typeSymbol.asClass
+    // TODO staticClass things are printed without the FQN, but should have them
+
+    val to_matchers = parts.zipWithIndex.map {
+      case (tp, i) =>
+        val cons = c.mirror.staticClass(s"_root_.scalaz.OneOf${parts.length}.V${i + 1}")
+        cq"p : $tp => ${cons.companion}.apply(p)"
+    }
+
+    val from_matchers = parts.zipWithIndex.map {
+      case (_, i) =>
+        val uncons = c.mirror.staticClass(s"_root_.scalaz.OneOf${parts.length}.V${i + 1}")
+        cq"${uncons.companion}(p) => p"
+    }
+
+    val result =
+      q"""new _root_.scalaz.Isomorphism.Iso[Function1, $ST, $oneof] {
+            override val to: ($ST => $oneof) = a => a match { case ..$to_matchers }
+            override val from: ($oneof => $ST) = b => b match { case ..$from_matchers }
+          }"""
+
+    c.Expr(result)
+  }
+
 }

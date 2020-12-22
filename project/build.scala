@@ -373,6 +373,43 @@ object build {
       jvm_js_settings,
       typeClasses := TypeClass.core
     )
+    .settings(
+      libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+      sourceGenerators in Compile += Def.task {
+        val dir = (sourceManaged in Compile).value
+        val file = dir / "scalaz" / "GeneratedOneOfs.scala"
+        val oneofs = (1 to 22).map { i =>
+          val tparams = (1 to i).map(p => s"A$p").mkString(", ")
+          val defns = (1 to i).map(p => s"case class V$p[$tparams](value: A$p) extends OneOf$i[$tparams]").mkString("\n  ")
+          val either = (1 until i).foldRight(s"A$i" + ("]" * (i - 1)))((e, acc) => s"Either[A$e, $acc")
+          def rights(pp: Int, s: String): String = if (pp <= 0) s else rights(pp - 1, s"Right($s)")
+          def either_cons(p: Int, splice: String): String = if (p == i) rights(p - 1, splice) else rights(p - 1, s"Left($splice)")
+          val toEithers = (1 to i).map { p => s"""case OneOf$i.V$p(v) => ${either_cons(p, "v")}""" }.mkString("\n    ")
+          val fromEithers = (1 to i).map { p => s"""case ${either_cons(p, "v")} => V$p(v)""" }.mkString("\n    ")
+
+          s"""sealed trait OneOf$i[$tparams] extends OneOf {
+             |  def toEither: $either = this match {
+             |    ${toEithers}
+             |  }
+             |}
+             |object OneOf$i {
+             |  def fromEither[$tparams](e: $either): OneOf$i[$tparams] = e match {
+             |    ${fromEithers}
+             |  }
+             |  $defns
+             |}""".stripMargin
+        }
+        IO.write(
+          file,
+          s"""package scalaz
+             |
+             |trait OneOf
+             |
+             |${oneofs.mkString("\n\n")}
+             |""".stripMargin)
+        Seq(file)
+      }.taskValue
+    )
 
   lazy val effect = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
