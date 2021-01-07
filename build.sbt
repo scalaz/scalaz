@@ -85,6 +85,7 @@ lazy val example = Project(
   base = file("example")
 ).settings(
   standardSettings,
+  unmanagedSourcePathSettings,
   name := "scalaz-example",
   notPublish,
   TaskKey[Unit]("runAllMain") := {
@@ -103,6 +104,7 @@ lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
+    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
       scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
@@ -117,6 +119,7 @@ lazy val scalacheckBindingJS  = scalacheckBinding.js
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
+  .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
   .settings(
     name := "scalaz-tests",
     notPublish,

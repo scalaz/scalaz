@@ -110,6 +110,23 @@ object build {
 
   private[this] val buildInfoPackageName = "scalaz"
 
+  lazy val unmanagedSourcePathSettings: Seq[Sett] = Def.settings(
+    Seq(Compile, Test).map { scope =>
+      unmanagedSourceDirectories in scope ++= {
+        val dir = Defaults.nameForSrc(scope.name)
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, _)) =>
+            Seq(ScalazCrossType.scala2(baseDirectory.value, dir))
+          case Some((0 | 3, _)) =>
+            Seq(ScalazCrossType.scala3(baseDirectory.value, dir))
+          case _ =>
+            Nil
+        }
+      }
+    },
+    scala213_pre_cross_setting
+  )
+
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
@@ -139,20 +156,6 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.15.2",
-    Seq(Compile, Test).map { scope =>
-      unmanagedSourceDirectories in scope ++= {
-        val dir = Defaults.nameForSrc(scope.name)
-        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, _)) =>
-            Seq(ScalazCrossType.scala2(baseDirectory.value, dir))
-          case Some((0 | 3, _)) =>
-            Seq(ScalazCrossType.scala3(baseDirectory.value, dir))
-          case _ =>
-            Nil
-        }
-      }
-    },
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
@@ -185,8 +188,6 @@ object build {
     Seq(Compile, Test).flatMap(c =>
       scalacOptions in (c, console) --= unusedWarnOptions.value
     ),
-
-    scala213_pre_cross_setting,
 
     scalacOptions in (Compile, doc) := {
       val tag = tagOrHash.value
@@ -354,6 +355,7 @@ object build {
 
   lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
+    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
@@ -376,6 +378,7 @@ object build {
 
   lazy val effect = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
+    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
@@ -387,6 +390,7 @@ object build {
 
   lazy val iteratee = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
+    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
