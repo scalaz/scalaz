@@ -24,8 +24,6 @@ import sbtdynver.DynVerPlugin.autoImport._
 
 import xerial.sbt.Sonatype.autoImport._
 
-import dotty.tools.sbtplugin.DottyPlugin.autoImport.{isDotty, isDottyJS, dottyLatestNightlyBuild}
-
 object build {
   type Sett = Def.Setting[_]
 
@@ -62,7 +60,13 @@ object build {
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
-      val key = if (isDottyJS.value) "-scalajs-mapSourceURI" else "-P:scalajs:mapSourceURI"
+
+      val key = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) =>
+          "-scalajs-mapSourceURI"
+        case _ =>
+          "-P:scalajs:mapSourceURI"
+      }
       s"${key}:$a->$g/"
     }
   )
@@ -139,9 +143,6 @@ object build {
       }
       (f, path)
     },
-    commands += Command.command("SetScala3NightlyVersion") {
-      s"""++ ${dottyLatestNightlyBuild.get}! -v""" :: _
-    },
     commands += Command.command("SetScala3") {
       s"""++ ${Scala30}! -v""" :: _
     },
@@ -193,18 +194,21 @@ object build {
       val tag = tagOrHash.value
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
       val options = (scalacOptions in (Compile, doc)).value
-      if (isDotty.value) {
-        Nil
-      } else {
-        options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
+
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) =>
+          Nil
+        case _ =>
+          options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
       }
     },
     sources in (Compile, doc) := {
       val src = (sources in (Compile, doc)).value
-      if (isDotty.value) {
-        Nil
-      } else {
-        src
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) =>
+          Nil
+        case _ =>
+          src
       }
     },
 
