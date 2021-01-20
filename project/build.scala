@@ -151,8 +151,6 @@ object build {
   private def Scala212 = "2.12.13"
   private def Scala213 = "2.13.4"
 
-  private val SetScala211 = releaseStepCommand("++" + Scala211)
-
   private[this] val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
@@ -279,15 +277,13 @@ object build {
       checkSnapshotDependencies,
       inquireVersions,
       runTest,
-      SetScala211,
-      releaseStepCommand(s"${nativeTestId}/run"),
+      releaseStepCommand(s"+ ${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      SetScala211,
-      releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      releaseStepCommand(s"+ ${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
@@ -394,8 +390,8 @@ object build {
 
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,
-    scalaVersion := Scala211,
-    crossScalaVersions := Scala211 :: Nil
+    mimaPreviousArtifacts := Set.empty,
+    scalaVersion := Scala211
   )
 
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
