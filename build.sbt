@@ -111,7 +111,15 @@ lazy val example = Project(
 ).settings(
   standardSettings,
   name := "scalaz-example",
-  notPublish
+  notPublish,
+  TaskKey[Unit]("runAllMain") := {
+    val r = (runner in run).value
+    val classpath = (Compile / fullClasspath).value
+    val log = streams.value.log
+    (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+      r.run(c, classpath.map(_.data), Nil, log)
+    )
+  },
 ).dependsOn(
   coreJVM, iterateeJVM, concurrent
 )
