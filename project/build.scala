@@ -276,7 +276,12 @@ object build {
       x => false
     },
     pomExtra := (
-      <url>http://scalaz.org</url>
+        <scm>
+          <url>git@github.com:scalaz/scalaz.git</url>
+          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
+          <tag>{tagOrHash.value}</tag>
+        </scm>
+        <url>http://scalaz.org</url>
         <licenses>
           <license>
             <name>BSD-style</name>
