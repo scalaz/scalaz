@@ -10,7 +10,7 @@ val minSuccessfulTests = settingKey[Int]("")
  *   onLoad in Global := { s => "project rootJVM" :: s }
  *
  * and regular commands such as "compile" / "test" will skip over all the
- * scalajs stuff.
+ * scalajs / scala-native stuff.
  */
 
 lazy val jsProjects = Seq[ProjectReference](
@@ -19,6 +19,10 @@ lazy val jsProjects = Seq[ProjectReference](
 
 lazy val jvmProjects = Seq[ProjectReference](
   coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, example
+)
+
+lazy val nativeProjects = Seq[ProjectReference](
+  coreNative, effectNative, iterateeNative // TODO , scalacheckBindingNative
 )
 
 lazy val scalaz = Project(
@@ -48,12 +52,20 @@ lazy val scalaz = Project(
     }
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
+
+lazy val rootNative = Project(
+  rootNativeId,
+  file("rootNative")
+).settings(
+  standardSettings,
+  notPublish
+).aggregate(nativeProjects: _*)
 
 lazy val rootJS = Project(
   "rootJS",
@@ -73,12 +85,15 @@ lazy val rootJVM = Project(
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+lazy val coreNative = core.native
 
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
+lazy val effectNative = effect.native
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
+lazy val iterateeNative = iteratee.native
 
 lazy val example = Project(
   id = "example",
@@ -116,6 +131,8 @@ lazy val scalacheckBinding =
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+// TODO https://github.com/typelevel/scalacheck/pull/751
+// lazy val scalacheckBindingNative = scalacheckBinding.native
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)

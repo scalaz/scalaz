@@ -18,6 +18,9 @@ jobs:
           - java: 8
             scala: 2
             project: rootJS
+          - java: 8
+            scala: 2
+            project: rootNative
 
           - java: 11
             scala: 2

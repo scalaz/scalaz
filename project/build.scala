@@ -17,6 +17,8 @@ import com.typesafe.sbt.osgi.SbtOsgi
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
+import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
 
@@ -26,6 +28,8 @@ import xerial.sbt.Sonatype.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
+
+  val rootNativeId = "rootNative"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -88,6 +92,7 @@ object build {
       val dir = projectType match {
         case JVMPlatform => "jvm"
         case JSPlatform => "js"
+        case NativePlatform => "native"
       }
       crossBase / dir
     }
@@ -270,6 +275,7 @@ object build {
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
+      releaseStepCommand(s"${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
@@ -357,10 +363,10 @@ object build {
     }
   }
 
-  lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
-    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
+      unmanagedSourcePathSettings,
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
@@ -380,10 +386,10 @@ object build {
       typeClasses := TypeClass.core
     )
 
-  lazy val effect = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
-    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
+      unmanagedSourcePathSettings,
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
@@ -392,10 +398,10 @@ object build {
       typeClasses := TypeClass.effect
     )
 
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
-    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
+      unmanagedSourcePathSettings,
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
