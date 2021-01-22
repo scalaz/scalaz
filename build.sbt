@@ -22,7 +22,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative // TODO , scalacheckBindingNative
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative
 )
 
 lazy val scalaz = Project(
@@ -116,11 +116,11 @@ lazy val example = Project(
   coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
-    .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
     .settings(
+      unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
       libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value).cross(CrossVersion.for3Use2_13),
@@ -131,13 +131,12 @@ lazy val scalacheckBinding =
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
-// TODO https://github.com/typelevel/scalacheck/pull/751
-// lazy val scalacheckBindingNative = scalacheckBinding.native
+lazy val scalacheckBindingNative = scalacheckBinding.native
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
-  .platformsSettings(JSPlatform, JVMPlatform)(unmanagedSourcePathSettings)
   .settings(
+    unmanagedSourcePathSettings,
     name := "scalaz-tests",
     notPublish,
     testOptions in Test += {
@@ -167,7 +166,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
       }
     },
   )
-  .jvmSettings(
+  .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33,
   )
   .jsSettings(
@@ -182,6 +181,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+lazy val testsNative = tests.native
 
 lazy val site = Project(
   id = "site",

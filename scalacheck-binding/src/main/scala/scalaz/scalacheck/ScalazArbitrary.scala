@@ -8,7 +8,7 @@ import reflect.ClassTag
 /**
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
  */
-object ScalazArbitrary extends ScalazArbitraryPlatform {
+object ScalazArbitrary {
   import Scalaz._
   import Tags._
   import Arbitrary._
