@@ -388,7 +388,11 @@ object build {
 
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,
-    mimaPreviousArtifacts := Set.empty,
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+      }.toSet
+    },
     scalaVersion := Scala211
   )
 
