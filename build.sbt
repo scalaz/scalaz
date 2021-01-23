@@ -168,9 +168,6 @@ def scalacheckBindingProject(
           case _ =>
             Set.empty
         }
-
-        // TODO enable if "-scalacheck-1.15" version released
-        Set.empty
       }
     )
     .jsSettings(
@@ -186,9 +183,6 @@ def scalacheckBindingProject(
           case _ =>
             Set.empty
         }
-
-        // TODO enable if "-scalacheck-1.15" version released
-        Set.empty
       }
     )
     .nativeSettings(
@@ -197,8 +191,14 @@ def scalacheckBindingProject(
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/native/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        // TODO enable if "-scalacheck-1.15" version released
-        Set.empty
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, v)) if v <= 13 =>
+            scalazMimaBasis.?.value.map { v =>
+              organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
+            }.toSet
+          case _ =>
+            Set.empty
+        }
       },
     )
 }
