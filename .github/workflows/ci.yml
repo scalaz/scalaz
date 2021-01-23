@@ -19,11 +19,8 @@ jobs:
             project: rootJVM
           - java: 8
             project: rootJS
-
           - java: 8
-            native_version: "0.3.9"
-          - java: 8
-            native_version: "0.4.0-M2"
+            project: rootNative
 
           - java: 11
             project: rootJVM
@@ -33,36 +30,17 @@ jobs:
       with:
         java-version: "adopt@1.${{ matrix.java }}"
     - uses: coursier/cache-action@v5
-    - run: if [[ "${{ matrix.native_version }}" != "" ]] ; then ./.github/scala-native-setup.sh ; fi
-    - env:
-        SCALA_NATIVE_VERSION: "${{ matrix.native_version }}"
-      run: |
-        case "${{ matrix.native_version }}" in
-          "")
-            sbt -v \
-            checkGenTypeClasses \
-            "project ${{ matrix.project }}" \
-            "+ test:compile" \
-            "+ mimaReportBinaryIssues" \
-            $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "+ test:fastOptJS"; fi)
-            ;;
-          *)
-            sbt -v \
-            "++ 2.11.12! -v" \
-            nativeTest/run \
-            nativeTest/publishLocal
-            ;;
-        esac
     - run: |
-        case "${{ matrix.native_version }}" in
-          "")
-            sbt -v \
-            "project ${{ matrix.project }}" \
-            "+ test" \
-            "project /" \
-            $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "+ publishLocal"; echo "+ example/runAllMain"; fi)
-            ;;
-          *)
-            ;;
-        esac
+        sbt -v \
+        checkGenTypeClasses \
+        "project ${{ matrix.project }}" \
+        "+ test:compile" \
+        "+ mimaReportBinaryIssues" \
+        $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "+ test:fastOptJS"; fi)
+    - run: |
+        sbt -v \
+        "project ${{ matrix.project }}" \
+        "+ test" \
+        "project /" \
+        $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "+ publishLocal"; echo "+ example/runAllMain"; fi)
     - run: rm -rf "$HOME/.ivy2/local" || true

@@ -36,7 +36,6 @@ object build {
   type Sett = Def.Setting[_]
 
   val rootNativeId = "rootNative"
-  val nativeTestId = "nativeTest"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -62,8 +61,7 @@ object build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val scalaCheckVersion_1_13 = SettingKey[String]("scalaCheckVersion_1_13")
-  val scalaCheckVersion_1_14 = SettingKey[String]("scalaCheckVersion_1_14")
+  val scalaCheckVersion_1_15 = SettingKey[String]("scalaCheckVersion_1_15")
   val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
@@ -126,8 +124,6 @@ object build {
   private def Scala212 = "2.12.13"
   private def Scala213 = "2.13.4"
 
-  private val SetScala211 = releaseStepCommand("++" + Scala211)
-
   private[this] val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
@@ -177,8 +173,7 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_13 := "1.13.5",
-    scalaCheckVersion_1_14 := "1.14.3",
+    scalaCheckVersion_1_15 := "1.15.2",
     scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
@@ -255,15 +250,12 @@ object build {
       checkSnapshotDependencies,
       inquireVersions,
       runTest,
-      SetScala211,
-      releaseStepCommandAndRemaining(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      SetScala211,
-      releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
@@ -352,8 +344,11 @@ object build {
   )
 
   val nativeSettings = Seq(
-    scalaVersion := Scala211,
-    crossScalaVersions := Scala211 :: Nil
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+      }.toSet
+    }
   )
 
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)

@@ -19,15 +19,15 @@ val minSuccessfulTests = settingKey[Int]("")
 
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_14, testsJS
+  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_15, testsJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_14, testsJVM, concurrent, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_15, testsJVM, concurrent, example
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest, scalacheckBindingNative_1_14
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative_1_15, testsNative
 )
 
 lazy val scalaz = Project(
@@ -168,6 +168,9 @@ def scalacheckBindingProject(
           case _ =>
             Set.empty
         }
+
+        // TODO enable if "-scalacheck-1.15" version released
+        Set.empty
       }
     )
     .jsSettings(
@@ -183,28 +186,36 @@ def scalacheckBindingProject(
           case _ =>
             Set.empty
         }
+
+        // TODO enable if "-scalacheck-1.15" version released
+        Set.empty
       }
+    )
+    .nativeSettings(
+      nativeSettings,
+      (unmanagedSourceDirectories in Compile) += {
+        (baseDirectory in LocalRootProject).value / "scalacheck-binding/native/src/main/scala"
+      },
+      mimaPreviousArtifacts := {
+        // TODO enable if "-scalacheck-1.15" version released
+        Set.empty
+      },
     )
 }
 
-lazy val scalacheckBinding_1_14 = scalacheckBindingProject(
-  id = "scalacheck-binding_1_14",
-  base = "scalacheck-binding_1_14",
-  scalacheckVersion = scalaCheckVersion_1_14,
-  versionSuffix = "1.14",
+lazy val scalacheckBinding_1_15 = scalacheckBindingProject(
+  id = "scalacheck-binding_1_15",
+  base = "scalacheck-binding_1_15",
+  scalacheckVersion = scalaCheckVersion_1_15,
+  versionSuffix = "1.15",
   platforms = Seq(JVMPlatform, JSPlatform, NativePlatform)
 )
 
-lazy val scalacheckBindingJVM_1_14 = scalacheckBinding_1_14.jvm
-lazy val scalacheckBindingJS_1_14  = scalacheckBinding_1_14.js
-lazy val scalacheckBindingNative_1_14 = scalacheckBinding_1_14.native.settings(
-  nativeSettings,
-  (unmanagedSourceDirectories in Compile) += {
-    (baseDirectory in LocalRootProject).value / "scalacheck-binding/native/src/main/scala"
-  }
-)
+lazy val scalacheckBindingJVM_1_15 = scalacheckBinding_1_15.jvm
+lazy val scalacheckBindingJS_1_15  = scalacheckBinding_1_15.js
+lazy val scalacheckBindingNative_1_15 = scalacheckBinding_1_15.native
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -218,14 +229,26 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     }
   )
-  .jvmSettings(
+  .nativeSettings(
+    nativeSettings,
+    (Test / sources) := {
+      // https://github.com/scala-native/scala-native/issues/2125
+      val exclude = Set(
+        "DisjunctionTest.scala",
+      )
+      (Test / sources).value.filterNot { src =>
+         exclude.contains(src.getName)
+      }
+    }
+  )
+  .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33
   )
   .jsSettings(
     minSuccessfulTests := 10
   )
   .enablePlugins(MimaPlugin)
-  .dependsOn(core, effect, iteratee, scalacheckBinding_1_14)
+  .dependsOn(core, effect, iteratee, scalacheckBinding_1_15)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
   .settings(
@@ -234,13 +257,4 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
-
-// can't use "sbt test"
-// https://github.com/scala-native/scala-native/issues/339
-lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
-  .settings(
-    standardSettings,
-    nativeSettings,
-    notPublish
-  )
-  .dependsOn(iterateeNative)
+lazy val testsNative = tests.native
