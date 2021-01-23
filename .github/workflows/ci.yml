@@ -38,16 +38,9 @@ jobs:
         "+ mimaReportBinaryIssues" \
         $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "+ test:fastOptJS"; fi)
     - run: |
-        case "${{ matrix.project }}" in
-          "rootNative")
-            sbt -v "project rootNative" "+ publishLocal"
-            ;;
-          *)
-            sbt -v \
-            "project ${{ matrix.project }}" \
-            "+ test" \
-            "project /" \
-            $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "+ publishLocal"; echo "+ example/runAllMain"; fi)
-            ;;
-        esac
+        sbt -v \
+        "project ${{ matrix.project }}" \
+        "+ test" \
+        "project /" \
+        $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "+ publishLocal"; echo "+ example/runAllMain"; fi)
     - run: rm -rf "$HOME/.ivy2/local" || true
