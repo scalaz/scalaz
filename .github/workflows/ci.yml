@@ -51,3 +51,4 @@ jobs:
            test
            "project /"
            $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
+    - run: rm -rf "$HOME/.ivy2/local" || true
