@@ -113,6 +113,10 @@ sealed abstract class Heap[A] {
   def filter(p: A => Boolean): Heap[A] =
     fold(Empty[A], (_, leq, t) => t foldMap (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
 
+  /**Builds a new heap by applying a partial function to all elements of this heap on which the function is defined. O(n)*/
+  def collect[B: Order](pf: PartialFunction[A, B]): Heap[B] =
+    fold(Empty[B], (_, _, t) => t.foldMap(x => if (pf.isDefinedAt(x.value)) singleton(pf.apply(x.value)) else Empty[B]))
+
   /**Partition the heap according to a predicate. The first heap contains all elements that
    * satisfy the predicate. The second contains all elements that fail the predicate. O(n)*/
   def partition(p: A => Boolean): (Heap[A], Heap[A]) =

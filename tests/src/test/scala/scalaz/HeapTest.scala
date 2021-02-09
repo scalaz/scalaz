@@ -38,4 +38,9 @@ object HeapTest extends SpecLite {
       eq.forall(_ == x) must_===(true)
       gt.forall(_ > x) must_===(true)
   }
+
+  "collect" ! forAll {
+    (a: Heap[Int]) =>
+      a.collect {case i if i % 2 == 0 => i*2 }.toLazyList must_===(a.toLazyList.collect{case i if i % 2 == 0 => i*2 })
+  }
 }
