@@ -39,8 +39,12 @@ object HeapTest extends SpecLite {
       gt.forall(_ > x) must_===(true)
   }
 
+  val pf: PartialFunction[Int, Int] = {
+    case i: Int if pred(i) => i-1
+  }
+
   "collect" ! forAll {
     (a: Heap[Int]) =>
-      a.collect {case i if i % 2 == 0 => i*2 }.toLazyList must_===(a.toLazyList.collect{case i if i % 2 == 0 => i*2 })
+      a.collect(pf).toLazyList must_===(a.toLazyList.collect(pf).sorted)
   }
 }
