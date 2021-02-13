@@ -69,7 +69,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
   type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] {type I = B}
 
   /** See `by` method. */
-  final class By[F[_]] {
+  final class By[F[_]](private val dummy: Boolean = true) extends AnyVal {
     @inline def apply[A, B](k: A => B)(implicit F: F[B]): Aux[F, A, B] =
       ContravariantCoyoneda(F)(k)
   }
