@@ -8,7 +8,6 @@ a large number of data structures.
 
 [![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
 [![Gitter](http://badges.gitter.im/scalaz/scalaz.svg)](https://gitter.im/scalaz/scalaz)
-[![Discord](https://img.shields.io/discord/455164441852641282.svg?label=Discord)](https://discord.gg/cVHGnke)
 
 ## Getting Scalaz
 
