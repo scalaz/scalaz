@@ -54,7 +54,7 @@ object build {
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
   private[this] val tagName = Def.setting{
-    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+    s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
   private[this] val tagOrHash = Def.setting{
     if(isSnapshot.value) gitHash() else tagName.value
@@ -62,7 +62,7 @@ object build {
 
   val scalajsProjectSettings = Def.settings(
     scalacOptions += {
-      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
 
       val key = CrossVersion.partialVersion(scalaVersion.value) match {
@@ -121,7 +121,7 @@ object build {
 
   lazy val unmanagedSourcePathSettings: Seq[Sett] = Def.settings(
     Seq(Compile, Test).map { scope =>
-      unmanagedSourceDirectories in scope ++= {
+      (scope / unmanagedSourceDirectories) ++= {
         val dir = Defaults.nameForSrc(scope.name)
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, _)) =>
@@ -138,13 +138,13 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
-    mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
+    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
       val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((sourceManaged in Compile).value / buildInfoDir).get.getPath).getPath
+        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
       } else {
-        f.relativeTo((sourceManaged in Compile).value).get.getPath
+        f.relativeTo((Compile / sourceManaged).value).get.getPath
       }
       (f, path)
     },
@@ -157,7 +157,7 @@ object build {
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
       val date = extracted get dynverCurrentDate
-      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+      s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
@@ -192,13 +192,13 @@ object build {
       }
     },
     Seq(Compile, Test).flatMap(c =>
-      scalacOptions in (c, console) --= unusedWarnOptions.value
+      (c / console / scalacOptions) --= unusedWarnOptions.value
     ),
 
-    scalacOptions in (Compile, doc) := {
+    (Compile / doc / scalacOptions) := {
       val tag = tagOrHash.value
-      val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
-      val options = (scalacOptions in (Compile, doc)).value
+      val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
+      val options = (Compile / doc / scalacOptions).value
 
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _)) =>
@@ -207,8 +207,8 @@ object build {
           options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
       }
     },
-    sources in (Compile, doc) := {
-      val src = (sources in (Compile, doc)).value
+    (Compile / doc / sources) := {
+      val src = (Compile / doc / sources).value
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _)) =>
           Nil
@@ -218,7 +218,7 @@ object build {
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
@@ -250,9 +250,9 @@ object build {
       typeClasses.value.map(_.doc).mkString("\n")
     },
 
-    showDoc in Compile := {
-      val _ = (doc in Compile).value
-      val out = (target in doc in Compile).value
+    (Compile / showDoc) := {
+      val _ = (Compile / doc).value
+      val out = (Compile / doc / target).value
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
@@ -262,7 +262,7 @@ object build {
     sonatypeBundleDirectory := {
       (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
     },
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
 
     // adapted from sbt-release defaults
     // (performs `publish-signed` instead of `publish`)
@@ -325,7 +325,7 @@ object build {
       ),
 
     licenseFile := {
-      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
       if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
       LICENSE_txt
     },
@@ -339,13 +339,13 @@ object build {
     }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
-    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+    inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
   private[this] val jvm_js_settings = Seq(
-    unmanagedSourceDirectories in Compile += {
+    (Compile / unmanagedSourceDirectories) += {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
@@ -353,10 +353,10 @@ object build {
   private[this] val scala213_pre_cross_setting = {
     // sbt wants `scala-2.13.0-M1`, `scala-2.13.0-M2`, ... (sbt/sbt#2819)
     // @fommil tells me we could use sbt-sensible for this
-    unmanagedSourceDirectories in Compile ++= {
+    (Compile / unmanagedSourceDirectories) ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2L, minor)) =>
-          Some((baseDirectory in Compile).value.getParentFile / s"src/main/scala-2.$minor")
+          Some((Compile / baseDirectory).value.getParentFile / s"src/main/scala-2.$minor")
         case _               =>
           None
       }
@@ -368,7 +368,7 @@ object build {
     .settings(
       unmanagedSourcePathSettings,
       name := "scalaz-core",
-      sourceGenerators in Compile += (sourceManaged in Compile).map{
+      Compile / sourceGenerators += (Compile / sourceManaged).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),

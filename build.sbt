@@ -7,7 +7,7 @@ val minSuccessfulTests = settingKey[Int]("")
  * NOTICE if you are a contributor who only cares about the JVM, create a file
  * `local.sbt` containing
  *
- *   onLoad in Global := { s => "project rootJVM" :: s }
+ *   Global / onLoad := { s => "project rootJVM" :: s }
  *
  * and regular commands such as "compile" / "test" will skip over all the
  * scalajs / scala-native stuff.
@@ -31,8 +31,8 @@ lazy val scalaz = Project(
 ).settings(
   standardSettings,
   description := "scalaz unidoc",
-  artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+  artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -51,10 +51,10 @@ lazy val scalaz = Project(
         false
     }
   },
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := {
+  ScalaUnidoc / unidoc / unidocProjectFilter := {
     (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
-  Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -104,14 +104,14 @@ lazy val example = Project(
   name := "scalaz-example",
   notPublish,
   TaskKey[Unit]("runAllMain") := {
-    val r = (runner in run).value
+    val r = (run / runner).value
     val classpath = (Compile / fullClasspath).value
     val log = streams.value.log
     (Compile / discoveredMainClasses).value.sorted.foreach(c =>
       r.run(c, classpath.map(_.data), Nil, log)
     )
   },
-  scalacOptions in (Compile, compile) -= "-Xlint:adapted-args"
+  Compile / compile / scalacOptions -= "-Xlint:adapted-args"
 ).dependsOn(
   coreJVM, iterateeJVM
 )
@@ -122,7 +122,7 @@ lazy val scalacheckBinding =
     .settings(
       unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
-      scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
+      Compile / compile / scalacOptions -= "-Ywarn-value-discard",
       libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value).withDottyCompat(scalaVersion.value),
       osgiExport("scalaz.scalacheck")
     )
@@ -139,7 +139,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     unmanagedSourcePathSettings,
     name := "scalaz-tests",
     notPublish,
-    testOptions in Test += {
+    (Test / testOptions) += {
       val scalacheckOptions = Seq(
         "-maxSize", "5",
         "-workers", "1",
@@ -181,7 +181,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     minSuccessfulTests := 33,
   )
   .jsSettings(
-    sources in Test ~= { values =>
+    Test / sources ~= { values =>
       // https://github.com/scala-js/scala-js/issues/3953
       values.filter(_.getName != "StreamTTest.scala")
     },
@@ -201,7 +201,7 @@ lazy val site = Project(
   standardSettings,
   name := "scalaz-site",
   notPublish,
-  scalacOptions in (Compile, compile) -= "-Xlint:adapted-args",
+  Compile / compile / scalacOptions -= "-Xlint:adapted-args",
 ).dependsOn(
   coreJVM
 ).enablePlugins(
@@ -212,7 +212,7 @@ lazy val site = Project(
   micrositeFooterText := Some("""
                                 |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                 |""".stripMargin),
-  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.13/${(version in Compile).value}",
+  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.13/${(Compile / version).value}",
   micrositeDocumentationLabelDescription := "Scaladoc",
   micrositeName := "Scalaz",
   micrositeDescription := "Scalaz",
