@@ -11,7 +11,7 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.3.3, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x and Scala.js.
+The current stable version is 7.3.3, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x and Scala.js, scala-native.
 
 If you're using SBT, add the following line to your build file:
 
