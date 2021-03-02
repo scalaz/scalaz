@@ -11,7 +11,7 @@ package scalaz
 trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   ////
 
-  override def map[A,B](fa: F[A])(f: A => B) = bind(fa)(a => point(f(a)))
+  override def map[A,B](fa: F[A])(f: A => B): F[B] = bind(fa)(a => point(f(a)))
 
   /**
    * Execute an action repeatedly as long as the given `Boolean` expression
