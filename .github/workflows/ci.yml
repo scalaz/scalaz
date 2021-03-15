@@ -38,7 +38,7 @@ jobs:
     - uses: olafurpg/setup-scala@v10
       with:
         java-version: "adopt@1.${{ matrix.java }}"
-    - uses: coursier/cache-action@v5
+    - uses: coursier/cache-action@v6
     - run: sbt -v
            checkGenTypeClasses
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
