@@ -35,13 +35,13 @@ object build {
     action = st => {
       val extracted = st.extract
       val ref = extracted.get(thisProjectRef)
-      extracted.runAggregated(publishSigned in Global in ref, st)
+      extracted.runAggregated(ref / (Global / publishSigned), st)
     },
     check = st => {
       // getPublishTo fails if no publish repository is set up.
       val ex = st.extract
       val ref = ex.get(thisProjectRef)
-      val (newState, value) = ex.runTask(publishTo in Global in ref, st)
+      val (newState, value) = ex.runTask(ref / (Global / publishTo), st)
       Classpaths.getPublishTo(value)
       newState
     },
