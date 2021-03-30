@@ -123,7 +123,7 @@ lazy val scalacheckBinding =
       unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value).withDottyCompat(scalaVersion.value),
+      libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value),
       osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
@@ -148,7 +148,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       )
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test").withDottyCompat(scalaVersion.value),
+    libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test"),
     (Test / sources) := {
       val exclude = Set(
         "LeibnizTest.scala",
