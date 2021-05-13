@@ -330,7 +330,7 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    kindProjectorVersion := "0.11.3",
+    kindProjectorVersion := "0.12.0",
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, _)) =>
         Seq(
