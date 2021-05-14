@@ -43,7 +43,7 @@ jobs:
            checkGenTypeClasses
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"
-           test:compile
+           Test/compile
            $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
     - run: sbt -v
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
