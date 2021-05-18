@@ -114,7 +114,7 @@ object build {
     Seq("-Ywarn-unused:imports")
   }
 
-  private def Scala213 = "2.13.5"
+  private def Scala213 = "2.13.6"
   private def Scala30 = "3.0.0"
 
   private[this] val buildInfoPackageName = "scalaz"
