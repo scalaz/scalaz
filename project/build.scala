@@ -122,7 +122,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.13"
-  private def Scala213 = "2.13.4"
+  private def Scala213 = "2.13.6"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -318,7 +318,7 @@ object build {
       case _ =>
         Nil
     }),
-    kindProjectorVersion := "0.11.3",
+    kindProjectorVersion := "0.13.0",
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
