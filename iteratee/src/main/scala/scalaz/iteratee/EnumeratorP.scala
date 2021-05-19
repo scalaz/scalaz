@@ -104,7 +104,7 @@ trait EnumeratorPFunctions {
         new EnumeratorT[I, G] {
           import MO._
           implicit val IOrd = MO.transform[λ[(β[_], α) => IterateeT[K, β, α]]]
-          lazy val enum1 = e1[IterateeT[K, G, ?]]
+          lazy val enum1 = e1[IterateeT[K, G, *]]
           lazy val enum2 = e2[G]
 
           def apply[A] = {

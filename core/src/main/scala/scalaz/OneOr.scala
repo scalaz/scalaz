@@ -109,28 +109,28 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
 
 }
 
-private sealed trait OneOrFunctor[F[_]] extends Functor[OneOr[F, ?]] {
+private sealed trait OneOrFunctor[F[_]] extends Functor[OneOr[F, *]] {
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: OneOr[F, A])(f: A => B): OneOr[F, B] =
     fa map f
 }
 
-private sealed trait OneOrCobind[F[_]] extends Cobind[OneOr[F, ?]] with OneOrFunctor[F]{
+private sealed trait OneOrCobind[F[_]] extends Cobind[OneOr[F, *]] with OneOrFunctor[F]{
   implicit def F: Cobind[F]
 
   override final def cobind[A, B](fa: OneOr[F, A])(f: OneOr[F, A] => B): OneOr[F, B] =
     fa cobind f
 }
 
-private sealed trait OneOrComonad[F[_]] extends OneOrCobind[F] with Comonad[OneOr[F, ?]] {
+private sealed trait OneOrComonad[F[_]] extends OneOrCobind[F] with Comonad[OneOr[F, *]] {
   implicit def F: Comonad[F]
 
   override def copoint[A](fa: OneOr[F, A]) =
     fa.copoint
 }
 
-private sealed trait OneOrApplicative[F[_]] extends Applicative[OneOr[F, ?]] with OneOrFunctor[F]{
+private sealed trait OneOrApplicative[F[_]] extends Applicative[OneOr[F, *]] with OneOrFunctor[F]{
   implicit def F: Apply[F]
 
   override final def ap[A,B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
@@ -140,7 +140,7 @@ private sealed trait OneOrApplicative[F[_]] extends Applicative[OneOr[F, ?]] wit
     OneOr(\/-(a))
 }
 
-private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, ?]] {
+private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, *]] {
 
   implicit def F: Foldable[F]
 
@@ -170,7 +170,7 @@ private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, ?]] {
     fa.foldLeft(z)(f)
 }
 
-private sealed trait OneOrFoldable1[F[_]] extends Foldable1[OneOr[F, ?]] with OneOrFoldable[F]{
+private sealed trait OneOrFoldable1[F[_]] extends Foldable1[OneOr[F, *]] with OneOrFoldable[F]{
 
   implicit def F: Foldable1[F]
 
@@ -184,7 +184,7 @@ private sealed trait OneOrFoldable1[F[_]] extends Foldable1[OneOr[F, ?]] with On
     fa.foldMapLeft1(z)(f)
 }
 
-private sealed trait OneOrTraverse[F[_]] extends Traverse[OneOr[F, ?]] with OneOrFunctor[F] with OneOrFoldable[F] {
+private sealed trait OneOrTraverse[F[_]] extends Traverse[OneOr[F, *]] with OneOrFunctor[F] with OneOrFoldable[F] {
 
   implicit def F: Traverse[F]
 
@@ -193,7 +193,7 @@ private sealed trait OneOrTraverse[F[_]] extends Traverse[OneOr[F, ?]] with OneO
 
 }
 
-private sealed trait OneOrTraverse1[F[_]] extends Traverse1[OneOr[F, ?]] with OneOrFoldable1[F] with OneOrTraverse[F] {
+private sealed trait OneOrTraverse1[F[_]] extends Traverse1[OneOr[F, *]] with OneOrFoldable1[F] with OneOrTraverse[F] {
 
   implicit def F: Traverse1[F]
 
@@ -238,7 +238,7 @@ object OneOr extends OneOrInstances {
 
 sealed abstract class OneOrInstances extends OneOrInstances0 {
   // for binary compatibility
-  def OneOrFunctor[F[_]: Functor]: Functor[OneOr[F, ?]] =
+  def OneOrFunctor[F[_]: Functor]: Functor[OneOr[F, *]] =
     new OneOrFunctor[F] {
       def F = implicitly
     }
@@ -259,12 +259,12 @@ sealed abstract class OneOrInstances extends OneOrInstances0 {
 
 sealed abstract class OneOrInstances0 extends OneOrInstances1 {
   // for binary compatibility
-  def OneOrCobind[F[_]: Cobind]: Cobind[OneOr[F, ?]] =
+  def OneOrCobind[F[_]: Cobind]: Cobind[OneOr[F, *]] =
     new OneOrCobind[F] {
       def F = implicitly
     }
 
-  implicit def OneOrComonad0[F[_]: Comonad]: Comonad[OneOr[F, ?]] =
+  implicit def OneOrComonad0[F[_]: Comonad]: Comonad[OneOr[F, *]] =
     new OneOrComonad[F] {
       def F = implicitly
     }
@@ -277,13 +277,13 @@ sealed abstract class OneOrInstances0 extends OneOrInstances1 {
 }
 
 sealed abstract class OneOrInstances1 extends OneOrInstances2 {
-  implicit def OneOrCobind0[F[_]: Cobind]: Cobind[OneOr[F, ?]] =
+  implicit def OneOrCobind0[F[_]: Cobind]: Cobind[OneOr[F, *]] =
     new OneOrCobind[F] {
       def F = implicitly
     }
 
   // for binary compatibility
-  def OneOrComonad[F[_]: Comonad]: Comonad[OneOr[F, ?]] =
+  def OneOrComonad[F[_]: Comonad]: Comonad[OneOr[F, *]] =
     new OneOrComonad[F] {
       def F = implicitly
     }
@@ -296,7 +296,7 @@ sealed abstract class OneOrInstances1 extends OneOrInstances2 {
 }
 
 sealed abstract class OneOrInstances2 extends OneOrInstances3 {
-  implicit def OneOrApplicative[F[_]: Apply]: Applicative[OneOr[F, ?]] =
+  implicit def OneOrApplicative[F[_]: Apply]: Applicative[OneOr[F, *]] =
     new OneOrApplicative[F] {
       def F = implicitly
     }
@@ -304,11 +304,11 @@ sealed abstract class OneOrInstances2 extends OneOrInstances3 {
 
 sealed abstract class OneOrInstances3 extends OneOrInstances4 {
   // for binary compatibility
-  def OneOrFoldable[F[_]: Foldable]: Foldable[OneOr[F, ?]] =
+  def OneOrFoldable[F[_]: Foldable]: Foldable[OneOr[F, *]] =
     new OneOrFoldable[F] {
       def F = implicitly
     }
-  implicit def OneOrTraverse1_0[F[_]: Traverse1]: Traverse1[OneOr[F, ?]] =
+  implicit def OneOrTraverse1_0[F[_]: Traverse1]: Traverse1[OneOr[F, *]] =
     new OneOrTraverse1[F] {
       def F = implicitly
     }
@@ -316,11 +316,11 @@ sealed abstract class OneOrInstances3 extends OneOrInstances4 {
 
 sealed abstract class OneOrInstances4 extends OneOrInstances5 {
   // for binary compatibility
-  def OneOrFoldable1[F[_]: Foldable1]: Foldable1[OneOr[F, ?]] =
+  def OneOrFoldable1[F[_]: Foldable1]: Foldable1[OneOr[F, *]] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
-  implicit def OneOrTraverse0[F[_]: Traverse]: Traverse[OneOr[F, ?]] =
+  implicit def OneOrTraverse0[F[_]: Traverse]: Traverse[OneOr[F, *]] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
@@ -328,11 +328,11 @@ sealed abstract class OneOrInstances4 extends OneOrInstances5 {
 
 sealed abstract class OneOrInstances5 extends OneOrInstances6 {
   // for binary compatibility
-  def OneOrTraverse[F[_]: Traverse]: Traverse[OneOr[F, ?]] =
+  def OneOrTraverse[F[_]: Traverse]: Traverse[OneOr[F, *]] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
-  implicit def OneOrFoldable1_0[F[_]: Foldable1]: Foldable1[OneOr[F, ?]] =
+  implicit def OneOrFoldable1_0[F[_]: Foldable1]: Foldable1[OneOr[F, *]] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
@@ -340,15 +340,15 @@ sealed abstract class OneOrInstances5 extends OneOrInstances6 {
 
 sealed abstract class OneOrInstances6 {
   // for binary compatibility
-  def OneOrTraverse1[F[_]: Traverse1]: Traverse1[OneOr[F, ?]] =
+  def OneOrTraverse1[F[_]: Traverse1]: Traverse1[OneOr[F, *]] =
     new OneOrTraverse1[F] {
       def F = implicitly
     }
-  implicit def OneOrFoldable0[F[_]: Foldable]: Foldable[OneOr[F, ?]] =
+  implicit def OneOrFoldable0[F[_]: Foldable]: Foldable[OneOr[F, *]] =
     new OneOrFoldable[F] {
       def F = implicitly
     }
-  implicit def OneOrFunctor0[F[_]: Functor]: Functor[OneOr[F, ?]] =
+  implicit def OneOrFunctor0[F[_]: Functor]: Functor[OneOr[F, *]] =
     new OneOrFunctor[F] {
       def F = implicitly
     }

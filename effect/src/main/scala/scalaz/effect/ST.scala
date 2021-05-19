@@ -44,10 +44,10 @@ sealed abstract class STRef[S, A] {
 
 object STRef extends STRefInstances {
 
-  def apply[S]: (Id ~> STRef[S, ?]) =
+  def apply[S]: (Id ~> STRef[S, *]) =
     stRef[S]
 
-  def stRef[S]: (Id ~> STRef[S, ?]) = new (Id ~> STRef[S, ?]) {
+  def stRef[S]: (Id ~> STRef[S, *]) = new (Id ~> STRef[S, *]) {
     def apply[A](a: A) = new STRef[S, A] {
       var value = a
     }
@@ -148,7 +148,7 @@ object ST extends STInstances {
     st(s => (s, a))
 
   /**Run a state thread */
-  def runST[A](f: Forall[ST[?, A]]): A =
+  def runST[A](f: Forall[ST[*, A]]): A =
     f.apply.apply(ivoryTower)._2
 
   /**Allocates a fresh mutable reference. */
@@ -186,15 +186,15 @@ object ST extends STInstances {
 
 sealed abstract class STInstance0 {
   implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
-      Semigroup.liftSemigroup[ST[S, ?], A](ST.stMonad[S], A)
+      Semigroup.liftSemigroup[ST[S, *], A](ST.stMonad[S], A)
 }
 
 sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
-    Monoid.liftMonoid[ST[S, ?], A](stMonad[S], A)
+    Monoid.liftMonoid[ST[S, *], A](stMonad[S], A)
 
-  implicit def stMonad[S]: Monad[ST[S, ?]] =
-    new Monad[ST[S, ?]] {
+  implicit def stMonad[S]: Monad[ST[S, *]] =
+    new Monad[ST[S, *]] {
       def point[A](a: => A): ST[S, A] = returnST(a)
       def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f
     }

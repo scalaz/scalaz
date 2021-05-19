@@ -86,8 +86,8 @@ sealed abstract class AdjunctionInstances {
   import std.tuple._
   import std.function._
 
-  implicit def curryUncurryAdjunction[S]: (S, ?) -| (S => ?) =
-    new Adjunction[(S, ?), (S => ?)] {
+  implicit def curryUncurryAdjunction[S]: (S, *) -| (S => *) =
+    new Adjunction[(S, *), (S => *)] {
       override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f(s, a)
       override def rightAdjunct[A, B](a: (S, A))(f: A => S => B): B = f(a._2)(a._1)
     }
@@ -116,8 +116,8 @@ sealed abstract class AdjunctionInstances {
       override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
     }
 
-  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] =
-    new Adjunction[Writer[E, ?], Reader[E, ?]] {
+  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, *], Reader[E, *]] =
+    new Adjunction[Writer[E, *], Reader[E, *]] {
       override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
         Reader(e => f(Writer(e, a)))
       override def rightAdjunct[A, B](w: Writer[E, A])(f: A => Reader[E, B]): B = {

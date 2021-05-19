@@ -733,24 +733,24 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def isEmpty: Boolean = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
 
-  def viewl: ViewL[FingerTree[V, ?], A] =
+  def viewl: ViewL[FingerTree[V, *], A] =
     fold(
-      v => EmptyL[FingerTree[V, ?], A],
-      (v, x) => OnL[FingerTree[V, ?], A](x, empty[V, A]),
+      v => EmptyL[FingerTree[V, *], A],
+      (v, x) => OnL[FingerTree[V, *], A](x, empty[V, A]),
       (v, pr, m, sf) =>
         pr match {
-          case One(v, x) => OnL[FingerTree[V, ?], A](x, rotL(m, sf))
-          case _ => OnL[FingerTree[V, ?], A](pr.lhead, deep(pr.ltail, m, sf))
+          case One(v, x) => OnL[FingerTree[V, *], A](x, rotL(m, sf))
+          case _ => OnL[FingerTree[V, *], A](pr.lhead, deep(pr.ltail, m, sf))
         })
 
-  def viewr: ViewR[FingerTree[V, ?], A] =
+  def viewr: ViewR[FingerTree[V, *], A] =
     fold(
-      v => EmptyR[FingerTree[V, ?], A],
-      (v, x) => OnR[FingerTree[V, ?], A](empty[V, A], x),
+      v => EmptyR[FingerTree[V, *], A],
+      (v, x) => OnR[FingerTree[V, *], A](empty[V, A], x),
       (v, pr, m, sf) =>
         sf match {
-          case One(v, x) => OnR[FingerTree[V, ?], A](rotR(pr, m), x)
-          case _ => OnR[FingerTree[V, ?], A](deep(pr, m, sf.rtail), sf.rhead)
+          case One(v, x) => OnR[FingerTree[V, *], A](rotR(pr, m), x)
+          case _ => OnR[FingerTree[V, *], A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
   /**
@@ -863,20 +863,20 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 sealed abstract class FingerTreeInstances {
   import FingerTree._
 
-  implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[ViewL[S, ?]] =
-    new Functor[ViewL[S, ?]] {
+  implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[ViewL[S, *]] =
+    new Functor[ViewL[S, *]] {
       def map[A, B](t: ViewL[S, A])(f: A => B): ViewL[S, B] =
         t.fold(EmptyL[S, B], (x, xs) => OnL(f(x), s.map(xs)(f))) //TODO define syntax for &: and :&
     }
 
-  implicit def viewRFunctor[S[_]](implicit s: Functor[S]): Functor[ViewR[S, ?]] =
-    new Functor[ViewR[S, ?]] {
+  implicit def viewRFunctor[S[_]](implicit s: Functor[S]): Functor[ViewR[S, *]] =
+    new Functor[ViewR[S, *]] {
       def map[A, B](t: ViewR[S, A])(f: A => B): ViewR[S, B] =
         t.fold(EmptyR[S, B], (xs, x) => OnR(s.map(xs)(f), f(x)))
     }
 
   implicit def fingerFoldable[V] =
-    new Foldable[Finger[V, ?]] with Foldable.FromFoldMap[Finger[V, ?]] {
+    new Foldable[Finger[V, *]] with Foldable.FromFoldMap[Finger[V, *]] {
       override def foldMap[A, M: Monoid](v: Finger[V, A])(f: A => M) = v.foldMap(f)
     }
 
@@ -897,15 +897,15 @@ sealed abstract class FingerTreeInstances {
     UnitReducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
   }
 
-  implicit def nodeFoldable[V]: Foldable[Node[V, ?]] =
-    new Foldable[Node[V, ?]] {
+  implicit def nodeFoldable[V]: Foldable[Node[V, *]] =
+    new Foldable[Node[V, *]] {
       def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
       def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
          foldMap(v)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z
     }
 
-  implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, ?]] =
-    new Foldable[FingerTree[V, ?]] {
+  implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, *]] =
+    new Foldable[FingerTree[V, *]] {
       override def foldLeft[A, B](t: FingerTree[V, A], b: B)(f: (B, A) => B) = t.foldLeft(b)(f)
 
       def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t foldMap(f)
@@ -1097,9 +1097,9 @@ sealed abstract class IndSeqInstances {
     Equal.equalBy(_.self)
 
   implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
-    new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
+    new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, *]]{
       def G = implicitly
-      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
+      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, *]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
         implicit val r: Reducer[B, Int] = UnitReducer((_: B) => 1)

@@ -6,13 +6,13 @@ object StateTUsage extends App {
   import StateT._
 
   def f[M[_]: Functor] = {
-    Functor[StateT[M, Int, ?]]
+    Functor[StateT[M, Int, *]]
   }
 
   def m[M[_]: Monad] = {
-    Applicative[StateT[M, Int, ?]]
-    Monad[StateT[M, Int, ?]]
-    MonadState[StateT[M, Int, ?], Int]
+    Applicative[StateT[M, Int, *]]
+    Monad[StateT[M, Int, *]]
+    MonadState[StateT[M, Int, *], Int]
   }
 
   def state(): Unit = {

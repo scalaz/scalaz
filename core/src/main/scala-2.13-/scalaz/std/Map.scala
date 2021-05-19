@@ -78,7 +78,7 @@ trait MapSubInstances0 extends MapSub {
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
   }
 
-  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[XMap[K, ?]] {
+  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[XMap[K, *]] {
     override def foldLeft[A, B](fa: XMap[K, A], z: B)(f: (B, A) => B) =
       fa.valuesIterator.foldLeft(z)(f)
 
@@ -98,7 +98,7 @@ trait MapSubInstances0 extends MapSub {
       def OV = Equal[V]
     }
 
-  implicit def mapFoldable[K]: Foldable[XMap[K, ?]] =
+  implicit def mapFoldable[K]: Foldable[XMap[K, *]] =
     new MapFoldable[K]{}
 }
 
@@ -108,14 +108,14 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]] with Bind[XMap[K, ?]] with Align[XMap[K, ?]] =
-    new Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]] with Bind[XMap[K, ?]] with MapFoldable[K] with Align[XMap[K, ?]] {
+  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[XMap[K, *]] with IsEmpty[XMap[K, *]] with Bind[XMap[K, *]] with Align[XMap[K, *]] =
+    new Traverse[XMap[K, *]] with IsEmpty[XMap[K, *]] with Bind[XMap[K, *]] with MapFoldable[K] with Align[XMap[K, *]] {
       def empty[V] = fromSeq[K, V]()
       def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
       def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
       def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
       override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.transform{case (_, v) => f(v)}
-      override def widen[A, B](fa: XMap[K, A])(implicit ev: A <~< B) = Liskov.co[XMap[K, +?], A, B](ev)(fa)
+      override def widen[A, B](fa: XMap[K, A])(implicit ev: A <~< B) = Liskov.co[XMap[K, +*], A, B](ev)(fa)
       def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
       import \&/._
