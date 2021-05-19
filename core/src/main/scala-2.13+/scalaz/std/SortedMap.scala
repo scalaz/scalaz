@@ -84,7 +84,7 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
       def isEmpty[V](fa: SortedMap[K, V]) = fa.isEmpty
       def bind[A, B](fa: SortedMap[K,A])(f: A => SortedMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
       override def map[A, B](fa: SortedMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
-      override def widen[A, B](fa: SortedMap[K, A])(implicit ev: A <~< B) = Liskov.co[SortedMap[K, +?], A, B](ev)(fa)
+      override def widen[A, B](fa: SortedMap[K, A])(implicit ev: A <~< B) = Liskov.co[SortedMap[K, +*], A, B](ev)(fa)
       def traverseImpl[G[_],A,B](m: SortedMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[SortedMap[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => SortedMap(xs:_*))
       import \&/._

@@ -46,8 +46,8 @@ object NaturalTransformation extends NaturalTransformations {
    * Construct a natural transformation over a coproduct from its parts.
    * Useful for combining Free interpreters.
    */
-  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, ?] ~> G =
-    λ[Coproduct[F, H, ?] ~> G](_.fold(fg, hg))
+  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, *] ~> G =
+    λ[Coproduct[F, H, *] ~> G](_.fold(fg, hg))
 
   /**
    * Like Hoist, for Functors, when we already know how to transform `F ~> G`.

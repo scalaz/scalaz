@@ -17,8 +17,8 @@ final case class Endomorphic[=>:[_, _], A](run: A =>: A) {
 object Endomorphic extends EndomorphicInstances {
 
   /** Endomorphic Kleisli arrow */
-  final def endoKleisli[F[_]: Monad, A](f: A => F[A]): Endomorphic[Kleisli[F, ?, ?], A] =
-    Endomorphic[Kleisli[F, ?, ?], A](Kleisli(f))
+  final def endoKleisli[F[_]: Monad, A](f: A => F[A]): Endomorphic[Kleisli[F, *, *], A] =
+    Endomorphic[Kleisli[F, *, *], A](Kleisli(f))
 }
 
 sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
@@ -34,11 +34,11 @@ sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
 
 sealed abstract class EndomorphicInstances0 extends EndomorphicInstances1 {
 
-  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[Kleisli[F, ?, ?], A]] =
-    Endomorphic.endomorphicMonoid[Kleisli[F, ?, ?], A]
+  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[Kleisli[F, *, *], A]] =
+    Endomorphic.endomorphicMonoid[Kleisli[F, *, *], A]
 
-  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[Cokleisli[F, ?, ?], A]] =
-    Endomorphic.endomorphicMonoid[Cokleisli[F, ?, ?], A]
+  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[Cokleisli[F, *, *], A]] =
+    Endomorphic.endomorphicMonoid[Cokleisli[F, *, *], A]
 
 }
 
@@ -54,11 +54,11 @@ sealed abstract class EndomorphicInstances1 extends EndomorphicInstances2 {
 
 sealed abstract class EndomorphicInstances2 extends EndomorphicInstances3 {
 
-  implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[Kleisli[F, ?, ?], A]] =
-    Endomorphic.endomorphicSemigroup[Kleisli[F, ?, ?], A]
+  implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[Kleisli[F, *, *], A]] =
+    Endomorphic.endomorphicSemigroup[Kleisli[F, *, *], A]
 
-  implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[Cokleisli[F, ?, ?], A]] =
-    Endomorphic.endomorphicSemigroup[Cokleisli[F, ?, ?], A]
+  implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[Cokleisli[F, *, *], A]] =
+    Endomorphic.endomorphicSemigroup[Cokleisli[F, *, *], A]
 
 }
 

@@ -21,7 +21,7 @@ import scala.reflect.ClassTag
  *
  * def parseInt(s: String): Validation[String, Int] =
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
- * val V = Applicative[ValidationNel[String, ?]]
+ * val V = Applicative[ValidationNel[String, *]]
  *
  * val x: ValidationNel[String, Int] =
  *   V.apply2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
@@ -484,8 +484,8 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] =
-    new Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] {
+  implicit def ValidationInstances1[L]: Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Plus[Validation[L, *]] with Optional[Validation[L, *]] =
+    new Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Plus[Validation[L, *]] with Optional[Validation[L, *]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
@@ -524,8 +524,8 @@ sealed abstract class ValidationInstances3 {
         fab.bitraverse(f, g)
     }
 
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, ?]] =
-    new Applicative[Validation[L, ?]] {
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, *]] =
+    new Applicative[Validation[L, *]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
 

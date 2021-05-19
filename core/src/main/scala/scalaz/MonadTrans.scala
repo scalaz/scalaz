@@ -10,7 +10,7 @@ trait MonadTrans[F[_[_], _]] {
     liftM[G.M, G.A](G(a))(G.TC)
 
   /** The [[scalaz.Monad]] implied by this transformer. */
-  implicit def apply[G[_] : Monad]: Monad[F[G, ?]]
+  implicit def apply[G[_] : Monad]: Monad[F[G, *]]
 }
 
 object MonadTrans {
@@ -18,7 +18,7 @@ object MonadTrans {
 }
 
 trait Hoist[F[_[_], _]] extends MonadTrans[F] {
-  def hoist[M[_]: Monad, N[_]](f: M ~> N): F[M, ?] ~> F[N, ?]
+  def hoist[M[_]: Monad, N[_]](f: M ~> N): F[M, *] ~> F[N, *]
 }
 
 object Hoist {
@@ -44,8 +44,8 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
       def promote[A](m2: F[A]) = mo.promote(self.promote(m2))
     }
 
-  def transform[T[_[_], _]: MonadTrans]: MonadPartialOrder[T[G, ?], F] =
-    new MonadPartialOrder[T[G, ?], F] {
+  def transform[T[_[_], _]: MonadTrans]: MonadPartialOrder[T[G, *], F] =
+    new MonadPartialOrder[T[G, *], F] {
       val MG = MonadTrans[T].apply[G](self.MG)
       val MF = self.MF
       def promote[A](m2: F[A]) = MonadTrans[T].liftM(self.promote(m2))(self.MG)
@@ -66,7 +66,7 @@ sealed abstract class MonadPartialOrderFunctions extends MonadPartialOrderFuncti
       def promote[A](m: M[A]) = m
     }
 
-  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[F[M, ?], M] =
+  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[F[M, *], M] =
     id[M].transform[F]
 }
 

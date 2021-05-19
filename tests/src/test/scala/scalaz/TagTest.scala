@@ -60,10 +60,10 @@ object TagTest extends SpecLite {
 
     class BiTask[L, R]
     object BiTask {
-      implicit def parallel[L]: Applicative.Par[BiTask[L, ?]] = ???
+      implicit def parallel[L]: Applicative.Par[BiTask[L, *]] = ???
     }
 
     def reverseOrder[A: Order] = Order[A @@ Reverse]
-    def parallel[L] = implicitly[Applicative.Par[BiTask[L, ?]]]
+    def parallel[L] = implicitly[Applicative.Par[BiTask[L, *]]]
   }
 }

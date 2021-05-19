@@ -67,14 +67,14 @@ trait ReaderWriterStateTFunctions {
 }
 
 sealed abstract class IndexedReaderWriterStateTInstances1 {
-  implicit def irwstFunctor[F[_], R, W, S1, S2](implicit F0: Functor[F]): Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] =
+  implicit def irwstFunctor[F[_], R, W, S1, S2](implicit F0: Functor[F]): Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, *]] =
     new IndexedReaderWriterStateTFunctor[F, R, W, S1, S2] {
       implicit def F = F0
     }
 }
 
 sealed abstract class IndexedReaderWriterStateTInstances0 extends IndexedReaderWriterStateTInstances1 {
-  implicit def rwstBind[F[_], R, W, S](implicit F0: Bind[F], W0: Semigroup[W]): Bind[ReaderWriterStateT[F, R, W, S, ?]] =
+  implicit def rwstBind[F[_], R, W, S](implicit F0: Bind[F], W0: Semigroup[W]): Bind[ReaderWriterStateT[F, R, W, S, *]] =
     new ReaderWriterStateTBind[F, R, W, S] {
       def F = F0
       def W = W0
@@ -82,19 +82,19 @@ sealed abstract class IndexedReaderWriterStateTInstances0 extends IndexedReaderW
 }
 
 sealed abstract class IndexedReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances0 {
-  implicit def irwstPlus[F[_], R, W, S1, S2](implicit F0: Plus[F]): Plus[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] =
+  implicit def irwstPlus[F[_], R, W, S1, S2](implicit F0: Plus[F]): Plus[IndexedReaderWriterStateT[F, R, W, S1, S2, *]] =
     new IndexedReaderWriterStateTPlus[F, R, W, S1, S2] {
       override def F = F0
     }
 
-  implicit def rwstBindRec[F[_], R, W, S](implicit F0: BindRec[F], F1: Monad[F], W0: Semigroup[W]): BindRec[ReaderWriterStateT[F, R, W, S, ?]] =
+  implicit def rwstBindRec[F[_], R, W, S](implicit F0: BindRec[F], F1: Monad[F], W0: Semigroup[W]): BindRec[ReaderWriterStateT[F, R, W, S, *]] =
     new ReaderWriterStateTBindRec[F, R, W, S] {
       def F = F0
       def A = F1
       def W = W0
     }
 
-  implicit def rwstMonadError[F[_], R, W, S, E](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[ReaderWriterStateT[F, R, W, S, ?], E] =
+  implicit def rwstMonadError[F[_], R, W, S, E](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[ReaderWriterStateT[F, R, W, S, *], E] =
     new ReaderWriterStateTMonadError[F, R, W, S, E] {
       override implicit def F: MonadError[F, E] = F0
       override implicit def W: Monoid[W] = W0
@@ -102,15 +102,15 @@ sealed abstract class IndexedReaderWriterStateTInstances extends IndexedReaderWr
 }
 
 sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterStateTInstances {
-  implicit def irwstPlusEmpty[F[_], R, W, S1, S2](implicit F0: PlusEmpty[F]): PlusEmpty[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] =
+  implicit def irwstPlusEmpty[F[_], R, W, S1, S2](implicit F0: PlusEmpty[F]): PlusEmpty[IndexedReaderWriterStateT[F, R, W, S1, S2, *]] =
     new IndexedReaderWriterStateTPlusEmpty[F, R, W, S1, S2] {
       override def F = F0
     }
 
   implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]):
-  MonadReader[ReaderWriterStateT[F, R, W, S, ?], R] with
-  MonadState[ReaderWriterStateT[F, R, W, S, ?], S] with
-  MonadListen[ReaderWriterStateT[F, R, W, S, ?], W] =
+  MonadReader[ReaderWriterStateT[F, R, W, S, *], R] with
+  MonadState[ReaderWriterStateT[F, R, W, S, *], S] with
+  MonadListen[ReaderWriterStateT[F, R, W, S, *], W] =
     new ReaderWriterStateTMonad[F, R, W, S] {
       implicit def F = F0
       implicit def W = W0
@@ -118,7 +118,7 @@ sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterSt
 }
 
 abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 {
-  implicit def rwstMonadPlus[F[_], R, W, S](implicit W0: Monoid[W], F0: MonadPlus[F]): MonadPlus[ReaderWriterStateT[F, R, W, S, ?]] =
+  implicit def rwstMonadPlus[F[_], R, W, S](implicit W0: Monoid[W], F0: MonadPlus[F]): MonadPlus[ReaderWriterStateT[F, R, W, S, *]] =
     new ReaderWriterStateTMonadPlus[F, R, W, S] {
       override def F = F0
       override def W = W0
@@ -131,7 +131,7 @@ abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 
 
 }
 
-private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2] extends Plus[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] {
+private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2] extends Plus[IndexedReaderWriterStateT[F, R, W, S1, S2, *]] {
   def F: Plus[F]
 
   override final def plus[A](a: IRWST[F, R, W, S1, S2, A], b: => IRWST[F, R, W, S1, S2, A]) =
@@ -139,20 +139,20 @@ private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2] extends Plus[Ind
 }
 
 private trait IndexedReaderWriterStateTPlusEmpty[F[_], R, W, S1, S2]
-  extends PlusEmpty[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]]
+  extends PlusEmpty[IndexedReaderWriterStateT[F, R, W, S1, S2, *]]
   with IndexedReaderWriterStateTPlus[F, R, W, S1, S2] {
   def F: PlusEmpty[F]
 
   override final def empty[A] = IRWST((_, _) => F.empty)
 }
 
-private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2] extends Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] {
+private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2] extends Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, *]] {
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
 }
 
-private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[ReaderWriterStateT[F, R, W, S, ?], E] {
+private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[ReaderWriterStateT[F, R, W, S, *], E] {
   implicit def F: MonadError[F, E]
   implicit def W: Monoid[W]
 
@@ -169,7 +169,7 @@ private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[
     RWST((_, s) => F.point((W.zero, a, s)))
 }
 
-private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterStateT[F, R, W, S, ?]] with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {
+private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterStateT[F, R, W, S, *]] with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {
   implicit def F: Bind[F]
   implicit def W: Semigroup[W]
 
@@ -177,7 +177,7 @@ private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterSta
     fa flatMap f
 }
 
-private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWriterStateT[F, R, W, S, ?]] with ReaderWriterStateTBind[F, R, W, S] {
+private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWriterStateT[F, R, W, S, *]] with ReaderWriterStateTBind[F, R, W, S] {
   implicit def F: BindRec[F]
   implicit def A: Monad[F]
 
@@ -197,16 +197,16 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWri
 }
 
 private abstract class ReaderWriterStateTMonadPlus[F[_], R, W, S]
-  extends MonadPlus[ReaderWriterStateT[F, R, W, S, ?]]
+  extends MonadPlus[ReaderWriterStateT[F, R, W, S, *]]
   with ReaderWriterStateTMonad[F, R, W, S]
   with IndexedReaderWriterStateTPlusEmpty[F, R, W, S, S] {
   override def F: MonadPlus[F]
 }
 
 private trait ReaderWriterStateTMonad[F[_], R, W, S]
-  extends MonadReader[ReaderWriterStateT[F, R, W, S, ?], R]
-  with MonadState[ReaderWriterStateT[F, R, W, S, ?], S]
-  with MonadListen[ReaderWriterStateT[F, R, W, S, ?], W]
+  extends MonadReader[ReaderWriterStateT[F, R, W, S, *], R]
+  with MonadState[ReaderWriterStateT[F, R, W, S, *], S]
+  with MonadListen[ReaderWriterStateT[F, R, W, S, *], W]
   with ReaderWriterStateTBind[F, R, W, S] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
@@ -242,11 +242,11 @@ private trait ReaderWriterStateTHoist[R, W, S] extends Hoist[λ[(α[_], β) => R
   implicit def W: Monoid[W]
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    λ[ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N, R, W, S, ?]](_ mapT f)
+    λ[ReaderWriterStateT[M, R, W, S, *] ~> ReaderWriterStateT[N, R, W, S, *]](_ mapT f)
 
   def liftM[M[_], A](ma: M[A])(implicit M: Monad[M]): ReaderWriterStateT[M, R, W, S, A] =
     ReaderWriterStateT( (r,s) => M.map(ma)((W.zero, _, s)))
 
-  implicit def apply[M[_] : Monad]: Monad[ReaderWriterStateT[M, R, W, S, ?]] =
+  implicit def apply[M[_] : Monad]: Monad[ReaderWriterStateT[M, R, W, S, *]] =
     IndexedReaderWriterStateT.rwstMonad
 }

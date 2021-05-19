@@ -11,27 +11,27 @@ case class FreeList[A](f: Free[List, A])
 sealed abstract class FreeListInstances {
   implicit def freeListTraverse: Traverse[FreeList] = new Traverse[FreeList] {
     def traverseImpl[G[_], A, B](fa: FreeList[A])(f: A => G[B])(implicit G: Applicative[G]) =
-      G.map(Traverse[Free[List, ?]].traverseImpl(fa.f)(f))(FreeList.apply)
+      G.map(Traverse[Free[List, *]].traverseImpl(fa.f)(f))(FreeList.apply)
   }
 }
 
 object FreeList extends FreeListInstances {
 
   implicit val freeListZip: Zip[FreeList] = new Zip[FreeList] {
-    val Z = Zip[Free[List, ?]]
+    val Z = Zip[Free[List, *]]
     override def zip[A, B](a: => FreeList[A], b: => FreeList[B]) =
       FreeList(Z.zip(a.f, b.f))
   }
 
   implicit def freeListMonad: Monad[FreeList] with BindRec[FreeList] = new Monad[FreeList] with BindRec[FreeList] {
     def point[A](a: => A): FreeList[A] =
-      FreeList(Monad[Free[List, ?]].point(a))
+      FreeList(Monad[Free[List, *]].point(a))
 
     def bind[A, B](fa: FreeList[A])(f: A => FreeList[B]): FreeList[B] =
-      FreeList(Monad[Free[List, ?]].bind(fa.f) { a => f(a).f })
+      FreeList(Monad[Free[List, *]].bind(fa.f) { a => f(a).f })
 
     def tailrecM[A, B](f: A => FreeList[A \/ B])(a: A): FreeList[B] =
-      FreeList(BindRec[Free[List, ?]].tailrecM((x: A) => f(x).f)(a))
+      FreeList(BindRec[Free[List, *]].tailrecM((x: A) => f(x).f)(a))
   }
 
   implicit def freeListArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeList[A]] =
@@ -61,13 +61,13 @@ case class FreeOption[A](f: Free[Option, A])
 object FreeOption {
   implicit def freeOptionBindRec: BindRec[FreeOption] = new BindRec[FreeOption] {
     def map[A, B](fa: FreeOption[A])(f: A => B): FreeOption[B] =
-      FreeOption(Functor[Free[Option, ?]].map(fa.f)(f))
+      FreeOption(Functor[Free[Option, *]].map(fa.f)(f))
 
     def tailrecM[A, B](f: A => FreeOption[A \/ B])(a: A): FreeOption[B] =
-      FreeOption(BindRec[Free[Option, ?]].tailrecM[A, B] { a => f(a).f }(a))
+      FreeOption(BindRec[Free[Option, *]].tailrecM[A, B] { a => f(a).f }(a))
 
     def bind[A, B](fa: FreeOption[A])(f: A => FreeOption[B]): FreeOption[B] =
-      FreeOption(Bind[Free[Option, ?]].bind(fa.f) { a => f(a).f })
+      FreeOption(Bind[Free[Option, *]].bind(fa.f) { a => f(a).f })
   }
 
   implicit def freeOptionArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeOption[A]] =
@@ -86,8 +86,8 @@ object FreeStateT {
 
   def apply[M[_], S, A](f: S => M[(S, A)]): FreeStateT[M, S, A] = Free.liftF[λ[α => S => M[(S, α)]], A](f)
 
-  implicit def monadState[M[_], S](implicit M: Applicative[M]): MonadState[FreeStateT[M, S, ?], S] =
-    new MonadState[FreeStateT[M, S, ?], S] {
+  implicit def monadState[M[_], S](implicit M: Applicative[M]): MonadState[FreeStateT[M, S, *], S] =
+    new MonadState[FreeStateT[M, S, *], S] {
       type F[A] = S => M[(S, A)]
 
       def point[A](a: => A): FreeStateT[M, S, A] = Free.liftF[F, A](s => M.point((s, a)))
@@ -142,7 +142,7 @@ object FreeTest extends SpecLite {
     import FreeStateT._
 
     "be stack-safe on left-associated binds" in {
-      val ms: MonadState[FreeStateT[Option, Int, ?], Int] = FreeStateT.monadState
+      val ms: MonadState[FreeStateT[Option, Int, *], Int] = FreeStateT.monadState
 
       val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => FreeStateT[Option, Int, Int](i => Some((i+1, i+1)))))
 
@@ -167,12 +167,12 @@ object FreeTest extends SpecLite {
   }
 
   object instances {
-    def bindRec[F[_]] = BindRec[Free[F, ?]]
-    def monad[F[_]] = Monad[Free[F, ?]]
-    def foldable[F[_]: Foldable: Functor] = Foldable[Free[F, ?]]
-    def foldable1[F[_]: Foldable1: Functor] = Foldable1[Free[F, ?]]
-    def traverse[F[_]: Traverse] = Traverse[Free[F, ?]]
-    def traverse1[F[_]: Traverse1] = Traverse1[Free[F, ?]]
+    def bindRec[F[_]] = BindRec[Free[F, *]]
+    def monad[F[_]] = Monad[Free[F, *]]
+    def foldable[F[_]: Foldable: Functor] = Foldable[Free[F, *]]
+    def foldable1[F[_]: Foldable1: Functor] = Foldable1[Free[F, *]]
+    def traverse[F[_]: Traverse] = Traverse[Free[F, *]]
+    def traverse1[F[_]: Traverse1] = Traverse1[Free[F, *]]
     def monoid[F[_], A: Monoid] = Monoid[Free[F, A]]
     def semigroup[F[_], A: Semigroup] = Semigroup[Free[F, A]]
 
@@ -181,17 +181,17 @@ object FreeTest extends SpecLite {
       def monad = Monad[Free.Trampoline]
     }
     object sink {
-      def monad[S] = Monad[Free.Sink[S, ?]]
+      def monad[S] = Monad[Free.Sink[S, *]]
     }
     object source {
-      def monad[S] = Monad[Free.Source[S, ?]]
+      def monad[S] = Monad[Free.Source[S, *]]
     }
 
     // checking absence of ambiguity
-    def functor[F[_]: Traverse1] = Functor[Free[F, ?]]
-    def foldable[F[_]: Traverse1] = Foldable[Free[F, ?]]
-    def foldable1[F[_]: Traverse1] = Foldable1[Free[F, ?]]
-    def traverse[F[_]: Traverse1] = Traverse[Free[F, ?]]
+    def functor[F[_]: Traverse1] = Functor[Free[F, *]]
+    def foldable[F[_]: Traverse1] = Foldable[Free[F, *]]
+    def foldable1[F[_]: Traverse1] = Foldable1[Free[F, *]]
+    def traverse[F[_]: Traverse1] = Traverse[Free[F, *]]
     def semigroup[F[_], A: Monoid] = Semigroup[Free[F, A]]
   }
 }

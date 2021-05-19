@@ -12,10 +12,10 @@ object LazyEitherTest extends SpecLite {
 
 
   checkAll(equal.laws[LazyEither[Int,Int]])
-  checkAll(monad.laws[LazyEither[Int, ?]])
-  checkAll(monadError.laws[LazyEither[Int, ?], Int])
-  checkAll(bindRec.laws[LazyEither[Int, ?]])
-  checkAll(traverse.laws[LazyEither[Int, ?]])
+  checkAll(monad.laws[LazyEither[Int, *]])
+  checkAll(monadError.laws[LazyEither[Int, *], Int])
+  checkAll(bindRec.laws[LazyEither[Int, *]])
+  checkAll(traverse.laws[LazyEither[Int, *]])
   checkAll(associative.laws[LazyEither])
   checkAll(bitraverse.laws[LazyEither])
 
@@ -23,7 +23,7 @@ object LazyEitherTest extends SpecLite {
     val times = 10000
 
     val result =
-      BindRec[LazyEither[Int, ?]].tailrecM[Int, Int] {
+      BindRec[LazyEither[Int, *]].tailrecM[Int, Int] {
         i => LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i))
       }(0)
     result.getOrElse(0) must_=== times

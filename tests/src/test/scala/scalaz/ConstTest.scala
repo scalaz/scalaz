@@ -12,21 +12,21 @@ object ConstTest extends SpecLite {
   checkAll("Const List"  , applicative.laws[λ[α => Const[List[Int], α]]])
   checkAll("Const Option", applicative.laws[λ[α => Const[Option[Int], α]]])
 
-  checkAll(traverse.laws[Const[Int, ?]])
-  checkAll(contravariant.laws[Const[Int, ?]])
+  checkAll(traverse.laws[Const[Int, *]])
+  checkAll(contravariant.laws[Const[Int, *]])
 
   "const function" ! forAll { (x: Int, y: Function0[String]) =>
     const(x)(y) == x
   }
 
   object instances {
-    def functor[C] = Functor[Const[C, ?]]
-    def traverse[C] = Traverse[Const[C, ?]]
-    def functor[C: Semigroup] = Functor[Const[C, ?]]
-    def functor[C: Monoid] = Functor[Const[C, ?]]
-    def apply[C: Semigroup] = Apply[Const[C, ?]]
-    def apply[C: Monoid] = Apply[Const[C, ?]]
-    def applicative[C: Monoid] = Applicative[Const[C, ?]]
+    def functor[C] = Functor[Const[C, *]]
+    def traverse[C] = Traverse[Const[C, *]]
+    def functor[C: Semigroup] = Functor[Const[C, *]]
+    def functor[C: Monoid] = Functor[Const[C, *]]
+    def apply[C: Semigroup] = Apply[Const[C, *]]
+    def apply[C: Monoid] = Apply[Const[C, *]]
+    def applicative[C: Monoid] = Applicative[Const[C, *]]
     def equal[C: Equal, A] = Equal[Const[C, A]]
     def equalMax[C: Order, A] = Equal[Const[C, A]]
     def order[C: Order, A] = Order[Const[C, A]]
