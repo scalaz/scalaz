@@ -875,7 +875,7 @@ sealed abstract class FingerTreeInstances {
         t.fold(EmptyR[S, B], (xs, x) => OnR(s.map(xs)(f), f(x)))
     }
 
-  implicit def fingerFoldable[V] =
+  implicit def fingerFoldable[V]: Foldable[Finger[V, *]] with Foldable.FromFoldMap[Finger[V, *]] =
     new Foldable[Finger[V, *]] with Foldable.FromFoldMap[Finger[V, *]] {
       override def foldMap[A, M: Monoid](v: Finger[V, A])(f: A => M) = v.foldMap(f)
     }
