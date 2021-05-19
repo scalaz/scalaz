@@ -37,8 +37,8 @@ lazy val scalaz = Project(
   standardSettings,
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
-  artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+  artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -48,10 +48,10 @@ lazy val scalaz = Project(
     }
     new RuleTransformer(rule).transform(node)(0)
   },
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := {
+  ScalaUnidoc / unidoc / unidocProjectFilter := {
     (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
-  Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -113,7 +113,7 @@ lazy val example = Project(
   name := "scalaz-example",
   notPublish,
   TaskKey[Unit]("runAllMain") := {
-    val r = (runner in run).value
+    val r = (run / runner).value
     val classpath = (Compile / fullClasspath).value
     val log = streams.value.log
     (Compile / discoveredMainClasses).value.sorted.foreach(c =>
@@ -147,8 +147,8 @@ def scalacheckBindingProject(
           fullVersion(v)
         }
       },
-      (unmanagedSourceDirectories in Compile) += {
-        (baseDirectory in LocalRootProject).value / "scalacheck-binding/src/main/scala"
+      (Compile / unmanagedSourceDirectories) += {
+        (LocalRootProject / baseDirectory).value / "scalacheck-binding/src/main/scala"
       },
       libraryDependencies += scalaCheckGroupId.value %%% "scalacheck" % scalacheckVersion.value,
       osgiExport("scalaz.scalacheck"))
@@ -156,8 +156,8 @@ def scalacheckBindingProject(
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings)
     .jvmSettings(
-      (unmanagedSourceDirectories in Compile) += {
-        (baseDirectory in LocalRootProject).value / "scalacheck-binding/jvm/src/main/scala"
+      (Compile / unmanagedSourceDirectories) += {
+        (LocalRootProject / baseDirectory).value / "scalacheck-binding/jvm/src/main/scala"
       },
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
@@ -171,8 +171,8 @@ def scalacheckBindingProject(
       }
     )
     .jsSettings(
-      (unmanagedSourceDirectories in Compile) += {
-        (baseDirectory in LocalRootProject).value / "scalacheck-binding/js/src/main/scala"
+      (Compile / unmanagedSourceDirectories) += {
+        (LocalRootProject / baseDirectory).value / "scalacheck-binding/js/src/main/scala"
       },
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
@@ -187,8 +187,8 @@ def scalacheckBindingProject(
     )
     .nativeSettings(
       nativeSettings,
-      (unmanagedSourceDirectories in Compile) += {
-        (baseDirectory in LocalRootProject).value / "scalacheck-binding/native/src/main/scala"
+      (Compile / unmanagedSourceDirectories) += {
+        (LocalRootProject / baseDirectory).value / "scalacheck-binding/native/src/main/scala"
       },
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
@@ -219,7 +219,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
-    testOptions in Test += {
+    (Test / testOptions) += {
       val scalacheckOptions = Seq(
         "-maxSize", "5",
         "-workers", "1",
