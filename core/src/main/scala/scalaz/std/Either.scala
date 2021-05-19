@@ -208,7 +208,7 @@ trait EitherInstances extends EitherInstances0 {
       implicit def G: Bifunctor[Either] = eitherInstance
     }
 
-  implicit def eitherRightLInstance[L] =
+  implicit def eitherRightLInstance[L]: Monad[RightProjection[L, *]] =
     new Monad[RightProjection[L, *]] {
       def point[A](a: => A) = Right(a).right
       def bind[A, B](fa: RightProjection[L, A])(f: A => RightProjection[L, B]) = fa.e match {
@@ -223,7 +223,7 @@ trait EitherInstances extends EitherInstances0 {
   implicit def eitherLastRightLInstance[L]: Monad[λ[α => RightProjection[L, α] @@ Last]] =
     Tags.Last.subst1[Monad, RightProjection[L, *]](Monad[RightProjection[L, *]])
 
-  implicit def eitherLeftRInstance[R] =
+  implicit def eitherLeftRInstance[R]: Monad[LeftProjection[*, R]] =
     new Monad[LeftProjection[*, R]] {
       def point[A](a: => A) = Left(a).left
       def bind[A, B](fa: LeftProjection[A, R])(f: A => LeftProjection[B, R]) = fa.e match {
