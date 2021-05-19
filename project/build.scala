@@ -41,13 +41,13 @@ object build {
     action = st => {
       val extracted = st.extract
       val ref = extracted.get(thisProjectRef)
-      extracted.runAggregated(publishSigned in Global in ref, st)
+      extracted.runAggregated(ref / (Global / publishSigned), st)
     },
     check = st => {
       // getPublishTo fails if no publish repository is set up.
       val ex = st.extract
       val ref = ex.get(thisProjectRef)
-      val (newState, value) = ex.runTask(publishTo in Global in ref, st)
+      val (newState, value) = ex.runTask(ref / (Global / publishTo), st)
       Classpaths.getPublishTo(value)
       newState
     },
@@ -57,8 +57,8 @@ object build {
   lazy val setMimaVersion: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
     val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
-    IO.write(extracted get releaseVersionFile, s"""\nbuild.scalazMimaBasis in ThisBuild := "${releaseV}"\n""", append = true)
-    reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
+    IO.write(extracted get releaseVersionFile, s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
+    reapply(Seq(ThisBuild / scalazMimaBasis := releaseV), st)
   }
 
   val scalaCheckVersion_1_15 = SettingKey[String]("scalaCheckVersion_1_15")
@@ -71,7 +71,7 @@ object build {
   def scalac210Options = Seq("-Yno-generic-signatures")
 
   private[this] val tagName = Def.setting{
-    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+    s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
   private[this] val tagOrHash = Def.setting{
     if(isSnapshot.value) gitHash() else tagName.value
@@ -79,7 +79,7 @@ object build {
 
   val scalajsProjectSettings = Seq[Sett](
     scalacOptions += {
-      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
@@ -129,7 +129,7 @@ object build {
   lazy val standardSettings: Seq[Sett] = Def.settings(
     Seq(12, 13).flatMap { scalaV =>
       Seq((Compile, "main"), (Test, "test")).map { case (scope, dir) =>
-        unmanagedSourceDirectories in scope += {
+        (scope / unmanagedSourceDirectories) += {
           val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
           CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, v)) if v >= scalaV =>
@@ -142,7 +142,7 @@ object build {
     },
     organization := "org.scalaz",
     Seq(Compile, Test).map { scope =>
-      unmanagedSourceDirectories in scope += {
+      (scope / unmanagedSourceDirectories) += {
         val dir = Defaults.nameForSrc(scope.name)
         val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
         CrossVersion.partialVersion(scalaVersion.value) match {
@@ -153,13 +153,13 @@ object build {
         }
       }
     },
-    mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
+    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
       val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((sourceManaged in Compile).value / buildInfoDir).get.getPath).getPath
+        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
       } else {
-        f.relativeTo((sourceManaged in Compile).value).get.getPath
+        f.relativeTo((Compile / sourceManaged).value).get.getPath
       }
       (f, path)
     },
@@ -169,7 +169,7 @@ object build {
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
       val date = extracted get dynverCurrentDate
-      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+      s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
@@ -195,19 +195,19 @@ object build {
           Nil
       }
     },
-    scalacOptions in (Compile, doc) ++= {
-      val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
+    (Compile / doc / scalacOptions) ++= {
+      val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
       Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
         val dir = name.value match {
           case ConcurrentName =>
-            (scalaSource in Compile).value
+            (Compile / scalaSource).value
           case _ =>
             ScalazCrossType.shared(baseDirectory.value, "main")
         }
@@ -230,9 +230,9 @@ object build {
       typeClasses.value.map(_.doc).mkString("\n")
     },
 
-    showDoc in Compile := {
-      val _ = (doc in Compile).value
-      val out = (target in doc in Compile).value
+    (Compile / showDoc) := {
+      val _ = (Compile / doc).value
+      val out = (Compile / doc / target).value
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
@@ -242,7 +242,7 @@ object build {
     sonatypeBundleDirectory := {
       (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
     },
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
 
     // adapted from sbt-release defaults
     // (performs `publish-signed` instead of `publish`)
@@ -307,7 +307,7 @@ object build {
       ),
 
     licenseFile := {
-      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
       if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
       LICENSE_txt
     },
@@ -322,7 +322,7 @@ object build {
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
-    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+    inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ Def.settings(
@@ -360,7 +360,7 @@ object build {
         Nil
       },
       name := "scalaz-core",
-      sourceGenerators in Compile += (sourceManaged in Compile).map{
+      (Compile / sourceGenerators) += (Compile / sourceManaged).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
