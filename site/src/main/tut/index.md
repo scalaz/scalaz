@@ -30,7 +30,6 @@ println(s"""libraryDependencies += "org.scalaz" %% "scalaz-effect" % "${scalaz.S
 
 # Community
 
-- Gitter: [Gitter](https://gitter.im/scalaz/scalaz)
-- IRC: [Freenode](https://webchat.freenode.net/?channels=%23scalaz&uio=d4)
+- IRC: [Libera](https://web.libera.chat/#scalaz)
 - Mailing List: [Google Groups](https://groups.google.com/group/scalaz)
 - Voice Chat: [Discord](https://discord.gg/eYZhcW)

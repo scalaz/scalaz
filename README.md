@@ -6,8 +6,7 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
-[![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
-[![Gitter](http://badges.gitter.im/scalaz/scalaz.svg)](https://gitter.im/scalaz/scalaz)
+[![IRC](https://img.shields.io/badge/chat-on%20libera-brightgreen.svg)](irc://irc.libera.chat/scalaz)
 
 ## Getting Scalaz
 
@@ -77,7 +76,7 @@ The [examples module](https://github.com/scalaz/scalaz/tree/master/example/src/m
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
-Talk with us by joining [IRC: irc.freenode.net channel #scalaz](https://webchat.freenode.net/?channels=%23scalaz&uio=d4), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
+Talk with us by joining [IRC: irc.libera.chat channel #scalaz](https://web.libera.chat/#scalaz), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
 
 The [typelevel blog](https://typelevel.org/blog/) has some great posts such as [Towards Scalaz](https://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
 
