@@ -33,6 +33,12 @@ sealed abstract class LiskovInstances {
 
     def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
   }
+  
+  /** Lift Scala's subtyping relationship */
+  implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
+    def substCo[F[+ _]](p: F[A]) = p
+    def substCt[F[- _]](p: F[B]) = p
+  }
 }
 
 object Liskov extends LiskovInstances {
@@ -42,12 +48,6 @@ object Liskov extends LiskovInstances {
 
   /** A flipped alias, for those used to their arrows running left to right */
   type >~>[+B, -A] = Liskov[A, B]
-
-  /** Lift Scala's subtyping relationship */
-  implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
-    def substCo[F[+ _]](p: F[A]) = p
-    def substCt[F[- _]](p: F[B]) = p
-  }
 
   /** We can witness equality by using it to convert between types */
   implicit def witness[A, B](lt: A <~< B): A => B = {
