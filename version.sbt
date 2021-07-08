@@ -1,3 +1,3 @@
-version in ThisBuild := "7.3.4-SNAPSHOT"
+ThisBuild / version := "7.3.4-SNAPSHOT"
 
-build.scalazMimaBasis in ThisBuild := "7.3.3"
+ThisBuild / build.scalazMimaBasis := "7.3.3"
