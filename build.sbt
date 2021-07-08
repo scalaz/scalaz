@@ -33,8 +33,8 @@ lazy val scalaz = Project(
   standardSettings,
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
-  artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+  artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -44,10 +44,10 @@ lazy val scalaz = Project(
     }
     new RuleTransformer(rule).transform(node)(0)
   },
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := {
+  ScalaUnidoc / unidoc / unidocProjectFilter := {
     (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
-  Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings((Compile / packageDoc), (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -96,14 +96,14 @@ lazy val example = Project(
   name := "scalaz-example",
   notPublish,
   TaskKey[Unit]("runAllMain") := {
-    val r = (runner in run).value
+    val r = (run / runner).value
     val classpath = (Compile / fullClasspath).value
     val log = streams.value.log
     (Compile / discoveredMainClasses).value.sorted.foreach(c =>
       r.run(c, classpath.map(_.data), Nil, log)
     )
   },
-  scalacOptions in (Compile, compile) -= "-Xlint:adapted-args"
+  Compile / compile / scalacOptions -= "-Xlint:adapted-args"
 ).dependsOn(
   coreJVM, iterateeJVM
 )
@@ -114,7 +114,7 @@ lazy val scalacheckBinding =
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
-      scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
+      Compile / compile / scalacOptions -= "-Ywarn-value-discard",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")
     )
@@ -130,7 +130,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
-    testOptions in Test += {
+    (Test / testOptions) += {
       val scalacheckOptions = Seq(
         "-maxSize", "5",
         "-workers", "1",
@@ -156,7 +156,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     minSuccessfulTests := 33
   )
   .jsSettings(
-    sources in Test ~= { values =>
+    Test / sources ~= { values =>
       // https://github.com/scala-js/scala-js/issues/3953
       values.filter(_.getName != "StreamTTest.scala")
     },
