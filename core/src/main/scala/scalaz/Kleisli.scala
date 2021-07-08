@@ -262,7 +262,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
   implicit def kleisliMonadTrans[R]: Hoist[λ[(α[_], β) => Kleisli[α, R, β]]] =
     new KleisliHoist[R] {}
 
-  implicit def kleisliCatchable[F[_], A](implicit F0: Catchable[F]): Catchable[Kleisli[F, A, ?]] =
+  implicit def kleisliCatchable[F[_], A](implicit F0: Catchable[F]): Catchable[Kleisli[F, A, *]] =
     new KleisliCatchable[F, A] {
       implicit def F = F0
     }
@@ -515,7 +515,7 @@ private trait KleisliPlusEmpty[F[_], A] extends PlusEmpty[Kleisli[F, A, *]] with
     Kleisli[F, A, B](a => F.empty[B])
 }
 
-private trait KleisliCatchable[F[_], A] extends Catchable[Kleisli[F, A, ?]] {
+private trait KleisliCatchable[F[_], A] extends Catchable[Kleisli[F, A, *]] {
   implicit def F: Catchable[F]
 
   def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] =
