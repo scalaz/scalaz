@@ -281,7 +281,7 @@ object build {
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      releaseStepCommand(s"+ ${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
