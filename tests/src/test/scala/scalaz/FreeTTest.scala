@@ -17,9 +17,9 @@ object FreeTTest extends SpecLite {
       Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeTListOptionArb[A].arbitrary))
     ))
 
-  implicit def freeTListOptionEq[A](implicit A: Equal[A]): Equal[FreeTListOption[A]] = new Equal[FreeTListOption[A]] {
-    def equal(a: FreeTListOption[A], b: FreeTListOption[A]) = Equal[Option[A]].equal(a.runM(_.headOption), b.runM(_.headOption))
-  }
+  implicit def freeTListOptionEq[A](implicit A: Equal[A]): Equal[FreeTListOption[A]] =
+    (a: FreeTListOption[A], b: FreeTListOption[A]) =>
+      Equal[Option[A]].equal(a.runM(_.headOption), b.runM(_.headOption))
 
   def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(

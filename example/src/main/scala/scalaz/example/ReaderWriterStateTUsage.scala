@@ -29,12 +29,10 @@ case object B extends Token
 object Token {
 
   implicit val euqalsRef: Equal[Token] = Equal.equalRef
-  implicit val showTok: Show[Token] = new Show[Token] {
-    override def show(t: Token) = t match {
-      case A => Cord("A")
-      case B => Cord("B")
-      case C => Cord("C")
-    }
+  implicit val showTok: Show[Token] = {
+    case A => Cord("A")
+    case B => Cord("B")
+    case C => Cord("C")
   }
 }
 

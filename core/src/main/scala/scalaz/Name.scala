@@ -53,9 +53,8 @@ object Name {
           case \/-(b) => Name(b)
         }
     }
-  implicit def nameEqual[A: Equal]: Equal[Name[A]] = new Equal[Name[A]] {
-    def equal(a1: Name[A], a2: Name[A]): Boolean = Equal[A].equal(a1.value, a2.value)
-  }
+  implicit def nameEqual[A: Equal]: Equal[Name[A]] =
+    (a1: Name[A], a2: Name[A]) => Equal[A].equal(a1.value, a2.value)
   implicit val covariant: IsCovariant[Name] = IsCovariant.force
 }
 
@@ -92,9 +91,8 @@ object Need {
           case \/-(b) => Need(b)
         }
     }
-  implicit def needEqual[A: Equal]: Equal[Need[A]] = new Equal[Need[A]] {
-    def equal(a1: Need[A], a2: Need[A]): Boolean = Equal[A].equal(a1.value, a2.value)
-  }
+  implicit def needEqual[A: Equal]: Equal[Need[A]] =
+    (a1: Need[A], a2: Need[A]) => Equal[A].equal(a1.value, a2.value)
   implicit val covariant: IsCovariant[Need] = IsCovariant.force
 }
 
@@ -124,8 +122,7 @@ object Value {
           case \/-(b) => Value(b)
         }
     }
-  implicit def valueEqual[A: Equal]: Equal[Value[A]] = new Equal[Value[A]] {
-    def equal(a1: Value[A], a2: Value[A]): Boolean = Equal[A].equal(a1.value, a2.value)
-  }
+  implicit def valueEqual[A: Equal]: Equal[Value[A]] =
+    (a1: Value[A], a2: Value[A]) => Equal[A].equal(a1.value, a2.value)
   implicit val covariant: IsCovariant[Value] = IsCovariant.force
 }

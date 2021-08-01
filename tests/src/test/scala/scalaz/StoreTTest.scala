@@ -10,13 +10,10 @@ object StoreTTest extends SpecLite {
   private[this] val storeTestInts = (-10 to 10).toList
 
   implicit def storeTIntEqual[F[_]: Comonad]: Equal[StoreT[F, Int, Int]] =
-    new Equal[StoreT[F, Int, Int]] {
-      def equal(a1: StoreT[F, Int, Int], a2: StoreT[F, Int, Int]) =
-        (a1.run, a2.run) match {
-          case ((tf1, x1), (tf2, x2)) =>
-            Equal[Int].equal(x1, x2) && storeTestInts.forall(i =>
-              Equal[Int].equal(Comonad[F].copoint(tf1)(i), Comonad[F].copoint(tf2)(i)))
-        }
+    (a1: StoreT[F, Int, Int], a2: StoreT[F, Int, Int]) => (a1.run, a2.run) match {
+      case ((tf1, x1), (tf2, x2)) =>
+        Equal[Int].equal(x1, x2) && storeTestInts.forall(i =>
+          Equal[Int].equal(Comonad[F].copoint(tf1)(i), Comonad[F].copoint(tf2)(i)))
     }
 
   checkAll(comonad.laws[StoreT[Tuple1, Int, *]])

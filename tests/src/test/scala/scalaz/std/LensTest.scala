@@ -12,9 +12,8 @@ object LensTest extends SpecLite {
 
   {
     implicit def lensArb: Arbitrary[Lens[Int, Int]] = Arbitrary(Gen.const(Lens.lensId[Int]))
-    implicit def lensEqual: Equal[Lens[Int, Int]] = new Equal[Lens[Int, Int]] {
-      def equal(a1: Lens[Int, Int], a2: Lens[Int, Int]): Boolean = a1.get(0) == a2.get(0)
-    }
+    implicit def lensEqual: Equal[Lens[Int, Int]] =
+      (a1: Lens[Int, Int], a2: Lens[Int, Int]) => a1.get(0) == a2.get(0)
     checkAll("Lens", category.laws[Lens]) // not really testing much!
   }
 

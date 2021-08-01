@@ -39,9 +39,8 @@ object Show {
   /** For compatibility with Scalaz 6 */
   def showA[A]: Show[A] = showFromToString[A]
 
-  def show[A](f: A => Cord): Show[A] = new Show[A] {
-    override def show(a: A): Cord = f(a)
-  }
+  def show[A](f: A => Cord): Show[A] =
+    (a: A) => f(a)
 
   def shows[A](f: A => String): Show[A] = new Show[A] {
     override def show(f: A): Cord = Cord(shows(f))
@@ -50,9 +49,8 @@ object Show {
 
   // scalaz-deriving provides a coherent n-arity derivers extending this
   private[scalaz] class ShowContravariant extends Contravariant[Show] {
-    def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
-      override def show(b: B): Cord = r.show(f(b))
-    }
+    def contramap[A, B](r: Show[A])(f: B => A): Show[B] =
+      (b: B) => r.show(f(b))
   }
   implicit val showContravariant: Contravariant[Show] = new ShowContravariant
 

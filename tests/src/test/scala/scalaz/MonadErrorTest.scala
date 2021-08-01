@@ -12,9 +12,8 @@ object MonadErrorTest extends SpecLite {
   }
   object Decoder {
     @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
-    @inline def instance[A](f: String => Int \/ A): Decoder[A] = new Decoder[A] {
-      override def decode(s: String): Int \/ A = f(s)
-    }
+    @inline def instance[A](f: String => Int \/ A): Decoder[A] =
+      (s: String) => f(s)
 
     implicit val string: Decoder[String] = instance(_.right)
 

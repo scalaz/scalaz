@@ -12,12 +12,10 @@ import Id._
 object EnumeratorTTest extends SpecLite {
   implicit def enumeratorTArb[F[_], A](implicit FA: Arbitrary[List[A]], F: Monad[F]): Arbitrary[EnumeratorT[A, F]] = Functor[Arbitrary].map(FA)(l => EnumeratorT.enumStream[A, F](l.toStream))
 
-  implicit def enumeratorEqual[A](implicit EQ: Equal[A]): Equal[Enumerator[A]] = new Equal[Enumerator[A]] {
-    def equal(en1: Enumerator[A], en2: Enumerator[A]): Boolean = {
-      val l1 = (consume[A, Id, List] &= en1).run
-      val l2 = (consume[A, Id, List] &= en2).run
-      Equal[List[A]].equal(l1, l2)
-    }
+  implicit def enumeratorEqual[A](implicit EQ: Equal[A]): Equal[Enumerator[A]] = (en1: Enumerator[A], en2: Enumerator[A]) => {
+    val l1 = (consume[A, Id, List] &= en1).run
+    val l2 = (consume[A, Id, List] &= en2).run
+    Equal[List[A]].equal(l1, l2)
   }
 
   "Issue #553" in {
