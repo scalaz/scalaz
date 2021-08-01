@@ -8,7 +8,7 @@ but may also be of interest to users.
 `scalaz-core` should be kept lean and mean: type classes and instances, important data structures, and functions
 related to these.
 
-`scalaz.{iteratee, effect, concurrent}` have each been moved a dedicated sub-project. Consider the same approach
+`scalaz.{iteratee, effect}` have each been moved a dedicated sub-project. Consider the same approach
 when adding large new features.
 
 ## Type Classes
