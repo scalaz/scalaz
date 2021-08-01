@@ -33,19 +33,17 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def choose[A,B](a: F[A], b: F[B]): F[(  A,  F[B]) \/
                                        (F[A],   B )] =
     map(chooseAny(IList[F[A \/ B]](map(a)(\/.left[A, B]), map(b)(\/.right[A, B]))).get) {
-      (x: (A \/ B, IList[F[A \/ B]])) => x match {
-        case (-\/(a), ICons(z, _)) =>
-          -\/((a, map(z) {
-            case \/-(b) => b
-            case _ => sys.error("broken residual handling in a Nondeterminism instance")
-          }))
-        case (\/-(b), ICons(z, _)) =>
-          \/-((map(z) {
-            case -\/(a) => a
-            case _ => sys.error("broken residual handling in a Nondeterminism instance")
-          }, b))
-        case _ => sys.error("broken Nondeterminism instance tossed out a residual")
-      }
+      case (-\/(a), ICons(z, _)) =>
+        -\/((a, map(z) {
+          case \/-(b) => b
+          case _ => sys.error("broken residual handling in a Nondeterminism instance")
+        }))
+      case (\/-(b), ICons(z, _)) =>
+        \/-((map(z) {
+          case -\/(a) => a
+          case _ => sys.error("broken residual handling in a Nondeterminism instance")
+        }, b))
+      case _ => sys.error("broken Nondeterminism instance tossed out a residual")
     }
 
   /**
