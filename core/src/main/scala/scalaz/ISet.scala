@@ -608,6 +608,7 @@ sealed abstract class ISet[A] {
       case (None, None) =>
         this
       case (Some(lx), None) =>
+        @tailrec
         def greater(lo: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, _, r) => if (o.lessThanOrEqual(x, lo)) greater(lo, r) else t
@@ -615,6 +616,7 @@ sealed abstract class ISet[A] {
           }
         greater(lx, this)
       case (None, Some(hx)) =>
+        @tailrec
         def lesser(hi: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, l, _) => if (o.greaterThanOrEqual(x, hi)) lesser(hi, l) else t
@@ -622,6 +624,7 @@ sealed abstract class ISet[A] {
           }
         lesser(hx, this)
       case (Some(lx), Some(rx)) =>
+        @tailrec
         def middle(lo: A, hi: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, l, r) =>
