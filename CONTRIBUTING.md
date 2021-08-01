@@ -249,10 +249,10 @@ Define type lambdas using the kind-projector plugin. Raw type-lambdas should be 
 letters as the type parameters. This helps to distinguish them from the applied types. Type Lambdas should use the
 kind-projector syntax. Here's some inline syntax examples:
 
-    F[X, ?]     ===  ({type λ[α] = F[X, α]})#λ
-    F[X, ?, ?]  ===  ({type λ[α, β] = F[X, α, β]})#λ
-    F[X, ?]     ===  ({type l[a] = F[X, a]})#l
-    F[X, ?, ?]  ===  ({type l[a, b] = F[X, a, b]})#l
+    F[X, *]     ===  ({type λ[α] = F[X, α]})#λ
+    F[X, *, *]  ===  ({type λ[α, β] = F[X, α, β]})#λ
+    F[X, *]     ===  ({type l[a] = F[X, a]})#l
+    F[X, *, *]  ===  ({type l[a, b] = F[X, a, b]})#l
 
 If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficient), use greek letters for
 parameters.
