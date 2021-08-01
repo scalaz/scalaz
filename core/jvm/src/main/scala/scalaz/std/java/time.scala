@@ -5,9 +5,8 @@ import java.time._
 
 trait TimeInstances {
 
-  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] = new Order[A] {
-    def order(x: A, y: A) = Ordering.fromInt(f(x, y))
-  }
+  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] =
+    (x: A, y: A) => Ordering.fromInt(f(x, y))
 
   implicit val localDateTimeInstance: Order[LocalDateTime] = orderFromInt[LocalDateTime](_ compareTo _)
   implicit val offsetDateTimeInstance: Order[OffsetDateTime] = orderFromInt[OffsetDateTime](_ compareTo _)

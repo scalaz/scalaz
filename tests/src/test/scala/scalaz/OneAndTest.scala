@@ -85,10 +85,9 @@ object OneAndTest extends SpecLite {
        must_==(Traverse[OneAndList].traverse(ints)(f)))
   }
 
-  implicit def OneAndNelEqual[A](implicit E: Equal[IList[A]]): Equal[NonEmptyList[OneAndNel[A]]] = new Equal[NonEmptyList[OneAndNel[A]]] {
-    override def equal(a: NonEmptyList[OneAndNel[A]], b: NonEmptyList[OneAndNel[A]]): Boolean =
+  implicit def OneAndNelEqual[A](implicit E: Equal[IList[A]]): Equal[NonEmptyList[OneAndNel[A]]] =
+    (a: NonEmptyList[OneAndNel[A]], b: NonEmptyList[OneAndNel[A]]) =>
       Equal[IList[A]].equal(a.map(oa => oa.head +: oa.tail.list).list.flatten, b.map(bb => bb.head +: bb.tail.list).list.flatten)
-  }
 
   "traverse1 on traverse1" ! forAll {(ints: OneAnd[NonEmptyList, Int],
                                     f: Int => NonEmptyList[Int]) =>

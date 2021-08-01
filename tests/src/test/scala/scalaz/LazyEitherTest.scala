@@ -6,10 +6,9 @@ import std.AllInstances._
 import syntax.either._
 
 object LazyEitherTest extends SpecLite {
-  implicit def LazyEitherEqual[A: Equal, B: Equal]: Equal[LazyEither[A, B]] = new Equal[LazyEither[A, B]] {
-    def equal(a: LazyEither[A, B], b: LazyEither[A, B]) =
-      Equal[Either[A, B]].equal(a.toEither,b.toEither)
-  }
+  implicit def LazyEitherEqual[A: Equal, B: Equal]: Equal[LazyEither[A, B]] =
+    (a: LazyEither[A, B], b: LazyEither[A, B]) =>
+      Equal[Either[A, B]].equal(a.toEither, b.toEither)
 
 
   checkAll(equal.laws[LazyEither[Int,Int]])

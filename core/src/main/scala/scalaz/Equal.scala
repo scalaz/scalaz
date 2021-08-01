@@ -11,9 +11,8 @@ trait Equal[F]  { self =>
   ////
   def equal(a1: F, a2: F): Boolean
 
-  def contramap[G](f: G => F): Equal[G] = new Equal[G] {
-    def equal(a1: G, a2: G) = self.equal(f(a1), f(a2))
-  }
+  def contramap[G](f: G => F): Equal[G] =
+    (a1: G, a2: G) => self.equal(f(a1), f(a2))
 
   /** @return true, if `equal(f1, f2)` is known to be equivalent to `f1 == f2` */
   def equalIsNatural: Boolean = false
@@ -56,9 +55,8 @@ object Equal {
   }
 
   /** Creates an Equal instance based on reference equality, `a1 eq a2` */
-  def equalRef[A <: AnyRef]: Equal[A] = new Equal[A] {
-    def equal(a1: A, a2: A): Boolean = a1 eq a2
-  }
+  def equalRef[A <: AnyRef]: Equal[A] =
+    (a1: A, a2: A) => a1 eq a2
 
   def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
 
@@ -87,9 +85,8 @@ object Equal {
   implicit val equalDecidable: Decidable[Equal] = new EqualDecidable
 
   /** Construct an instance, but prefer SAM types with scala 2.12+ */
-  def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
-    def equal(a1: A, a2: A) = f(a1, a2)
-  }
+  def equal[A](f: (A, A) => Boolean): Equal[A] =
+    (a1: A, a2: A) => f(a1, a2)
 
   ////
 }

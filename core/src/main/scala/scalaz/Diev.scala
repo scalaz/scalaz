@@ -235,7 +235,6 @@ sealed abstract class DievInstances extends DievImplementation {
     def zero: Diev[A] = new DieVector[A]()
   }
 
-  implicit def dievShow[A: Show]: Show[Diev[A]] = new Show[Diev[A]] {
-    override def show(diev: Diev[A]) = Show[Vector[(A, A)]].show(diev.intervals)
-  }
+  implicit def dievShow[A: Show]: Show[Diev[A]] =
+    (diev: Diev[A]) => Show[Vector[(A, A)]].show(diev.intervals)
 }

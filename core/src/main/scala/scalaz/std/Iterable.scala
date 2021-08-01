@@ -29,23 +29,21 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
-    def equal(a1: CC[A], a2: CC[A]) = {
-      val i1 = a1.iterator
-      val i2 = a2.iterator
-      var b = false
+  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = (a1: CC[A], a2: CC[A]) => {
+    val i1 = a1.iterator
+    val i2 = a2.iterator
+    var b = false
 
-      while (i1.hasNext && i2.hasNext && !b) {
-        val x1 = i1.next()
-        val x2 = i2.next()
+    while (i1.hasNext && i2.hasNext && !b) {
+      val x1 = i1.next()
+      val x2 = i2.next()
 
-        if (!Equal[A].equal(x1, x2)) {
-          b = true
-        }
+      if (!Equal[A].equal(x1, x2)) {
+        b = true
       }
-
-      !(b || i1.hasNext || i2.hasNext)
     }
+
+    !(b || i1.hasNext || i2.hasNext)
   }
 
   implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] =

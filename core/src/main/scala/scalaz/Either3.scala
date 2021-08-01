@@ -36,21 +36,17 @@ object Either3 {
   def middle3[A, B, C](b: B): Either3[A, B, C] = Middle3(b)
   def right3[A, B, C](c: C):  Either3[A, B, C] = Right3(c)
 
-  implicit def equal[A: Equal, B: Equal, C: Equal]: Equal[Either3[A, B, C]] = new Equal[Either3[A, B, C]] {
-    def equal(e1: Either3[A, B, C], e2: Either3[A, B, C]) = (e1, e2) match {
-      case (Left3(a1),   Left3(a2))   => a1 === a2
-      case (Middle3(b1), Middle3(b2)) => b1 === b2
-      case (Right3(c1),  Right3(c2))  => c1 === c2
-      case _ => false
-    }
+  implicit def equal[A: Equal, B: Equal, C: Equal]: Equal[Either3[A, B, C]] = {
+    case (Left3(a1), Left3(a2)) => a1 === a2
+    case (Middle3(b1), Middle3(b2)) => b1 === b2
+    case (Right3(c1), Right3(c2)) => c1 === c2
+    case _ => false
   }
 
-  implicit def show[A: Show, B: Show, C: Show]: Show[Either3[A, B, C]] = new Show[Either3[A, B, C]] {
-    override def show(v: Either3[A, B, C]) = v match {
-      case Left3(a)   => cord"Left3($a)"
-      case Middle3(b) => cord"Middle3($b)"
-      case Right3(c)  => cord"Right3($c)"
-    }
+  implicit def show[A: Show, B: Show, C: Show]: Show[Either3[A, B, C]] = {
+    case Left3(a) => cord"Left3($a)"
+    case Middle3(b) => cord"Middle3($b)"
+    case Right3(c) => cord"Right3($c)"
   }
 }
 

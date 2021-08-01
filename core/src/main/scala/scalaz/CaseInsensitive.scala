@@ -35,20 +35,13 @@ sealed abstract class CaseInsensitiveInstances {
     }
 
   implicit def CaseInsensitiveEqual[A: Equal]: Equal[CaseInsensitive[A]] =
-    new Equal[CaseInsensitive[A]] {
-      def equal(a: CaseInsensitive[A], b: CaseInsensitive[A]) =
-        Equal[A].equal(a.foldedCase, b.foldedCase)
-    }
+    (a: CaseInsensitive[A], b: CaseInsensitive[A]) => Equal[A].equal(a.foldedCase, b.foldedCase)
 
   implicit def CaseInsensitiveOrder[A: Order]: Order[CaseInsensitive[A]] =
-    new Order[CaseInsensitive[A]] {
-      def order(a: CaseInsensitive[A], b: CaseInsensitive[A]) = Order[A].order(a.foldedCase, b.foldedCase)
-    }
+    (a: CaseInsensitive[A], b: CaseInsensitive[A]) => Order[A].order(a.foldedCase, b.foldedCase)
 
   implicit def CaseInsensitiveShow[A: Show]: Show[CaseInsensitive[A]] =
-    new Show[CaseInsensitive[A]] {
-      override def show(a: CaseInsensitive[A]) = Show[A].show(a.original)
-    }
+    (a: CaseInsensitive[A]) => Show[A].show(a.original)
 }
 
 trait FoldCase[A] {
@@ -58,7 +51,5 @@ trait FoldCase[A] {
 object FoldCase extends FoldCaseInstances
 
 sealed abstract class FoldCaseInstances {
-  implicit val StringFoldCase: FoldCase[String] = new FoldCase[String] {
-    def foldCase(s: String) = s.toLowerCase
-  }
+  implicit val StringFoldCase: FoldCase[String] = (s: String) => s.toLowerCase
 }

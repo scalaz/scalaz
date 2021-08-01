@@ -14,9 +14,8 @@ trait Resource[F]  { self =>
   def close(f: F): IO[Unit]
 
   // derived functions
-  def contramap[G](f: G => F): Resource[G] = new Resource[G] {
-    def close(g: G): IO[Unit] = self.close(f(g))
-  }
+  def contramap[G](f: G => F): Resource[G] =
+    (g: G) => self.close(f(g))
 
   ////
   val resourceSyntax: scalaz.syntax.effect.ResourceSyntax[F] =
@@ -37,9 +36,7 @@ object Resource {
   ////
 
   def resource[A](closeAction: A => IO[Unit]): Resource[A] =
-    new Resource[A] {
-      def close(a: A): IO[Unit] = closeAction(a)
-    }
+    (a: A) => closeAction(a)
 
   def resourceFromAutoCloseable[A <: java.lang.AutoCloseable]: Resource[A] =
     resource(a => IO(a.close()))

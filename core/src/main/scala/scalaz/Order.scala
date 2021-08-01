@@ -37,9 +37,8 @@ trait Order[F] extends Equal[F] { self =>
 
   /** @note `Order.fromScalaOrdering(toScalaOrdering).order(x, y)`
             = `this.order(x, y)` */
-  def toScalaOrdering: SOrdering[F] = new SOrdering[F] {
-    def compare(x: F, y: F) = self.order(x, y).toInt
-  }
+  def toScalaOrdering: SOrdering[F] =
+    (x: F, y: F) => self.order(x, y).toInt
 
   def reverseOrder: Order[F] = new Order[F] {
     def order(x: F, y: F): Ordering = self.order(y, x)
@@ -116,25 +115,21 @@ object Order {
     }
   }
 
-  def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
-  }
+  def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] =
+    (a1: A, a2: A) => std.anyVal.intInstance.order(O.compare(a1, a2), 0)
 
   /** Alias for `Order[B] contramap f`, with inferred `B`. */
-  def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
+  def orderBy[A, B: Order](f: A => B): Order[A] =
+    Order[B] contramap f
 
   /** Derive from an `order` function. */
-  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = f(a1, a2)
-  }
+  def order[A](f: (A, A) => Ordering): Order[A] =
+    (a1: A, a2: A) => f(a1, a2)
 
   implicit def orderMonoid[A]: Monoid[Order[A]] = new Monoid[Order[A]] {
-    def zero: Order[A] = new Order[A] {
-      def order(x: A, y: A): Ordering = Monoid[Ordering].zero
-    }
-    def append(f1: Order[A], f2: => Order[A]): Order[A] = new Order[A] {
-      def order(x: A, y: A): Ordering = Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
-    }
+    def zero: Order[A] = (x: A, y: A) => Monoid[Ordering].zero
+    def append(f1: Order[A], f2: => Order[A]): Order[A] =
+      (x: A, y: A) => Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
   }
 
   ////
