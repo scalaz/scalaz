@@ -32,7 +32,7 @@ trait SortedMapInstances0 {
     override def equal(a1: SortedMap[K, V], a2: SortedMap[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
-      else Equal[Set[K]].equal(a1.keySet.toSet, a2.keySet.toSet) && {
+      else Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
         a1.forall {
           case (k, v) => a2.get(k).exists(v2 => Equal[V].equal(v, v2))
         }
