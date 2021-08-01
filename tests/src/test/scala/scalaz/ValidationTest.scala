@@ -89,16 +89,16 @@ object ValidationTest extends SpecLite {
     import syntax.std.string._
     import syntax.validation._
     def errmsg(i: Int) = "Int must be positive: " + i
-    (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], 2.success[String], 3.success[String]))
+    (List("1", "2", "3") map (_.parseInt excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], 2.success[String], 3.success[String]))
 
-    (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
+    (List("1", "-2", "3") map (_.parseInt excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
   }
 
   "ensure" in {
     import syntax.std.string._
     import syntax.validation._
-    List("1", "2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], 2.success[String]))
-    List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], "Fail".failure[Int]))
+    List("1", "2") map (_.parseInt.ensure("Fail")(_ >= 0)) must_===(List(1.success[String], 2.success[String]))
+    List("1", "-2") map (_.parseInt.ensure("Fail")(_ >= 0)) must_===(List(1.success[String], "Fail".failure[Int]))
   }
 
   "Plus accumulates errors" in {
