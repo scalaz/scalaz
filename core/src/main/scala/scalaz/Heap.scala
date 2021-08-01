@@ -3,6 +3,7 @@ package scalaz
 import std.tuple._
 import EphemeralStream.{EStream, emptyEphemeralStream, ##::}
 
+import scala.annotation.tailrec
 
 /**An efficient, asymptotically optimal, implementation of priority queues
  * extended with support for efficient size.
@@ -257,12 +258,14 @@ object Heap extends HeapInstances {
 
   /**Create a heap consisting of multiple copies of the same value. O(log n) */
   def replicate[A: Order](a: A, i: Int): Heap[A] = {
+    @tailrec
     def f(x: Heap[A], y: Int): Heap[A] =
       if (y % 2 == 0) f(x union x, y / 2)
       else
       if (y == 1) x
       else
         g(x union x, (y - 1) / 2, x)
+    @tailrec
     def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
       if (y % 2 == 0) g(x union x, y / 2, z)
       else
