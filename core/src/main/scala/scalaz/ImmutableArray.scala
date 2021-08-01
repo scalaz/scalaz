@@ -261,7 +261,7 @@ object ImmutableArray extends ImmutableArrayInstances {
   object WrappedImmutableArray {
     import scalaz.{ImmutableArray => IA}
     class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
-      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str.toString))
+      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str))
     }
 
     abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
