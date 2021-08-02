@@ -35,7 +35,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2.3.4
-    - uses: olafurpg/setup-scala@v12
+    - uses: olafurpg/setup-scala@v13
       with:
         java-version: "adopt@1.${{ matrix.java }}"
     - uses: coursier/cache-action@v6
