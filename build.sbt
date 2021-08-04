@@ -156,10 +156,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     minSuccessfulTests := 33
   )
   .jsSettings(
-    Test / sources ~= { values =>
-      // https://github.com/scala-js/scala-js/issues/3953
-      values.filter(_.getName != "StreamTTest.scala")
-    },
     minSuccessfulTests := 10
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
