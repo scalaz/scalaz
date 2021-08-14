@@ -175,7 +175,6 @@ object build {
           Seq(
             "-Ykind-projector",
             s"-language:$common",
-            "-source", "3.0-migration",
           )
         case _ =>
           Seq(

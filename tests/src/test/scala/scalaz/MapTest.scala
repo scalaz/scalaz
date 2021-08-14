@@ -852,7 +852,8 @@ object MapTest extends SpecLite {
                 }
             }
           }
-        rec(a)
+
+          rec(a)
       }
     }
 
@@ -901,7 +902,8 @@ object MapTest extends SpecLite {
                 }
             }
           }
-        rec(a)
+
+          rec(a)
       }
     }
   }
