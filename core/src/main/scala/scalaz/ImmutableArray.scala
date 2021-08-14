@@ -11,7 +11,6 @@ import syntax.Ops
  * @tparam A type of the elements of the array
  */
 sealed abstract class ImmutableArray[+A] {
-  protected[this] def elemTag: ClassTag[A]
 
   // these methods are not total
   private[scalaz] def apply(index: Int): A
@@ -135,8 +134,6 @@ object ImmutableArray extends ImmutableArrayInstances {
 
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
-    // override def stringPrefix = "ImmutableArray"
-    // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemTag)
 
     def componentType: Class[_] = arr.getClass().getComponentType
 
@@ -157,53 +154,36 @@ object ImmutableArray extends ImmutableArrayInstances {
     }
   }
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
-    protected[this] lazy val elemTag = ClassTag[A](componentType)
   }
 
   final class ofByte(array: Array[Byte]) extends ImmutableArray1[Byte](array) {
-    protected[this] def elemTag = ClassTag.Byte
   }
 
   final class ofShort(array: Array[Short]) extends ImmutableArray1[Short](array) {
-    protected[this] def elemTag = ClassTag.Short
   }
 
   final class ofChar(array: Array[Char]) extends ImmutableArray1[Char](array) {
-    protected[this] def elemTag = ClassTag.Char
-
-    // def mkString = new String(arr)
-    // TODO why can elemTag be protected, but arr can't?
   }
 
   final class ofInt(array: Array[Int]) extends ImmutableArray1[Int](array) {
-    protected[this] def elemTag = ClassTag.Int
   }
 
   final class ofLong(array: Array[Long]) extends ImmutableArray1[Long](array) {
-    protected[this] def elemTag = ClassTag.Long
   }
 
   final class ofFloat(array: Array[Float]) extends ImmutableArray1[Float](array) {
-    protected[this] def elemTag = ClassTag.Float
   }
 
   final class ofDouble(array: Array[Double]) extends ImmutableArray1[Double](array) {
-    protected[this] def elemTag = ClassTag.Double
   }
 
   final class ofBoolean(array: Array[Boolean]) extends ImmutableArray1[Boolean](array) {
-    protected[this] def elemTag = ClassTag.Boolean
   }
 
   final class ofUnit(array: Array[Unit]) extends ImmutableArray1[Unit](array) {
-    protected[this] def elemTag = ClassTag.Unit
   }
 
   final class StringArray(val str: String) extends ImmutableArray[Char] {
-    protected[this] def elemTag = ClassTag.Char
-
-    // override protected[this] def newBuilder = (new StringBuilder).mapResult(new StringArray(_))
-
     def apply(idx: Int) = str(idx)
 
     def length = str.length
@@ -254,60 +234,44 @@ object ImmutableArray extends ImmutableArrayInstances {
           IndexedSeq[A] {
     def apply(index: Int) = value(index)
     def length = value.length
-
-    protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
   }
 
   object WrappedImmutableArray {
     import scalaz.{ImmutableArray => IA}
     class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
-      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str))
     }
 
     abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
-      protected[this] def elemTag: ClassTag[A]
-
-      override protected[this] def arrayBuilder = ImmutableArray.newBuilder[A](elemTag)
     }
 
     final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
-      protected[this] lazy val elemTag = ClassTag[A](array.componentType)
     }
 
     final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
-      protected[this] def elemTag = ClassTag.Byte
     }
 
     final class ofShort(array: IA.ofShort) extends ofImmutableArray1[Short](array) {
-      protected[this] def elemTag = ClassTag.Short
     }
 
     final class ofChar(array: IA.ofChar) extends ofImmutableArray1[Char](array) {
-      protected[this] def elemTag = ClassTag.Char
     }
 
     final class ofInt(array: IA.ofInt) extends ofImmutableArray1[Int](array) {
-      protected[this] def elemTag = ClassTag.Int
     }
 
     final class ofLong(array: IA.ofLong) extends ofImmutableArray1[Long](array) {
-      protected[this] def elemTag = ClassTag.Long
     }
 
     final class ofFloat(array: IA.ofFloat) extends ofImmutableArray1[Float](array) {
-      protected[this] def elemTag = ClassTag.Float
     }
 
     final class ofDouble(array: IA.ofDouble) extends ofImmutableArray1[Double](array) {
-      protected[this] def elemTag = ClassTag.Double
     }
 
     final class ofBoolean(array: IA.ofBoolean) extends ofImmutableArray1[Boolean](array) {
-      protected[this] def elemTag = ClassTag.Boolean
     }
 
     final class ofUnit(array: IA.ofUnit) extends ofImmutableArray1[Unit](array) {
-      protected[this] def elemTag = ClassTag.Unit
     }
   }
 
