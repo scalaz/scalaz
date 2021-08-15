@@ -54,6 +54,44 @@ object OptionTest extends SpecLite {
     (Max(x) |+| Max(None)) must_=== Max(x)
   }
 
+  "lifted Monoid is short-circuiting" in {
+    val M: Monoid[Option[Int]] = Monoid.liftMonoid[Option, Int]
+
+    val f: Int => Maybe[(Option[Int], Int)] = i => {
+      if (i > 0) Maybe.just((Option(i), i - 1))
+      else if (i == 0) Maybe.just((None, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    M.unfoldrSum(5)(f) must_=== None
+  }
+
+  "lifted PlusEmpty is short-circuiting" in {
+    import scalaz.std.list._
+
+    val P: PlusEmpty[λ[a => Option[List[a]]]] = PlusEmpty.liftPlusEmpty[Option, List]
+
+    val f: Int => Maybe[(Option[List[Int]], Int)] = i => {
+      if (i > 0) Maybe.just((Option(List.range(0, i)), i - 1))
+      else if (i == 0) Maybe.just((None, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    P.unfoldrPsum(5)(f) must_=== None
+  }
+
+  "lifted Reducer is short-circuiting" in {
+    val R: Reducer[Option[Int], Option[Int]] = Apply[Option].liftReducer(Reducer.identityReducer[Int])
+
+    val f: Int => Maybe[(Option[Int], Int)] = i => {
+      if (i > 0) Maybe.just((Option(i), i - 1))
+      else if (i == 0) Maybe.just((None, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    R.unfoldrOpt(5)(f) must_=== Maybe.just(None)
+  }
+
   object instances {
     def equal[A: Equal] = Equal[Option[A]]
     def order[A: Order] = Order[Option[A]]
