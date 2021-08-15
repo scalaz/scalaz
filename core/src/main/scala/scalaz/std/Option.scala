@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scala.annotation.tailrec
+
 sealed trait OptionInstances0 extends OptionInstances1 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
@@ -96,6 +98,44 @@ trait OptionInstances extends OptionInstances0 {
           case Some(-\/(a)) => tailrecM(a)(f)
           case Some(\/-(b)) => Some(b)
         }
+
+      override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(Option[A], S)]): Maybe[Option[A]] = {
+        @tailrec def go(s1: S): Option[A] = f(s1) match {
+          case Maybe.Just((ma, s2)) => ma match {
+            case a @ Some(_) =>
+              a
+            case _ =>
+              go(s2)
+          }
+          case _ =>
+            None
+        }
+        f(seed).map {
+          case (a @ Some(_), _) =>
+            a
+          case (_, s) =>
+            go(s)
+        }
+      }
+
+      override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(Option[A], S)])(implicit r: Reducer[A, B]): Maybe[Option[B]] = {
+        @tailrec def go(acc: B, s1: S): Option[B] = f(s1) match {
+          case Maybe.Just((ma, s2)) => ma match {
+            case Some(a) =>
+              go(r.snoc(acc, a), s2)
+            case _ =>
+              None
+          }
+          case _ =>
+            Some(acc)
+        }
+        f(seed).map {
+          case (Some(a), s) =>
+            go(r.unit(a), s)
+          case _ =>
+            None
+        }
+      }
     }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
