@@ -81,15 +81,7 @@ object OptionTest extends SpecLite {
   }
 
   "lifted Reducer is short-circuiting" in {
-    val R: Reducer[Option[Int], Option[Int]] = Apply[Option].liftReducer(Reducer.identityReducer[Int])
-
-    val f: Int => Maybe[(Option[Int], Int)] = i => {
-      if (i > 0) Maybe.just((Option(i), i - 1))
-      else if (i == 0) Maybe.just((None, i - 1))
-      else sys.error("BOOM!")
-    }
-
-    R.unfoldrOpt(5)(f) must_=== Maybe.just(None)
+    ApplyTest.unfoldrOptShortCircuiting[Option](None)
   }
 
   object instances {
