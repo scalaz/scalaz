@@ -129,16 +129,8 @@ object MaybeTest extends SpecLite {
     P.unfoldrPsum(5)(f) must_=== Just("Stop")
   }
 
-  "lifted Monoid is short-circuiting" in {
-    val M: Monoid[Maybe[Int]] = Monoid.liftMonoid
-
-    val f: Int => Maybe[(Maybe[Int], Int)] = i => {
-      if (i > 0) just((just(i), i-1))
-      else if (i == 0) just((empty, i-1))
-      else sys.error("BOOM!")
-    }
-
-    M.unfoldrSum(5)(f) must_=== Empty()
+  "lifted Reducer is short-circuiting" in {
+    ApplyTest.unfoldrOptShortCircuiting[Maybe](Maybe.empty)
   }
 
   "lifted PlusEmpty is short-circuiting" in {
