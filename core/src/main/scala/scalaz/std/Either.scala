@@ -91,6 +91,27 @@ trait EitherInstances extends EitherInstances0 {
           case Right(a) =>
             \/-(a)
         }
+
+      override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(Either[L, A], S)])(implicit r: Reducer[A, B]): Maybe[Either[L, B]] = {
+        @annotation.tailrec
+        def go(acc: B, s1: S): Either[L, B] = f(s1) match {
+          case Maybe.Just((ma, s2)) =>
+            ma match {
+              case Right(a) =>
+                go(r.snoc(acc, a), s2)
+              case Left(l) =>
+                Left(l)
+            }
+          case _ =>
+            Right(acc)
+        }
+        f(seed).map {
+          case (Right(a), s) =>
+            go(r.unit(a), s)
+          case (Left(l), _) =>
+            Left(l)
+        }
+      }
     }
 
   implicit def eitherOrder[A, B](implicit OrderA: Order[A], OrderB: Order[B]): Order[Either[A, B]] =

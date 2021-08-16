@@ -20,4 +20,8 @@ object EitherTest extends SpecLite {
     left.shows must_===("Left(\"leftside\")")
     right.shows must_===("Right(0)")
   }
+
+  "lifted Reducer is short-circuiting" in {
+    ApplyTest.unfoldrOptShortCircuiting[Either[Int, *]](Left(42))
+  }
 }

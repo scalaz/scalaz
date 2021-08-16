@@ -80,4 +80,17 @@ object ApplyTest extends SpecLite {
     (none[String] `<*ByName` err)      must_=== (none[String])
   }
 
+  def unfoldrOptShortCircuiting[F[_]](empty: F[Int])(implicit F: Applicative[F]): Unit = {
+    val reducer: Reducer[F[Int], F[Int]] =
+      F.liftReducer(Reducer.identityReducer[Int])
+
+    val f: Int => Maybe[(F[Int], Int)] = i => {
+      if (i > 0) Maybe.just((F.point(i), i - 1))
+      else if (i == 0) Maybe.just((empty, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    reducer.unfoldrOpt(5)(f) must_== Maybe.just(empty)
+  }
+
 }
