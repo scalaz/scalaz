@@ -604,6 +604,27 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         case -\/(e) => f(e)
         case r => r
       }
+
+      override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(L \/ A, S)])(implicit r: Reducer[A, B]): Maybe[L \/ B] = {
+        @annotation.tailrec
+        def go(acc: B, s1: S): L \/ B = f(s1) match {
+          case Maybe.Just((ma, s2)) =>
+            ma match {
+              case \/-(a) =>
+                go(r.snoc(acc, a), s2)
+              case l @ -\/(_) =>
+                l.coerceRight[B]
+            }
+          case _ =>
+            \/-(acc)
+        }
+        f(seed).map {
+          case (\/-(a), s) =>
+            go(r.unit(a), s)
+          case (l @ -\/(_), _) =>
+            l.coerceRight[B]
+        }
+      }
     }
 }
 

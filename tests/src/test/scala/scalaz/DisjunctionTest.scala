@@ -101,6 +101,10 @@ object DisjunctionTest extends SpecLite {
       ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
   }
 
+  "lifted Reducer is short-circuiting" in {
+    ApplyTest.unfoldrOptShortCircuiting[\/[Int, *]](-\/(42))
+  }
+
   object instances {
     def semigroup[A: Semigroup, B: Semigroup] = Semigroup[A \/ B]
     def monoid[A: Semigroup, B: Monoid] = Monoid[A \/ B]
