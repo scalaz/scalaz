@@ -45,11 +45,19 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   def traverse1[G[_], A, B](fa: F[A])(f: A => G[B])(implicit a: Apply[G]): G[F[B]] =
     traverse1Impl(fa)(f)
 
+  /** A version of `traverse1` where a subsequent monadic join is applied to the inner result. */
+  def traverse1M[A, G[_], B](fa: F[A])(f: A => G[F[B]])(implicit G: Apply[G], F: Bind[F]): G[F[B]] =
+    G.map(G.traverse1(fa)(f)(this))(F.join)
+
   final def traverse1U[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Apply, GB]): G.M[F[G.A]] =
     traverse1(fa)(G.leibniz.onF(f))(G.TC)
 
   def sequence1[G[_]:Apply,A](fga: F[G[A]]): G[F[A]] =
     traverse1Impl[G, G[A], A](fga)(identity)
+
+  /** A version of `sequence1` where a subsequent monadic join is applied to the inner result */
+  def sequence1M[A, G[_]](fgfa: F[G[F[A]]])(implicit G: Apply[G], F: Bind[F]): G[F[A]] =
+    G.map(sequence1(fgfa))(F.join)
 
   final def sequence1U[GA](fga: F[GA])(implicit G: Unapply[Apply, GA]): G.M[F[G.A]] =
     sequence1(G.leibniz.subst(fga))(G.TC)
