@@ -77,7 +77,7 @@ object TraverseTest extends SpecLite {
     }
   }
 
-  "stream" should {
+  "LazyList" should {
     "apply effects in order" in {
       val s: Writer[String, LazyList[Int]] = LazyList(1, 2, 3).traverse(x => Writer(x.toString, x))
       s.run must_===(("123", LazyList(1, 2, 3)))
