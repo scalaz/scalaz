@@ -62,4 +62,15 @@ object IStreamTest extends SpecLite {
     counter must_=== 0
   }
 
+  "index" ! forAll { (i: Byte, xs: IStream[Int]) =>
+    val n = i.abs % 3
+    Foldable[IStream].index(xs, n) must_=== Foldable[IStream].toList(xs).lift.apply(n)
+  }
+
+  "index infinite" in {
+    val i = util.Random.nextInt(1000)
+    val xs = Stream from 0
+    Foldable[IStream].index(IStream.fromStream(xs), i) must_===(xs.lift.apply(i))
+  }
+
 }

@@ -127,6 +127,23 @@ object IStream {
           case Cons(head, tail) => f(head.value, foldRight(tail.value, z)(f))
         }
 
+      override def index[A](fa: IStream[A], i: Int): Option[A] = {
+        if (i < 0) {
+          None
+        } else {
+          @tailrec
+          def loop(n: Int, xs: IStream[A]): Option[A] = {
+            xs match {
+              case Cons(h, t) =>
+                if (n == 0) Some(h.value) else loop(n - 1, t.value)
+              case _ =>
+                None
+            }
+          }
+          loop(i, fa)
+        }
+      }
+
       override def foldLeft[A, B](fa: IStream[A], z: B)(f: (B, A) => B): B = {
         @tailrec def loop(t: IStream[A], acc: B): B = t match {
           case _: Nil[_]        => acc
