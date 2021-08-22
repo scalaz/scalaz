@@ -192,6 +192,23 @@ object CorecursiveList extends CorecursiveListInstances {
         rec(z, fa.init)
       }
 
+      override def index[A](fa: CorecursiveList[A], i: Int) = {
+        if (i < 0) {
+          None
+        } else {
+          @tailrec
+          def loop(n: Int, s1: fa.S): Option[A] = {
+            fa.step(s1) match {
+              case Maybe.Just((s2, a)) =>
+                if (n == 0) Some(a) else loop(n - 1, s2)
+              case _ =>
+                None
+            }
+          }
+          loop(i, fa.init)
+        }
+      }
+
       override def empty[A] =
         CorecursiveList(())(Function const Empty())
 
