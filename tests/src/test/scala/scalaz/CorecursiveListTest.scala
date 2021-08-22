@@ -50,7 +50,7 @@ object CorecursiveListTest extends SpecLite {
     p
   }
 
-  checkAll("stream to corec iso", isoTest(CL.lazyListIso))
+  checkAll("LazyList to corec iso", isoTest(CL.lazyListIso))
 
   checkAll("eph stream to corec iso", isoTest(CL.ephemeralStreamIso))
 
