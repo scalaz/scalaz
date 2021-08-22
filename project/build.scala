@@ -48,7 +48,6 @@ object build {
     enableCrossBuild = true
   )
 
-  val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -161,7 +160,6 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.15.4",
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
