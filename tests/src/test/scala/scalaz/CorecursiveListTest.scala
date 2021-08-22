@@ -10,6 +10,7 @@ import Maybe.just
 import std.anyVal._
 import std.lazylist._
 import std.tuple._
+import std.option._
 import syntax.contravariant._
 
 object CorecursiveListTest extends SpecLite {
@@ -109,6 +110,17 @@ object CorecursiveListTest extends SpecLite {
 
   "cons naturality" ! forAll {(x: Int, xs: CL[Int]) =>
     CL.lazyListIso.from(CL.cons(x, xs)) must_===(x #:: CL.lazyListIso.from(xs))
+  }
+
+  "index" ! forAll { (i: Int, xs: CL[Int]) =>
+    val n = i.abs % 3
+    Foldable[CL].index(xs, n) must_=== Foldable[CL].toList(xs).lift.apply(n)
+  }
+
+  "index infinite" ! forAll { (n: Int) =>
+    val i = n.abs % 1000
+    val xs = CL(0)(x => Maybe.just((x + 1, x)))
+    Foldable[CL].index(xs, i) must_=== CL.lazyListIso.from(xs).lift.apply(i)
   }
 
   object instances {
