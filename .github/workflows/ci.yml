@@ -26,6 +26,10 @@ jobs:
             scala: 2
             project: rootJVM
 
+          - java: 17
+            scala: 2
+            project: rootJVM
+
           - java: 8
             scala: 3
             project: rootJVM
