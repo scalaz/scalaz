@@ -24,4 +24,3 @@ jobs:
         github-token: ${{ steps.generate_token.outputs.token }}
         author-email: "74843977+scalaz-bot[bot]@users.noreply.github.com"
         author-name: scalaz-bot[bot]
-        scala-steward-version: 0.10.0 # https://oss.sonatype.org/content/repositories/snapshots/org/scala-steward/scala-steward-core_2.13/
