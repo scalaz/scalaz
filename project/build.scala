@@ -416,7 +416,7 @@ object build {
     .jvmSettings(
       jvm_js_settings,
       libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
       }.toList,
       typeClasses := TypeClass.core
     )
