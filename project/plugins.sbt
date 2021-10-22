@@ -1,6 +1,6 @@
 scalacOptions += "-deprecation"
 
-val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("1.7.0")
+val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("1.7.1")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.10.0")
