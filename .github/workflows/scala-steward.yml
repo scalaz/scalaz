@@ -19,8 +19,9 @@ jobs:
         private_key: ${{ secrets.SCALAZ_BOT_KEY }}
     - name: Launch Scala Steward
       if: ${{ !github.event.repository.fork }}
-      uses: scala-steward-org/scala-steward-action@v2.13.5
+      uses: scala-steward-org/scala-steward-action@v2.13.6
       with:
         github-token: ${{ steps.generate_token.outputs.token }}
         author-email: "74843977+scalaz-bot[bot]@users.noreply.github.com"
         author-name: scalaz-bot[bot]
+        branches: master,series/7.3.x,series/7.2.x
