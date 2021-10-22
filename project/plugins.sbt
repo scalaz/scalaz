@@ -14,7 +14,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.1.0")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % scalaNativeVersion)
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.9.2")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.0.1")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.10")
 
 // https://github.com/sbt/sbt/issues/2217
