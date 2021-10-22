@@ -318,7 +318,7 @@ object build {
       case _ =>
         Nil
     }),
-    kindProjectorVersion := "0.13.0",
+    kindProjectorVersion := "0.13.2",
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
