@@ -49,7 +49,7 @@ jobs:
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"
            Test/compile
-           $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+           $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
     - run: ./sbt -v
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"
