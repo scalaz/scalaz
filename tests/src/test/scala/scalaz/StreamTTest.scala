@@ -204,5 +204,6 @@ object StreamTTest extends SpecLite {
     def functor[F[_]: Applicative] = Functor[StreamT[F, *]]
     def bind[F[_]: Applicative] = Bind[StreamT[F, *]]
     def plus[F[_]: Applicative] = Plus[StreamT[F, *]]
+    def monoid[F[_]: Nondeterminism, A] = Monoid[StreamT[F, A] @@ Tags.Parallel]
   }
 }
