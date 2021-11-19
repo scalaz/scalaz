@@ -241,6 +241,27 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
         Yield(a, next().distinctUntilChanged(a))
     }
 
+  def mergeWith(f2: => StreamT[M, A])(implicit M: Nondeterminism[M]): StreamT[M, A] = {
+    def mergeStep(s1: Step[A, StreamT[M, A]], fs2: M[Step[A, StreamT[M, A]]]): Step[A, StreamT[M, A]] = {
+      s1 match {
+        case Yield(a, s) => 
+          Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
+        case Skip(s) =>
+          Skip(() => StreamT(mergeFStep(s().step, fs2)))
+        case Done() => 
+          Skip(() => StreamT(fs2))
+      }
+    }
+    def mergeFStep(fs1: M[Step[A, StreamT[M, A]]], fs2: M[Step[A, StreamT[M, A]]]): M[Step[A, StreamT[M, A]]] = {
+      M.map(M.choose(fs1, fs2)) {
+        case -\/((s1, fs2)) =>
+          mergeStep(s1, fs2)
+        case \/-((fs1, s2)) =>
+          mergeStep(s2, fs1)
+      }
+    }
+    StreamT(mergeFStep(this.step, f2.step))
+  }
 }
 
 //
@@ -402,31 +423,10 @@ private trait StreamTHoist extends Hoist[StreamT] {
 }
 
 private trait StreamTMergeMonoid[F[_], A] extends Monoid[StreamT[F, A] @@ Tags.Parallel] {
-  import StreamT._
   implicit def F: Nondeterminism[F] 
-  private def mergeStep(s1: Step[A, StreamT[F, A]], fs2: F[Step[A, StreamT[F, A]]]): Step[A, StreamT[F, A]] = {
-    s1 match {
-      case Yield(a, s) => 
-        Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
-      case Skip(s) =>
-        Skip(() => StreamT(mergeFStep(s().step, fs2)))
-      case Done() => 
-        Skip(() => StreamT(fs2))
-    }
-  }
 
-  private def mergeFStep(fs1: F[Step[A, StreamT[F, A]]], fs2: F[Step[A, StreamT[F, A]]]): F[Step[A, StreamT[F, A]]] = {
-    F.map(F.choose(fs1, fs2)) {
-      case -\/((s1, fs2)) =>
-        mergeStep(s1, fs2)
-      case \/-((fs1, s2)) =>
-        mergeStep(s2, fs1)
-    }
-  }
+  def append(f1: StreamT[F, A] @@ Tags.Parallel, f2: => StreamT[F, A] @@ Tags.Parallel): StreamT[F, A] @@ Tags.Parallel =
+    Tags.Parallel(Tags.Parallel.unwrap(f1).mergeWith(Tags.Parallel.unwrap(f2)))
 
-  override def append(f1: StreamT[F, A] @@ Tags.Parallel, f2: => StreamT[F, A] @@ Tags.Parallel): StreamT[F, A] @@ Tags.Parallel = {
-    Tags.Parallel(StreamT(mergeFStep(Tags.Parallel.unwrap(f1).step, Tags.Parallel.unwrap(f2).step)))
-  }
-
-  override def zero: StreamT[F, A] @@ Tags.Parallel = Tags.Parallel(StreamTMonoid(F).zero)
+  def zero: StreamT[F, A] @@ Tags.Parallel = Tags.Parallel(StreamT.empty)
 }
