@@ -285,15 +285,18 @@ object StreamT extends StreamTInstances {
   def wrapEffect[M[_]:Functor,A](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(Functor[M].map(m)(Skip(_)))
 
   def runStreamT[S,A](stream : StreamT[State[S, *],A], s0: S): StreamT[Id,A] =
-    StreamT[Id,A]({
-      val (a, s) = stream.step(s0)
-      s match {
-        case Yield(a1, s1) => Yield(a1, runStreamT(s1(), a))
-        case Skip(s1)      => Skip(runStreamT(s1(), a))
-        case Done()        => Done()
-      }
-    })
+    runStreamT[S, Id, A](stream, s0)
 
+  def runStreamT[S, M[_], A](stream : StreamT[StateT[S, M, *], A], s0: S)(implicit M: Bind[M]): StreamT[M,A] =
+    StreamT(
+      M.map(stream.step(s0)) { case (a, s) =>
+        s match {
+          case Yield(a1, s1) => Yield(a1, runStreamT(s1(), a))
+          case Skip(s1)      => Skip(runStreamT(s1(), a))
+          case Done()        => Done()
+        }
+      }
+    )
 
   sealed abstract class Step[A, S] extends Product with Serializable
 
