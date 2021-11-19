@@ -241,6 +241,45 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
         Yield(a, next().distinctUntilChanged(a))
     }
 
+  def mergeWith(f2: => StreamT[M, A])(implicit M: Nondeterminism[M]): StreamT[M, A] = {
+    StreamT(mergeFStep(this.step, f2.step))
+  }
+
+  def mergeMap[B](f: A => StreamT[M, B])(implicit M: Nondeterminism[M]): StreamT[M, B] = {
+    def mergeMapInitStep(fsa: M[Step[A, StreamT[M, A]]]): M[Step[B, StreamT[M, B]]] = {
+      M.map(fsa) {
+        case Yield(a, s) =>
+          Skip(() => StreamT(mergeMapStep(s().step, f(a).step)))
+        case Skip(s) =>
+          Skip(() => StreamT(mergeMapInitStep(s().step)))
+        case Done() =>
+          Done()
+      }
+    }
+    def mergeMapStep(fsa: M[Step[A, StreamT[M, A]]], fsb: M[Step[B, StreamT[M, B]]]): M[Step[B, StreamT[M, B]]] = {
+      M.map(M.choose(fsa, fsb)) {
+        case -\/((sa, fsb)) =>
+          sa match {
+            case Yield(a, s) =>
+              Skip(() => StreamT(mergeMapStep(s().step, mergeFStep(f(a).step, fsb))))
+            case Skip(s) =>
+              Skip(() => StreamT(mergeMapStep(s().step, fsb)))
+            case Done() =>
+              Skip(() => StreamT(fsb))
+          }
+        case \/-((fsa, sb)) =>
+          sb match {
+            case Yield(b, s) => 
+              Yield(b, () => StreamT(mergeMapStep(fsa, s().step)))
+            case Skip(s) =>
+              Skip(() => StreamT(mergeMapStep(fsa, s().step)))
+            case Done() =>
+              Skip(() => StreamT(mergeMapInitStep(fsa)))
+          }
+      }
+    }
+    StreamT(mergeMapInitStep(this.step))
+  }
 }
 
 //
@@ -274,6 +313,19 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
   implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, *]] =
     new Foldable[StreamT[F, *]] with Foldable.FromFoldMap[StreamT[F, *]] {
       override def foldMap[A, M: Monoid](s: StreamT[F, A])(f: A => M) = s.foldMap(f)
+    }
+  implicit def StreamTMergeMonoid[F[_], A](implicit F0: Nondeterminism[F]): Monoid[StreamT[F, A] @@ Tags.Parallel] =
+    new StreamTMergeMonoid[F, A] {
+      implicit def F: Nondeterminism[F] = F0
+    }
+  implicit def StreamTMergeMonad[F[_]](implicit F0: Nondeterminism[F]): Monad[λ[α => StreamT[F, α] @@ Tags.Parallel]] =
+    new Monad[λ[α => StreamT[F, α] @@ Tags.Parallel]] {
+
+      def bind[A, B](fa: StreamT[F, A] @@ Tags.Parallel)(f: A => StreamT[F, B] @@ Tags.Parallel): StreamT[F, B] @@ Tags.Parallel =
+        Tags.Parallel(Tags.Parallel.unwrap(fa).mergeMap(Tags.Parallel.unsubst(f)))
+
+      def point[A](a: => A): StreamT[F, A] @@ Tags.Parallel =
+        Tags.Parallel(StreamTMonadPlus(F0).point(a))
     }
 }
 
@@ -319,6 +371,26 @@ object StreamT extends StreamTInstances {
         }
       }
     )
+
+  private def mergeStep[M[_], A](s1: Step[A, StreamT[M, A]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): Step[A, StreamT[M, A]] = {
+      s1 match {
+        case Yield(a, s) => 
+          Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
+        case Skip(s) =>
+          Skip(() => StreamT(mergeFStep(s().step, fs2)))
+        case Done() => 
+          Skip(() => StreamT(fs2))
+      }
+    }
+
+  private def mergeFStep[M[_], A](fs1: M[Step[A, StreamT[M, A]]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): M[Step[A, StreamT[M, A]]] = {
+    M.map(M.choose(fs1, fs2)) {
+      case -\/((s1, fs2)) =>
+        mergeStep(s1, fs2)
+      case \/-((fs1, s2)) =>
+        mergeStep(s2, fs1)
+    }
+  }
 
   sealed abstract class Step[A, S] extends Product with Serializable
 
@@ -395,4 +467,13 @@ private trait StreamTHoist extends Hoist[StreamT] {
         }
       ))
    }
+}
+
+private trait StreamTMergeMonoid[F[_], A] extends Monoid[StreamT[F, A] @@ Tags.Parallel] {
+  implicit def F: Nondeterminism[F] 
+
+  def append(f1: StreamT[F, A] @@ Tags.Parallel, f2: => StreamT[F, A] @@ Tags.Parallel): StreamT[F, A] @@ Tags.Parallel =
+    Tags.Parallel(Tags.Parallel.unwrap(f1).mergeWith(Tags.Parallel.unwrap(f2)))
+
+  def zero: StreamT[F, A] @@ Tags.Parallel = Tags.Parallel(StreamT.empty)
 }
