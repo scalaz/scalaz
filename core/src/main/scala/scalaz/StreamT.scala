@@ -275,6 +275,10 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
     new Foldable[StreamT[F, *]] with Foldable.FromFoldMap[StreamT[F, *]] {
       override def foldMap[A, M: Monoid](s: StreamT[F, A])(f: A => M) = s.foldMap(f)
     }
+  implicit def StreamTMergeMonoid[F[_], A](implicit F0: Nondeterminism[F]): Monoid[StreamT[F, A] @@ Tags.Parallel] =
+    new StreamTMergeMonoid[F, A] {
+      implicit def F: Nondeterminism[F] = F0
+    }
 }
 
 object StreamT extends StreamTInstances {
@@ -395,4 +399,34 @@ private trait StreamTHoist extends Hoist[StreamT] {
         }
       ))
    }
+}
+
+private trait StreamTMergeMonoid[F[_], A] extends Monoid[StreamT[F, A] @@ Tags.Parallel] {
+  import StreamT._
+  implicit def F: Nondeterminism[F] 
+  private def mergeStep(s1: Step[A, StreamT[F, A]], fs2: F[Step[A, StreamT[F, A]]]): Step[A, StreamT[F, A]] = {
+    s1 match {
+      case Yield(a, s) => 
+        Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
+      case Skip(s) =>
+        Skip(() => StreamT(mergeFStep(s().step, fs2)))
+      case Done() => 
+        Skip(() => StreamT(fs2))
+    }
+  }
+
+  private def mergeFStep(fs1: F[Step[A, StreamT[F, A]]], fs2: F[Step[A, StreamT[F, A]]]): F[Step[A, StreamT[F, A]]] = {
+    F.map(F.choose(fs1, fs2)) {
+      case -\/((s1, fs2)) =>
+        mergeStep(s1, fs2)
+      case \/-((fs1, s2)) =>
+        mergeStep(s2, fs1)
+    }
+  }
+
+  override def append(f1: StreamT[F, A] @@ Tags.Parallel, f2: => StreamT[F, A] @@ Tags.Parallel): StreamT[F, A] @@ Tags.Parallel = {
+    Tags.Parallel(StreamT(mergeFStep(Tags.Parallel.unwrap(f1).step, Tags.Parallel.unwrap(f2).step)))
+  }
+
+  override def zero: StreamT[F, A] @@ Tags.Parallel = Tags.Parallel(StreamTMonoid(F).zero)
 }
