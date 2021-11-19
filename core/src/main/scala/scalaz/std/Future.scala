@@ -25,12 +25,20 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
     val fs = (head +: tail).zipWithIndex
     val counter = new AtomicInteger(fs.length)
     val result = Promise[(A, Int)]()
+    var mutableResult = result
     def attemptComplete(t: Try[(A, Int)]): Unit = {
       val remaining = counter.decrementAndGet
-      t match {
-        case TSuccess(_) => val _ = result tryComplete t
-        case _ if remaining == 0 => val _ = result tryComplete t
-        case _ =>
+      val result = mutableResult
+      if (result != null) {
+        t match {
+          case TSuccess(_) =>
+            val _ = result tryComplete t
+            mutableResult = null
+          case _ if remaining == 0 =>
+            val _ = result tryComplete t
+            mutableResult = null
+          case _ =>
+        }
       }
     }
 
