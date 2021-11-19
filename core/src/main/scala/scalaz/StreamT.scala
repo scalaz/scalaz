@@ -242,24 +242,6 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     }
 
   def mergeWith(f2: => StreamT[M, A])(implicit M: Nondeterminism[M]): StreamT[M, A] = {
-    def mergeStep(s1: Step[A, StreamT[M, A]], fs2: M[Step[A, StreamT[M, A]]]): Step[A, StreamT[M, A]] = {
-      s1 match {
-        case Yield(a, s) => 
-          Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
-        case Skip(s) =>
-          Skip(() => StreamT(mergeFStep(s().step, fs2)))
-        case Done() => 
-          Skip(() => StreamT(fs2))
-      }
-    }
-    def mergeFStep(fs1: M[Step[A, StreamT[M, A]]], fs2: M[Step[A, StreamT[M, A]]]): M[Step[A, StreamT[M, A]]] = {
-      M.map(M.choose(fs1, fs2)) {
-        case -\/((s1, fs2)) =>
-          mergeStep(s1, fs2)
-        case \/-((fs1, s2)) =>
-          mergeStep(s2, fs1)
-      }
-    }
     StreamT(mergeFStep(this.step, f2.step))
   }
 }
@@ -344,6 +326,26 @@ object StreamT extends StreamTInstances {
         }
       }
     )
+
+  private def mergeStep[M[_], A](s1: Step[A, StreamT[M, A]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): Step[A, StreamT[M, A]] = {
+      s1 match {
+        case Yield(a, s) => 
+          Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
+        case Skip(s) =>
+          Skip(() => StreamT(mergeFStep(s().step, fs2)))
+        case Done() => 
+          Skip(() => StreamT(fs2))
+      }
+    }
+
+  private def mergeFStep[M[_], A](fs1: M[Step[A, StreamT[M, A]]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): M[Step[A, StreamT[M, A]]] = {
+    M.map(M.choose(fs1, fs2)) {
+      case -\/((s1, fs2)) =>
+        mergeStep(s1, fs2)
+      case \/-((fs1, s2)) =>
+        mergeStep(s2, fs1)
+    }
+  }
 
   sealed abstract class Step[A, S] extends Product with Serializable
 
