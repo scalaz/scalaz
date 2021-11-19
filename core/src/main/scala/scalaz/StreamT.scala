@@ -219,6 +219,28 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       }
     }
 
+  def distinctUntilChanged(latest: A)(implicit M: Functor[M], A: Equal[A]): StreamT[M, A] =
+    stepMap {
+      case Skip(next) =>
+        Skip(next().distinctUntilChanged(latest))
+      case Done() =>
+        Done()
+      case Yield(a, next) if A.equal(a, latest) =>
+        Skip(next().distinctUntilChanged(latest))
+      case Yield(a, next) =>
+        Yield(a, next().distinctUntilChanged(a))
+    }
+
+  def distinctUntilChanged(implicit M: Functor[M], A: Equal[A]): StreamT[M, A] =
+    stepMap {
+      case Skip(next) =>
+        Skip(next().distinctUntilChanged)
+      case Done() =>
+        Done()
+      case Yield(a, next) =>
+        Yield(a, next().distinctUntilChanged(a))
+    }
+
 }
 
 //
