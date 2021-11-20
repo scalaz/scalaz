@@ -64,14 +64,8 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
     fab zip fa map { case (fa, a) => fa(a) }
 
-  def attempt[A](f: Future[A]): Future[Throwable \/ A] =
-    f.map(\/.right[Throwable, A]).recover { case e => -\/(e) }
-
-  def fail[A](e: Throwable): Future[A] =
-    Future.failed(e)
-
   def raiseError[A](e: Throwable): Future[A] =
-    fail(e)
+    Future.failed(e)
 
   def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
     fa.recoverWith { case e => f(e) }
