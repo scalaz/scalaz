@@ -86,7 +86,7 @@ object Cofree extends CofreeInstances {
   def unapply[S[_], A](c: Cofree[S, A]): Some[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
 
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
-  def applyT[S[_],A](a: A, tf: Free.Trampoline[S[Cofree[S,A]]])(implicit T: Functor[λ[a => Free.Trampoline[a]]]): Cofree[S, A] =
+  def applyT[S[_],A](a: A, tf: Free.Trampoline[S[Cofree[S,A]]])(implicit T: Functor[Free.Trampoline]): Cofree[S, A] =
     new Cofree[S,A] {
 
       def head = a
@@ -106,7 +106,7 @@ object Cofree extends CofreeInstances {
   def unfoldC[F[_], A](a: A)(f: A => F[A])(implicit F: Functor[F]): Cofree[F, A] =
     Cofree.delay(a, F.map(f(a))(unfoldC(_)(f)))
 
-  def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[λ[a => Free.Trampoline[a]]]): Cofree[F, A] = {
+  def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[Free.Trampoline]): Cofree[F, A] = {
     val (a, fb) = f(b)
     val nt = T.map(Trampoline.done(fb))(F.lift(unfold(_)(f)))
     Cofree.applyT(a, nt)
