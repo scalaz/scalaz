@@ -44,6 +44,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def measure: Maybe[V] =
     fold(Maybe.empty, (v, _) => Just(v), (v, _, _, _) => Just(v))
 
+  def measureMonoid(implicit V: Monoid[V]): V =
+    fold(V.zero, (v, _) => v, (v, _, _, _) => v)
+
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(s.zero, (v, x) => f(x), (v, pr, m, sf) =>
       s.append(s.append(pr.foldMap(f), m.foldMap(x => x.foldMap(f))), sf.foldMap(f)))
