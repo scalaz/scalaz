@@ -219,6 +219,10 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       }
     }
 
+  /** Returns a new [[StreamT]] only containing items that are different from their previous items.
+    *
+    * <img style="max-width: 100%" src="http://reactivex.io/documentation/operators/images/distinctUntilChanged.png" />
+    */
   def distinctUntilChanged(latest: A)(implicit M: Functor[M], A: Equal[A]): StreamT[M, A] =
     stepMap {
       case Skip(next) =>
