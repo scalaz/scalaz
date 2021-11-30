@@ -184,7 +184,7 @@ trait ListFunctions {
     Applicative[M].filterM(as)(p)
 
   /** Run `p(a)`s left-to-right until it yields a true value,
-    * answering `Some(that)`, or `None` if nothing matched `p`.
+    * answering `Maybe.Just(that)`, or `Maybe.empty` if nothing matched `p`.
     */
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Maybe[A]] = as match {
     case Nil    => Monad[M].point(Maybe.empty[A])
