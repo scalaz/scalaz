@@ -145,7 +145,7 @@ trait VectorFunctions {
       F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
 
   /** Run `p(a)`s left-to-right until it yields a true value,
-    * answering `Some(that)`, or `None` if nothing matched `p`.
+    * answering `Maybe.Just(that)`, or `Maybe.empty` if nothing matched `p`.
     */
   final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Maybe[A]] =
     lazyFoldRight(as, Monad[M].point(Maybe.empty[A]))((a, g) =>
