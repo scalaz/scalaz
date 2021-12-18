@@ -56,6 +56,18 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => Done()
   }
 
+  def collect[B](pf: PartialFunction[A, B])(implicit M: Functor[M]): StreamT[M, B] =
+    StreamT(M.map(step) {
+      case Yield(pf(b), s) =>
+        Yield(b, () => s().collect(pf))
+      case Yield(_, s) =>
+        Skip(() => s().collect(pf))
+      case Skip(s) =>
+        Skip(() => s().collect(pf))
+      case Done() =>
+        Done()
+    })
+
   def drop(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap[A] {
     case Yield(a, s) => if (n > 0) Skip(s() drop (n - 1)) else Yield(a, s)
     case Skip(s)     => Skip(s() drop n)
