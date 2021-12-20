@@ -345,6 +345,9 @@ object StreamT extends StreamTInstances {
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
 
+  def liftM[M[_], A](a: M[A])(implicit M: Applicative[M]): StreamT[M, A] =
+    StreamT[M, A](M.map(a)(Yield(_, empty[M, A](M))))
+
   def fromLazyList[M[_], A](mas: M[LazyList[A]])(implicit M: Applicative[M]): StreamT[M, A] = {
     def loop(as: LazyList[A]): Step[A, StreamT[M, A]] = as match {
       case head #:: tail => Yield(head, apply(M.point(loop(tail))))
@@ -463,8 +466,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
 
   implicit def apply[G[_] : Monad]: Monad[StreamT[G, *]] = StreamTMonadPlus[G]
 
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] =
-    StreamT[G, A](G.map(a)(Yield(_, empty[G, A](G))))
+  def liftM[M[_], A](a: M[A])(implicit M: Monad[M]): StreamT[M, A] =
+    StreamT.liftM(a)
 
   override def wrapEffect[G[_]: Monad, A](a: G[StreamT[G, A]]): StreamT[G, A] = StreamT.wrapEffect(a)
 
