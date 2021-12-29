@@ -43,7 +43,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def tailOptionRec(implicit M: BindRec[M]): M[Option[StreamT[M, A]]] =
     M.map(unconsRec)(_.map(_._2))
 
-  def trans[N[_]](t: M ~> N)(implicit M: Functor[M], N: Functor[N]): StreamT[N, A] =
+  def trans[N[_]](t: M ~> N)(implicit M: Functor[M]): StreamT[N, A] =
     StreamT(t(M.map[Step[A, StreamT[M, A]], Step[A, StreamT[N, A]]](this.step) {
       case Yield(a, s) => Yield(a, s() trans t)
       case Skip(s)     => Skip(s() trans t)
@@ -514,14 +514,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): StreamT[M, *] ~> StreamT[N, *] =
     new (StreamT[M, *] ~> StreamT[N, *]) {
-      def apply[A](a: StreamT[M, A]) = StreamT[N, A](
-        f(M.map(a.step) {
-          case Yield(a, s) => Yield(a, hoist(f).apply(s()))
-          case Skip(s)     => Skip(hoist(f).apply(s()))
-          case Done()      => Done()
-        }
-      ))
-   }
+      def apply[A](a: StreamT[M, A]) = a.trans(f)
+    }
 }
 
 private trait StreamTMergeMonoid[F[_], A] extends Monoid[StreamT[F, A] @@ Tags.Parallel] {
