@@ -8,6 +8,18 @@ import org.scalacheck.Prop.forAll
 object StreamTTest extends SpecLite {
   type StreamTOpt[A] = StreamT[Option, A]
 
+  "collect" ! forAll {
+    (xs: LazyList[Byte], pf: PartialFunction[Byte, Byte]) =>
+      StreamT.fromLazyList[Id.Id, Byte](xs).collect(pf) must_=== StreamT.fromLazyList[Id.Id, Byte](xs.collect(pf))
+  }
+
+  "infinite StreamT collect" in {
+    val n = 10
+    val xs = LazyList.from(1)
+    val pf: PartialFunction[Int, String] = { case i if i % 2 == 0 => i.toString }
+    StreamT.fromLazyList[Id.Id, Int](xs).collect(pf).take(n).asLazyList must_=== xs.collect(pf).take(n)
+  }
+
   "fromLazyList / toLazyList" ! forAll {
     (ass: LazyList[LazyList[Int]]) =>
       StreamT.fromLazyList(ass).toLazyList must_===(ass)
