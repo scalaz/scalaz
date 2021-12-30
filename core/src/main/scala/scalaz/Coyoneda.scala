@@ -239,13 +239,22 @@ sealed abstract class CoyonedaInstances9 extends CoyonedaInstances10 {
     }
 }
 
-sealed abstract class CoyonedaInstances10 {
+sealed abstract class CoyonedaInstances10 extends CoyonedaInstances11 {
   implicit def coyonedaFoldable[F[_]: Foldable]: Foldable[Coyoneda[F, *]] =
     new CoyonedaFoldable[F]{ def F = implicitly }
 
   /** `Coyoneda[F,_]` is a functor for any `F` */
   implicit def coyonedaFunctor[F[_]]: Functor[Coyoneda[F, *]] =
     new CoyonedaFunctor[F] {}
+}
+
+sealed abstract class CoyonedaInstances11 {
+  implicit def coyonedaNondeterminism[F[_]: Nondeterminism]: Nondeterminism[Coyoneda[F, *]] =
+    new IsomorphismNondeterminism[Coyoneda[F, *], F] with CoyonedaBind[F] {
+      def G = Nondeterminism[F]
+      def iso = Coyoneda.iso
+    }
+
 }
 
 private trait CoyonedaFunctor[F[_]] extends Functor[Coyoneda[F, *]] {
