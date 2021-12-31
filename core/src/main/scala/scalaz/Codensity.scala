@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.annotation.tailrec
+
 abstract class Codensity[F[_], A] { self =>
   def apply[B](f: A => F[B]): F[B]
   def improve(implicit F: Applicative[F]): F[A] =
@@ -10,8 +12,17 @@ abstract class Codensity[F[_], A] { self =>
         self.apply(a => k(a)(h))
     }
   }
+  def flatMapRec[B](k: A => Codensity[F, B]): Codensity[F, B] = {
+    new Codensity.IntrusiveEphemeralStream[F, B] {
+      def tail = self.flatMap(k)
+    }
+  }
   def map[B](k: A => B): Codensity[F, B] =
     flatMap(x => Codensity.pureCodensity(k(x)))
+  def mapRec[B](k: A => B): Codensity[F, B] =
+    new Codensity.IntrusiveEphemeralStream[F, B] {
+      def tail = self.map(k)
+    }
 
   /** `Codensity[F,_]` is a right Kan extension of `F` along itself. */
   def toRan: Ran[F, F, A] = new Ran[F, F, A] {
@@ -20,6 +31,23 @@ abstract class Codensity[F[_], A] { self =>
 }
 
 object Codensity extends CodensityInstances {
+
+  private[Codensity] abstract class IntrusiveEphemeralStream[F[_], A]
+      extends Codensity[F, A] {
+    def tail: Codensity[F, A]
+    @tailrec final def last: Codensity[F, A] = {
+      tail match {
+        case stream: IntrusiveEphemeralStream[F, A] =>
+          stream.last
+        case _ =>
+          tail
+      }
+    }
+    def apply[B](f: A => F[B]): F[B] = {
+      last(f)
+    }
+  }
+
   def rep[F[_], A](f: F[A])(implicit F: Monad[F]): Codensity[F, A] =
     new Codensity[F, A] {
       def apply[B](k: A => F[B]) = F.bind(f)(k)
@@ -55,11 +83,14 @@ object Codensity extends CodensityInstances {
 }
 
 sealed abstract class CodensityInstances {
-  implicit def codensityMonad[F[_]]: Monad[Codensity[F, *]] =
+  implicit def codensityMonad[F[_]]
+      : Monad[Codensity[F, *]] with BindRec[Codensity[F, *]] =
     new CodensityMonad[F]
 }
 
-private[scalaz] sealed class CodensityMonad[F[_]] extends Monad[Codensity[F, *]] {
+private[scalaz] sealed class CodensityMonad[F[_]]
+    extends Monad[Codensity[F, *]]
+    with BindRec[Codensity[F, *]] {
   final def point[A](a: => A) = Codensity.pureCodensity(a)
 
   override final def map[A, B](fa: Codensity[F, A])(f: A => B) =
@@ -67,4 +98,14 @@ private[scalaz] sealed class CodensityMonad[F[_]] extends Monad[Codensity[F, *]]
 
   final def bind[A, B](fa: Codensity[F, A])(k: A => Codensity[F, B]) =
     fa flatMap k
+
+  final def tailrecM[A, B](
+      a: A
+  )(f: A => scalaz.Codensity[F, A \/ B]): scalaz.Codensity[F, B] =
+    f(a).flatMapRec {
+      case -\/(a) =>
+        tailrecM(a)(f)
+      case \/-(b) =>
+        Codensity.pureCodensity(b)
+    }
 }
