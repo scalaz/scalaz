@@ -20,7 +20,7 @@ abstract class Codensity[F[_], A] { self =>
 }
 
 object Codensity extends CodensityInstances {
-  def rep[F[_], A](f: F[A])(implicit F: Monad[F]): Codensity[F, A] =
+  def rep[F[_], A](f: F[A])(implicit F: Bind[F]): Codensity[F, A] =
     new Codensity[F, A] {
       def apply[B](k: A => F[B]) = F.bind(f)(k)
     }
