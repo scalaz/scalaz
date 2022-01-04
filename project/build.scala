@@ -114,7 +114,7 @@ object build {
   }
 
   private def Scala213 = "2.13.7"
-  private def Scala30 = "3.1.0"
+  private def Scala3 = "3.1.0"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -148,10 +148,10 @@ object build {
       (f, path)
     },
     commands += Command.command("SetScala3") {
-      s"""++ ${Scala30}! -v""" :: _
+      s"""++ ${Scala3}! -v""" :: _
     },
     scalaVersion := Scala213,
-    crossScalaVersions := Seq(Scala213, Scala30),
+    crossScalaVersions := Seq(Scala213, Scala3),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
