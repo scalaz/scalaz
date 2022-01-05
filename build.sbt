@@ -106,6 +106,35 @@ lazy val example = Project(
 ).dependsOn(
   coreJVM, iterateeJVM
 )
+
+// TODO https://github.com/typelevel/scalacheck/pull/868
+lazy val disableScala3 = Def.settings(
+  libraryDependencies := {
+    if (scalaBinaryVersion.value == "3") {
+      Nil
+    } else {
+      libraryDependencies.value
+    }
+  },
+  Seq(Compile, Test).map { x =>
+    (x / sources) := {
+      if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        (x / sources).value
+      }
+    }
+  },
+  Test / test := {
+    if (scalaBinaryVersion.value == "3") {
+      ()
+    } else {
+      (Test / test).value
+    }
+  },
+  publish / skip := scalaBinaryVersion.value == "3",
+)
+
 lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
@@ -116,6 +145,9 @@ lazy val scalacheckBinding =
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.15.4",
       osgiExport("scalaz.scalacheck")
+    )
+    .nativeSettings(
+      disableScala3, // TODO
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
@@ -165,7 +197,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       (Test / sources).value.filterNot { src =>
          exclude.contains(src.getName)
       }
-    }
+    },
+    disableScala3, // TODO
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33,

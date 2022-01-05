@@ -36,6 +36,9 @@ jobs:
           - java: 8
             scala: 3
             project: rootJS
+          - java: 8
+            scala: 3
+            project: rootNative
 
     steps:
     - uses: actions/checkout@v2.4.0
