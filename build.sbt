@@ -189,15 +189,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     },
   )
   .nativeSettings(
-    (Test / sources) := {
-      // https://github.com/scala-native/scala-native/issues/2125
-      val exclude = Set(
-        "DisjunctionTest.scala",
-      )
-      (Test / sources).value.filterNot { src =>
-         exclude.contains(src.getName)
-      }
-    },
     disableScala3, // TODO
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
