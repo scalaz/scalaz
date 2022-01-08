@@ -11,35 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        scala: [2, 3]
+        project: [rootJVM, rootJS, rootNative]
+        java: [8]
         include:
-          - java: 8
-            scala: 2
-            project: rootJVM
-          - java: 8
-            scala: 2
-            project: rootJS
-          - java: 8
-            scala: 2
-            project: rootNative
-
           - java: 11
             scala: 2
             project: rootJVM
-
           - java: 17
             scala: 2
             project: rootJVM
-
-          - java: 8
-            scala: 3
-            project: rootJVM
-          - java: 8
-            scala: 3
-            project: rootJS
-          - java: 8
-            scala: 3
-            project: rootNative
-
     steps:
     - uses: actions/checkout@v2.4.0
     - uses: actions/setup-java@v2
