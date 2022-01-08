@@ -15,15 +15,15 @@ val minSuccessfulTests = settingKey[Int]("")
  */
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
+  coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS, exampleJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, exampleJVM
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative, exampleNative
 )
 
 lazy val scalaz = Project(
@@ -88,25 +88,52 @@ lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
 lazy val iterateeNative = iteratee.native
 
-lazy val example = Project(
-  id = "example",
-  base = file("example")
-).settings(
-  standardSettings,
-  name := "scalaz-example",
-  notPublish,
-  TaskKey[Unit]("runAllMain") := {
-    val r = (run / runner).value
-    val classpath = (Compile / fullClasspath).value
-    val log = streams.value.log
-    (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-      r.run(c, classpath.map(_.data), Nil, log)
-    )
-  },
-  Compile / compile / scalacOptions -= "-Xlint:adapted-args"
-).dependsOn(
-  coreJVM, iterateeJVM
-)
+lazy val exampleJVM = example.jvm
+lazy val exampleJS = example.js
+lazy val exampleNative = example.native
+
+lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(ScalazCrossType)
+  .in(file("example"))
+  .settings(
+    standardSettings,
+    name := "scalaz-example",
+    notPublish,
+    Compile / compile / scalacOptions -= "-Xlint:adapted-args",
+  )
+  .jvmSettings(
+    TaskKey[Unit]("runAllMain") := {
+      val r = (run / runner).value
+      val classpath = (Compile / fullClasspath).value
+      val log = streams.value.log
+      (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+        r.run(c, classpath.map(_.data), Nil, log)
+      )
+    },
+  )
+  .jsSettings(
+    scalaJSUseMainModuleInitializer := true,
+    commands += Command.command("runAllMain") { state1 =>
+      val extracted = Project.extract(state1)
+      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+      classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+    },
+  )
+  .nativeSettings(
+    nativeSettings,
+    commands += Command.command("runAllMain") { state1 =>
+      val extracted = Project.extract(state1)
+      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+      classes.sorted.flatMap(c => s"""set Compile / selectMainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+    },
+  )
+  .settings(
+    mimaPreviousArtifacts := Set.empty,
+  )
+  .dependsOn(
+    iteratee
+  )
+
 lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))

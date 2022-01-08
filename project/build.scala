@@ -393,7 +393,6 @@ object build {
         organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
       }.toSet
     },
-    scalaVersion := Scala211
   )
 
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
