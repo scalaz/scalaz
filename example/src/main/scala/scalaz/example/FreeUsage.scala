@@ -77,7 +77,7 @@ object FreeUsage extends App {
   val prog: Rng[(Int, Int, String)] =
     for {
       a <- nextIntInRange(100)
-      b <- nextIntInRange(a)
+      b <- nextIntInRange(math.max(1, a))
       c <- choose("red", "green", "blue")
     } yield (a, b, c)
 
