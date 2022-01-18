@@ -35,7 +35,7 @@ object KleisliTest extends SpecLite {
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
   checkAll(strong.laws[KleisliOpt])
-  checkAll(monadTrans.laws[Kleisli[*[_], Int, *], List])
+  checkAll(monadTrans.laws[({type l[a[_], b] = Kleisli[a, Int, b]})#l, List])
   checkAll(divisible.laws[Kleisli[ConstInt, Int, *]])
 
   object instances {

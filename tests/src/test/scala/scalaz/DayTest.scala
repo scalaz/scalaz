@@ -41,7 +41,7 @@ object DayTest extends SpecLite {
     def cobind[F[_]: Cobind, G[_]: Cobind] = Cobind[Day[F, G, *]]
     def comonad[F[_]: Comonad, G[_]: Comonad] = Comonad[Day[F, G, *]]
 
-    def cohoist[F[_]: Comonad] = Cohoist[Lambda[(X[_], Y) => Day[F, X, Y]]]
+    def cohoist[F[_]: Comonad] = Cohoist[({type l[X[_], Y] = Day[F, X, Y]})#l]
 
     // checking absence of ambiguity
     def functor[F[_]: Apply      : Cobind  , G[_]: Apply      : Cobind]  = Functor[Day[F, G, *]]

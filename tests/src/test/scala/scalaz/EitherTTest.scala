@@ -20,7 +20,7 @@ object EitherTTest extends SpecLite {
   checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
-  checkAll(monadTrans.laws[EitherT[Int, *[_], *], List])
+  checkAll(monadTrans.laws[({type l[a[_], b] = EitherT[Int, a, b]})#l, List])
   checkAll(alt.laws[EitherTListInt])
 
   "rightU" should {
@@ -55,12 +55,12 @@ object EitherTTest extends SpecLite {
 
     e must_=== {
       a match {
-        case -\/(v) => EitherT.left(v)
-        case \/-(v) => EitherT.right(v)
+        case -\/(v) => EitherT.left[String, Option, Int](v)
+        case \/-(v) => EitherT.right[String, Option, Int](v)
       }
     }
 
-    e must_=== EitherT.either(a)
+    e must_=== EitherT.either[String, Option, Int](a)
   }
 
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>

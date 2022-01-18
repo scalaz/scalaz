@@ -9,7 +9,6 @@ import Id._
 import NaturalTransformation.id
 
 object Enumeratee2TTest extends SpecLite {
-  implicit val v = IterateeT.IterateeTMonad[Int, Id]
   val vt = IterateeT.IterateeTMonadTrans[Int]
   val intO = Order[Int].order _
 

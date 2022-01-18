@@ -11,7 +11,7 @@ object UnapplyTest extends SpecLite {
     implicitly[ue.A === String]
 
     // needs only transient stable type
-    Unapply[Monad, Int \/ String].TC : Monad[Int \/ *]
+    Unapply[Monad, Int \/ String].TC : Monad[\/[Int, *]]
   }
 
   object unapply2 {

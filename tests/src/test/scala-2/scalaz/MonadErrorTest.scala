@@ -18,7 +18,7 @@ object MonadErrorTest extends SpecLite {
 
     implicit val string: Decoder[String] = instance(_.right)
 
-    val iso: Decoder <~> Kleisli[Int \/ *, String, *] = Kleisli.iso(
+    val iso: Decoder <~> Kleisli[\/[Int, *], String, *] = Kleisli.iso(
       new (λ[a => (String => Int \/ a)] ~> Decoder){
         override def apply[A](a: String => (Int \/ A)) =
           instance(a)

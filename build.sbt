@@ -134,6 +134,34 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     iteratee
   )
 
+// TODO https://github.com/typelevel/scalacheck/pull/868
+lazy val disableScala3 = Def.settings(
+  libraryDependencies := {
+    if (scalaBinaryVersion.value == "3") {
+      Nil
+    } else {
+      libraryDependencies.value
+    }
+  },
+  Seq(Compile, Test).map { x =>
+    (x / sources) := {
+      if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        (x / sources).value
+      }
+    }
+  },
+  Test / test := {
+    if (scalaBinaryVersion.value == "3") {
+      ()
+    } else {
+      (Test / test).value
+    }
+  },
+  publish / skip := scalaBinaryVersion.value == "3",
+)
+
 lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
@@ -148,6 +176,9 @@ lazy val scalacheckBinding =
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
     .nativeSettings(nativeSettings)
+    .nativeSettings(
+      disableScala3, // TODO
+    )
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
@@ -169,15 +200,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
   .nativeSettings(
     nativeSettings,
-    (Test / sources) := {
-      // https://github.com/scala-native/scala-native/issues/2125
-      val exclude = Set(
-        "DisjunctionTest.scala",
-      )
-      (Test / sources).value.filterNot { src =>
-        exclude.contains(src.getName)
-      }
-    }
+    disableScala3, // TODO
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33

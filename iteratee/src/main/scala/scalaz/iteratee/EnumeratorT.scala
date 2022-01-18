@@ -84,8 +84,8 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
       implicit def M = M0
     }
 
-  implicit val enumeratorTMonadTrans: MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] =
-    new MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] {
+  implicit val enumeratorTMonadTrans: MonadTrans[({type l[β[_], α] = EnumeratorT[α, β]})#l] =
+    new MonadTrans[({type l[β[_], α] = EnumeratorT[α, β]})#l] {
       def liftM[G[_]: Monad, E](ga: G[E]): EnumeratorT[E, G] =
         new EnumeratorT[E, G] {
           def apply[A] = (s: StepT[E, G, A]) => iterateeT(Monad[G].bind(ga) { e => s.mapCont(k => k(elInput(e))).value })

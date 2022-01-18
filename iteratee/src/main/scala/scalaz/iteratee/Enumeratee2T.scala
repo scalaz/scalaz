@@ -141,7 +141,7 @@ trait Enumeratee2TFunctions {
     }
 
   private def endStep[J, K, EE, F[_]: Monad, A](sa: StepT[Either3[J, (J, K), K], F, StepT[EE, F, A]]) = {
-    IterateeT.IterateeTMonadTransT[J, λ[(β[_], α) => IterateeT[K, β, α]]].liftM(sa.pointI.run)
+    IterateeT.IterateeTMonadTransT[J, ({type l[β[_], α] = IterateeT[K, β, α]})#l].liftM(sa.pointI.run)
   }
 }
 

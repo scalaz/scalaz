@@ -133,11 +133,6 @@ object FreeTTest extends SpecLite {
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
   }
 
-  private def compilationTest = {
-    val a: String \/ Int = \/-(42)
-    val b: FreeT[Maybe, String \/ *, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
-  }
-
   object instances {
     def bind[S[_]: Functor, F[_]: Applicative] = Bind[FreeT[S, F, *]]
     def foldable[S[_]: Foldable: Functor, F[_]: Foldable: Applicative: BindRec] = Foldable[FreeT[S, F, *]]
@@ -150,7 +145,7 @@ object FreeTTest extends SpecLite {
     def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, *]]
     def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, *]]
     def alt[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Alt[FreeT[S, F, *]]
-    def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, *[_], *]]
+    def monadTrans[S[_]: Functor] = MonadTrans[({type l[a[_], b] = FreeT[S, a, b]})#l]
 
     // checking absence of ambiguity
     def functor[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Functor[FreeT[S, F, *]]

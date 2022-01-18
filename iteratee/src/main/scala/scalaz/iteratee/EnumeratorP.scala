@@ -78,13 +78,13 @@ trait EnumeratorPFunctions {
       enumStream[E, G](xs)
   }
 
-  def liftE2[J, K, I, F[_]](e2t: ForallM[λ[β[_] => Enumeratee2T[J, K, I, β]]]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
+  def liftE2[J, K, I, F[_]](e2t: ForallM[({type l[β[_]] = Enumeratee2T[J, K, I, β]})#l]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
     (e1: EnumeratorP[J, F], e2: EnumeratorP[K, F]) => new EnumeratorP[I, F] {
       def apply[G[_]: Monad](trans: F ~> G): EnumeratorT[I, G] =
         new EnumeratorT[I, G] {
           val transIterateeT = new (F ~> IterateeT[K, G, *]) {
             def apply[A](f: F[A]): IterateeT[K, G, A] =
-              MonadTrans[λ[(β[_], α) => IterateeT[K, β, α]]].liftM(trans(f))
+              MonadTrans[({type l[β[_], α] = IterateeT[K, β, α]})#l].liftM(trans(f))
           }
           lazy val enum1 = e1[IterateeT[K, G, *]](transIterateeT)
           lazy val enum2 = e2[G](trans)
@@ -97,20 +97,20 @@ trait EnumeratorPFunctions {
 
   def cogroupE[J, K, F[_]](compare: (J, K) => Ordering): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[Either3[J, (J, K), K], F] =
     liftE2[J, K, Either3[J, (J, K), K], F] {
-      new ForallM[λ[β[_] => Enumeratee2T[J, K, Either3[J, (J, K), K], β]]] {
+      new ForallM[({type l[β[_]] = Enumeratee2T[J, K, Either3[J, (J, K), K], β]})#l] {
         def apply[G[_] : Monad] = cogroupI[J, K, G](compare)
       }
     }
 
   def joinE[J, K, F[_]](compare: (J, K) => Ordering): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[(J, K), F] =
     liftE2[J, K, (J, K), F] {
-      new ForallM[λ[β[_] => Enumeratee2T[J, K, (J, K), β]]] {
+      new ForallM[({type l[β[_]] = Enumeratee2T[J, K, (J, K), β]})#l] {
         def apply[G[_] : Monad] = joinI[J, K, G](compare)
       }
     }
 
   def mergeE[E: Order, F[_]: Monad]: (EnumeratorP[E, F], EnumeratorP[E, F]) => EnumeratorP[E, F] = liftE2[E, E, E, F] {
-    new ForallM[λ[β[_] => Enumeratee2T[E, E, E, β]]] {
+    new ForallM[({type l[β[_]] = Enumeratee2T[E, E, E, β]})#l] {
       def apply[G[_]: Monad] = mergeI[E, G]
     }
   }

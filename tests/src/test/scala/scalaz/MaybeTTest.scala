@@ -48,6 +48,6 @@ object MaybeTTest extends SpecLite {
     def functor[F[_], E](implicit F1: MonadError[F, E], F2: Traverse[F]) = Functor[MaybeT[F, *]]
     def apply[F[_] : Monad] = Apply[MaybeT[F, *]]
     def foldable[F[_] : Traverse] = Foldable[MaybeT[F, *]]
-    def monadEither[E] = Monad[MaybeT[E \/ *, *]]
+    def monadEither[E] = Monad[MaybeT[\/[E, *], *]]
   }
 }
