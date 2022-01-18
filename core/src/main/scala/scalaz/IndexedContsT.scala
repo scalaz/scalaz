@@ -70,14 +70,14 @@ trait IndexedContsTFunctions {
     ContsT { k => M.bind(a)(W.copoint(k)) }
 
   def xhoist[W[_], R, O, M[_], N[_]](f: M ~> N, g: N ~> M)(implicit W: Functor[W]): IndexedContsT[W, R, O, M, *] ~> IndexedContsT[W, R, O, N, *] =
-    λ[IndexedContsT[W, R, O, M, *] ~> IndexedContsT[W, R, O, N, *]](
-      fa => IndexedContsT { wk => f(fa.run(W.map(wk) { k => { x => g(k(x)) } })) }
-    )
+    new (IndexedContsT[W, R, O, M, *] ~> IndexedContsT[W, R, O, N, *]) {
+      def apply[A](fa: IndexedContsT[W, R, O, M, A]): IndexedContsT[W, R, O, N, A] = IndexedContsT { wk => f(fa.run(W.map(wk) { k => { x => g(k(x)) } })) }
+    }
 
   def contracohoist[W[_], V[_], R, O, M[_]](f: V ~> W): (IndexedContsT[W, R, O, M, *] ~> IndexedContsT[V, R, O, M, *]) =
-    λ[IndexedContsT[W, R, O, M, *] ~> IndexedContsT[V, R, O, M, *]](
-      fa => IndexedContsT { k => fa.run(f(k)) }
-    )
+    new (IndexedContsT[W, R, O, M, *] ~> IndexedContsT[V, R, O, M, *]) {
+      def apply[A](fa: IndexedContsT[W, R, O, M, A]): IndexedContsT[V, R, O, M, A] = IndexedContsT { k => fa.run(f(k)) }
+    }
 
   def shift[W[_], I, R, J, O, M[_], A](f: (A => IndexedContsT[W, I, I, M, O]) => IndexedContsT[W, R, J, M, J])(implicit W: Comonad[W], WA: Applicative[W], M: Monad[M]): IndexedContsT[W, R, O, M, A] =
     IndexedContsT { k0 =>

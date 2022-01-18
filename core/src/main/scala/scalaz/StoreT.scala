@@ -204,8 +204,10 @@ private trait StoreTCohoist[S] extends Cohoist[({type l[ƒ[_], α] = StoreT[ƒ, 
     Cobind[G].map(a.run._1)((z: S => A) => z(a.run._2))
 
   def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-    λ[StoreT[M, S, *] ~> StoreT[N, S, *]]{ c =>
-      val (m, a) = c.run
-      StoreT((f(m), a))
+    new (StoreT[M, S, *] ~> StoreT[N, S, *]) {
+      def apply[A](c: StoreT[M, S, A]) = {
+        val (m, a) = c.run
+        StoreT((f(m), a))
+      }
     }
 }

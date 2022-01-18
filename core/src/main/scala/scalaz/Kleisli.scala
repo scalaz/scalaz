@@ -384,7 +384,10 @@ private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, *], 
 
 private trait KleisliHoist[R] extends Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): Kleisli[M, R, *] ~> Kleisli[N, R, *] =
-    λ[Kleisli[M, R, *] ~> Kleisli[N, R, *]](_ mapT f.apply)
+    new (Kleisli[M, R, *] ~> Kleisli[N, R, *]) {
+      def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] =
+        m.mapT(f.apply)
+    }
 
   def liftM[G[_] : Monad, A](a: G[A]): Kleisli[G, R, A] =
     Kleisli(_ => a)
