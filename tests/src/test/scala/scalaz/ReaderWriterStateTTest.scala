@@ -44,7 +44,7 @@ object ReaderWriterStateTTest extends SpecLite {
     def bind[F[_]: Bind, R, W: Semigroup, S] = Bind[RWST[F, R, W, S, *]]
     def monadReader[F[_]: Monad, R, W: Monoid, S] = MonadReader[RWST[F, R, W, S, *], R]
     def monadState[F[_]: Monad, R, W: Monoid, S] = MonadState[RWST[F, R, W, S, *], S]
-    def monadTrans[R, W: Monoid, S] = MonadTrans[λ[(f[_], α) => RWST[f, R, W, S, α]]]
+    def monadTrans[R, W: Monoid, S] = MonadTrans[({type l[f[_], α] = RWST[f, R, W, S, α]})#l]
     // checking absence of ambiguity
     def functor[F[_]: Monad, R, W: Monoid, S] = Functor[RWST[F, R, W, S, *]]
     def functor[F[_]: Bind, R, W: Semigroup, S] = Functor[RWST[F, R, W, S, *]]

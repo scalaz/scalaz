@@ -9,8 +9,8 @@ object BitraverseTest extends SpecLite {
   implicit val LE: Traverse[\/[*, Int]] = Bitraverse[\/].leftTraverse[Int]
   implicit val RE: Traverse[\/[Int, *]] = Bitraverse[\/].rightTraverse[Int]
 
-  checkAll("Left-biased Bitraverse for Either",  traverse.laws[* \/ Int])
-  checkAll("Right-biased Bitraverse for Either", traverse.laws[Int \/ *])
+  checkAll("Left-biased Bitraverse for Either",  traverse.laws[\/[*, Int]])
+  checkAll("Right-biased Bitraverse for Either", traverse.laws[\/[Int, *]])
 
 
   implicit val LT: Traverse[(*, Int)] = Bitraverse[Tuple2].leftTraverse[Int]
@@ -18,22 +18,6 @@ object BitraverseTest extends SpecLite {
 
   checkAll("Left-biased Bitraverse for (,)",  traverse.laws[(*, Int)])
   checkAll("Right-biased Bitraverse for (,)", traverse.laws[(Int, *)])
-
-  "bitraverseU" in {
-    import syntax.bitraverse._
-    val a: Validation[Int \/ String, Int \/ Boolean] = Success(\/-(true))
-    val b = a.bitraverseU(identity, identity)
-    val _ = b: (Int \/ Validation[String, Boolean])
-    b must_=== \/-(Success(true))
-  }
-
-  "bisequenceU" in {
-    import syntax.bitraverse._
-    val a: Validation[Int \/ String, Int \/ Boolean] = Success(\/-(true))
-    val b = a.bisequenceU
-    val _ = b: (Int \/ Validation[String, Boolean])
-    b must_=== \/-(Success(true))
-  }
 
   "left/right bias" in {
     import scalaz.syntax.either._

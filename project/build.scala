@@ -19,6 +19,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.core.ProblemFilters
 import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
+import com.typesafe.tools.mima.core.InheritedNewAbstractMethodProblem
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
@@ -81,12 +82,23 @@ object build {
     scalacOptions += {
       val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
-      s"-P:scalajs:mapSourceURI:$a->$g/"
+
+      val key = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) =>
+          "-scalajs-mapSourceURI"
+        case _ =>
+          "-P:scalajs:mapSourceURI"
+      }
+      s"${key}:$a->$g/"
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
@@ -123,6 +135,7 @@ object build {
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.15"
   private def Scala213 = "2.13.8"
+  private def Scala3 = "3.1.0"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -132,7 +145,7 @@ object build {
         (scope / unmanagedSourceDirectories) += {
           val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
           CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, v)) if v >= scalaV =>
+            case Some((x, y)) if ((x == 2) && (y >= scalaV)) || (x >= 3) =>
               base / s"scala-2.${scalaV}+"
             case _ =>
               base / s"scala-2.${scalaV}-"
@@ -146,10 +159,10 @@ object build {
         val dir = Defaults.nameForSrc(scope.name)
         val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v >= 13 =>
-            base / s"scala-2.13+"
+          case Some((2, v)) if v <= 12 =>
+            base / "scala-2.13-"
           case _ =>
-            base / s"scala-2.13-"
+            base / "scala-2.13+"
         }
       }
     },
@@ -164,7 +177,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -173,7 +186,14 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_15 := "1.15.2",
+    scalaCheckVersion_1_15 := {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          "1.15.4"
+        case _ =>
+          "1.15.2"
+      }
+    },
     scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
@@ -191,6 +211,17 @@ object build {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v <= 12 =>
           Seq("-Xfuture")
+        case _ =>
+          Nil
+      }
+    },
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Seq(
+            "-source", "3.0-migration",
+            "-Ykind-projector",
+          )
         case _ =>
           Nil
       }
@@ -319,7 +350,13 @@ object build {
         Nil
     }),
     kindProjectorVersion := "0.13.2",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+    libraryDependencies ++= {
+      if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        Seq(compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full))
+      }
+    }
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
@@ -331,23 +368,44 @@ object build {
       if (scalaBinaryVersion.value == "2.11") {
         Seq(
           ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.from_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.from_"),
         )
       } else {
         Nil
       }
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
   val nativeSettings = Seq(
+    Compile / doc / scalacOptions --= {
+      // TODO remove this workaround
+      // https://github.com/scala-native/scala-native/issues/2503
+      if (scalaBinaryVersion.value == "3") {
+        (Compile / doc / scalacOptions).value.filter(_.contains("-Xplugin"))
+      } else {
+        Nil
+      }
+    },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 

@@ -3,65 +3,63 @@ package scalaz
 final class NullArgument[A, B] private(_apply: Option[A] => B) {
   def apply(a: Option[A]): B = _apply(a)
 
-  import NullArgument._
-
   def dimap[C, D](f: C => A, g: B => D): NullArgument[C, D] =
     NullArgument(c => g(_apply(c.map(f))))
 
-  def map[C](f: B => C): A ?=> C =
+  def map[C](f: B => C): NullArgument[A, C] =
     NullArgument(_apply andThen f)
 
-  def contramap[C](f: C => A): C ?=> B =
+  def contramap[C](f: C => A): NullArgument[C, B] =
     NullArgument(c => apply(c.map(f)))
 
-  def flatMap[C](f: B => A ?=> C): A ?=> C =
+  def flatMap[C](f: B => NullArgument[A, C]): NullArgument[A, C] =
     NullArgument(a => f(apply(a))(a))
 
-  def ap[C](f: A ?=> (B => C)): A ?=> C =
+  def ap[C](f: NullArgument[A, B => C]): NullArgument[A, C] =
     for {
       ff <- f
       bb <- this
     } yield ff(bb)
 
-  def zip[C](x: A ?=> C): A ?=> (B, C) =
+  def zip[C](x: NullArgument[A, C]): NullArgument[A, (B, C)] =
     for {
       b <- this
       c <- x
     } yield (b, c)
 
-  def ***[C, D](x: C ?=> D): (A, C) ?=> (B, D) =
+  def ***[C, D](x: NullArgument[C, D]): NullArgument[(A, C), (B, D)] =
     NullArgument {
       case None => (apply(None), x(None))
       case Some((a, c)) => (apply(Some(a)), x(Some(c)))
     }
 
-  def +++[C, D](x: C ?=> D): (A \/ C) ?=> (B \/ D) =
+  def +++[C, D](x: NullArgument[C, D]): NullArgument[A \/ C, B \/ D] =
     left[D] compose x.right[A]
 
-  def left[C]: (A \/ C) ?=> (B \/ C) =
+  def left[C]: NullArgument[A \/ C, B \/ C] =
     NullArgument {
       case None => -\/(apply(None))
       case Some(-\/(a)) => -\/(apply(Some(a)))
       case Some(c @ \/-(_)) => c
     }
 
-  def right[C]: (C \/ A) ?=> (C \/ B) =
+  def right[C]: NullArgument[C \/ A, C \/ B] =
     NullArgument {
       case None => \/-(apply(None))
       case Some(\/-(a)) => \/-(apply(Some(a)))
       case Some(c @ -\/(_)) => c
     }
 
-  def compose[C](f: C ?=> A): C ?=> B =
+  def compose[C](f: NullArgument[C, A]): NullArgument[C, B] =
     NullArgument {
       case None => apply(None)
       case c @ Some(_) => apply(Some(f(c)))
     }
 
-  def andThen[C](g: B ?=> C): A ?=> C =
+  def andThen[C](g: NullArgument[B, C]): NullArgument[A, C] =
     g compose this
 
-  def |+|(x: A ?=> B)(implicit S: Semigroup[B]): A ?=> B =
+  def |+|(x: NullArgument[A, B])(implicit S: Semigroup[B]): NullArgument[A, B] =
     for {
       b1 <- this
       b2 <- x
@@ -88,24 +86,24 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
 }
 
 object NullArgument extends NullArgumentInstances {
-  def apply[A, B](f: Option[A] => B): A ?=> B =
-    new (A ?=> B)(f)
+  def apply[A, B](f: Option[A] => B): NullArgument[A, B] =
+    new NullArgument[A, B](f)
 
-  type ?=>[A, B] = NullArgument[A, B]
+  type `?=>`[A, B] = NullArgument[A, B]
 
-  def always[A, B](b: => B): A ?=> B =
+  def always[A, B](b: => B): NullArgument[A, B] =
     NullArgument(_ => b)
 
-  def zero[A, B](implicit M: Monoid[B]): A ?=> B =
+  def zero[A, B](implicit M: Monoid[B]): NullArgument[A, B] =
     always(M.zero)
 
-  def pair[A, B](f: A => B, b: => B): A ?=> B =
+  def pair[A, B](f: A => B, b: => B): NullArgument[A, B] =
     NullArgument((_: Option[A]) match {
       case None => b
       case Some(a) => f(a)
     })
 
-  def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
+  def cokleisli[A, B](c: Cokleisli[Option, A, B]): NullArgument[A, B] =
     NullArgument(c.run)
 }
 

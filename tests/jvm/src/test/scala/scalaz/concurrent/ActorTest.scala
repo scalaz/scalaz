@@ -9,7 +9,7 @@ object ActorTest extends SpecLite {
   val NumOfMessages = 1000
   val NumOfThreads = 4
   val NumOfMessagesPerThread = NumOfMessages / NumOfThreads
-  implicit val executor = Executors.newFixedThreadPool(NumOfThreads)
+  implicit val executor: ExecutorService = Executors.newFixedThreadPool(NumOfThreads)
 
   "code executes async" in {
     val latch = new CountDownLatch(1)

@@ -9,7 +9,7 @@ import Id._
 import org.scalacheck.Prop.forAll
 
 object VectorTest extends SpecLite {
-  implicit def vectorArb[A: Arbitrary] =
+  implicit def vectorArb[A: Arbitrary]: Arbitrary[Vector[A]] =
     Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toVector))
 
   import std.vector._

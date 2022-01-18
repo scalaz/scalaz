@@ -27,7 +27,7 @@ sealed abstract class Cofree[S[_], A] {
     applyCofree(f, _ map f)
 
   /** Alias for `extend` */
-  final def =>>[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] = this extend f
+  final def `=>>`[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] = this extend f
 
   /** Redecorates this structure with a computation whose context is the entire structure under that value. */
   final def extend[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] =

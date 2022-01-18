@@ -98,12 +98,13 @@ trait EnumeratorPFunctions {
     }
   }
 
-  def liftE2[J, K, I, F[_]](e2t: ForallM[λ[β[_] => Enumeratee2T[J, K, I, β]]]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
+  def liftE2[J, K, I, F[_]](e2t: ForallM[({type l[β[_]] = Enumeratee2T[J, K, I, β]})#l]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
     (e1: EnumeratorP[J, F], e2: EnumeratorP[K, F]) => new EnumeratorP[I, F] {
       def apply[G[_]](implicit MO: MonadPartialOrder[G, F]): EnumeratorT[I, G] =
         new EnumeratorT[I, G] {
           import MO._
-          implicit val IOrd = MO.transform[λ[(β[_], α) => IterateeT[K, β, α]]]
+          implicit val IOrd: MonadPartialOrder[IterateeT[K, G, *], F] =
+            MO.transform[({type λ[β[_], α] = IterateeT[K, β, α]})#λ]
           lazy val enum1 = e1[IterateeT[K, G, *]]
           lazy val enum2 = e2[G]
 
@@ -116,20 +117,20 @@ trait EnumeratorPFunctions {
 
   def cogroupE[J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[Either3[J, (J, K), K], F] =
     liftE2[J, K, Either3[J, (J, K), K], F] {
-      new ForallM[λ[β[_] => Enumeratee2T[J, K, Either3[J, (J, K), K], β]]] {
+      new ForallM[({type l[β[_]] = Enumeratee2T[J, K, Either3[J, (J, K), K], β]})#l] {
         def apply[G[_] : Monad] = cogroupI[J, K, G]
       }
     }
 
   def joinE[J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[(J, K), F] =
     liftE2[J, K, (J, K), F] {
-      new ForallM[λ[β[_] => Enumeratee2T[J, K, (J, K), β]]] {
+      new ForallM[({type l[β[_]] = Enumeratee2T[J, K, (J, K), β]})#l] {
         def apply[G[_] : Monad] = joinI[J, K, G]
       }
     }
 
   def mergeE[E: Order, F[_]: Monad]: (EnumeratorP[E, F], EnumeratorP[E, F]) => EnumeratorP[E, F] = liftE2[E, E, E, F] {
-    new ForallM[λ[β[_] => Enumeratee2T[E, E, E, β]]] {
+    new ForallM[({type l[β[_]] = Enumeratee2T[E, E, E, β]})#l] {
       def apply[G[_]: Monad] = mergeI[E, G]
     }
   }

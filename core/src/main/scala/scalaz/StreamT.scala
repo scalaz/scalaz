@@ -398,11 +398,12 @@ private trait StreamTHoist extends Hoist[StreamT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): StreamT[M, *] ~> StreamT[N, *] =
-    λ[StreamT[M, *] ~> StreamT[N, *]](a =>
-      StreamT(f(M.map(a.step)(
-        _( yieldd = (a, as) => Yield(a, hoist(f) apply as)
-         , skip = as => Skip(hoist(f) apply as)
-         , done = Done
-         ))))
-    )
+    new (StreamT[M, *] ~> StreamT[N, *]) {
+      def apply[A](a: StreamT[M, A]) =
+        StreamT(f(M.map(a.step)(
+          _( yieldd = (a, as) => Yield(a, hoist(f) apply as)
+           , skip = as => Skip(hoist(f) apply as)
+           , done = Done
+           ))))
+    }
 }

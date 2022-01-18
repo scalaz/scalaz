@@ -142,7 +142,7 @@ sealed abstract class StoreTInstances0 extends StoreTInstances1 {
     }
 }
 abstract class StoreTInstances extends StoreTInstances0 {
-  implicit def storeTCohoist[S]: Cohoist[λ[(ƒ[_], α) => StoreT[ƒ, S, α]]] =
+  implicit def storeTCohoist[S]: Cohoist[({type l[ƒ[_], α] = StoreT[ƒ, S, α]})#l] =
     new StoreTCohoist[S] {}
 
   implicit def storeMonad[S](implicit S: Monoid[S]): Monad[Store[S, *]] =
@@ -196,13 +196,15 @@ private trait StoreTComonadStore[F[_], S] extends ComonadStore[StoreT[F, S, *], 
   override def experiment[G[_], A](s: S => G[S], w: StoreT[F, S, A])(implicit FG: Functor[G]): G[A] = w experiment s
 }
 
-private trait StoreTCohoist[S] extends Cohoist[λ[(ƒ[_], α) => StoreT[ƒ, S, α]]] {
+private trait StoreTCohoist[S] extends Cohoist[({type l[ƒ[_], α] = StoreT[ƒ, S, α]})#l] {
   def lower[G[_] : Cobind, A](a: StoreT[G, S, A]) =
     Cobind[G].map(a.run._1)((z: S => A) => z(a.run._2))
 
   def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-    λ[StoreT[M, S, *] ~> StoreT[N, S, *]]{ c =>
-      val (m, a) = c.run
-      StoreT((f(m), a))
+    new (StoreT[M, S, *] ~> StoreT[N, S, *]) {
+      def apply[A](c: StoreT[M, S, A]) = {
+        val (m, a) = c.run
+        StoreT((f(m), a))
+      }
     }
 }

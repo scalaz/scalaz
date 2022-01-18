@@ -3,6 +3,7 @@ import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
 
 val minSuccessfulTests = settingKey[Int]("")
@@ -105,23 +106,54 @@ lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
 lazy val iterateeNative = iteratee.native
 
-lazy val example = Project(
-  id = "example",
-  base = file("example")
-).settings(
-  standardSettings,
-  name := "scalaz-example",
-  notPublish,
-  TaskKey[Unit]("runAllMain") := {
-    val r = (run / runner).value
-    val classpath = (Compile / fullClasspath).value
-    val log = streams.value.log
-    (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-      r.run(c, classpath.map(_.data), Nil, log)
-    )
-  },
-).dependsOn(
+lazy val exampleBase = CrossProject(id = "example", base = file("example"))(JVMPlatform)
+  .crossType(ScalazCrossType)
+  .withoutSuffixFor(JVMPlatform)
+  .settings(
+    standardSettings,
+    name := "scalaz-example",
+    notPublish,
+    TaskKey[Unit]("runAllMain") := {
+      val r = (run / runner).value
+      val classpath = (Compile / fullClasspath).value
+      val log = streams.value.log
+      (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+        r.run(c, classpath.map(_.data), Nil, log)
+      )
+    },
+  )
+
+lazy val example = exampleBase.jvm.dependsOn(
   coreJVM, iterateeJVM, concurrent
+)
+
+// TODO https://github.com/typelevel/scalacheck/pull/868
+lazy val disableScala3 = Def.settings(
+  mimaPreviousArtifacts := Set.empty,
+  libraryDependencies := {
+    if (scalaBinaryVersion.value == "3") {
+      Nil
+    } else {
+      libraryDependencies.value
+    }
+  },
+  Seq(Compile, Test).map { x =>
+    (x / sources) := {
+      if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        (x / sources).value
+      }
+    }
+  },
+  Test / test := {
+    if (scalaBinaryVersion.value == "3") {
+      ()
+    } else {
+      (Test / test).value
+    }
+  },
+  publish / skip := scalaBinaryVersion.value == "3",
 )
 
 def scalacheckBindingProject(
@@ -200,6 +232,7 @@ def scalacheckBindingProject(
             Set.empty
         }
       },
+      disableScala3, // TODO
     )
 }
 
@@ -231,15 +264,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .nativeSettings(
     nativeSettings,
-    (Test / sources) := {
-      // https://github.com/scala-native/scala-native/issues/2125
-      val exclude = Set(
-        "DisjunctionTest.scala",
-      )
-      (Test / sources).value.filterNot { src =>
-         exclude.contains(src.getName)
-      }
-    }
+    disableScala3, // TODO
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33

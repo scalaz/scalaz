@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
 
 object BigIntTest extends SpecLite {
-  checkAll("BigInt", enum.laws[BigInt])
+  checkAll("BigInt", `enum`.laws[BigInt])
   checkAll("BigInt @@ Multiplication", order.laws[BigInt @@ Multiplication])
 
   checkAll("BigInt @@ Multiplication", monoid.laws[BigInt @@ Multiplication])

@@ -38,9 +38,9 @@ sealed abstract class Reducer[C, M] {
 
   /** Distribute `C`s to `M` and `N`. */
   def compose[N](r: Reducer[C, N]): Reducer[C, (M, N)] = {
-    implicit val m = Reducer.this.monoid
-    implicit val n = r.monoid
     new Reducer[C, (M, N)] {
+      private[this] implicit val m: Monoid[M] = Reducer.this.monoid
+      private[this] implicit val n: Monoid[N] = r.monoid
 
       import std.tuple._
 

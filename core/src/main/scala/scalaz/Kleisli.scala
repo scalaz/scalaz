@@ -243,7 +243,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
       implicit def F = F0
     }
 
-  implicit def kleisliMonadTrans[R]: Hoist[λ[(α[_], β) => Kleisli[α, R, β]]] =
+  implicit def kleisliMonadTrans[R]: Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] =
     new KleisliHoist[R] {}
 
   implicit def kleisliCatchable[F[_], A](implicit F0: Catchable[F]): Catchable[Kleisli[F, A, *]] =
@@ -350,9 +350,12 @@ private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, *], 
     fa.local(f)
 }
 
-private trait KleisliHoist[R] extends Hoist[Kleisli[*[_], R, *]] {
+private trait KleisliHoist[R] extends Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): Kleisli[M, R, *] ~> Kleisli[N, R, *] =
-    λ[Kleisli[M, R, *] ~> Kleisli[N, R, *]](_ mapT f)
+    new (Kleisli[M, R, *] ~> Kleisli[N, R, *]) {
+      def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] =
+        m.mapT(f.apply)
+    }
 
   def liftM[G[_] : Monad, A](a: G[A]): Kleisli[G, R, A] =
     Kleisli(_ => a)
