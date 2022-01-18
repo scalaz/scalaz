@@ -171,10 +171,10 @@ object build {
         val dir = Defaults.nameForSrc(scope.name)
         val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v >= 13 =>
-            base / "scala-2.13+"
-          case _ =>
+          case Some((2, v)) if v <= 12 =>
             base / "scala-2.13-"
+          case _ =>
+            base / "scala-2.13+"
         }
       }
     },
