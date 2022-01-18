@@ -1,7 +1,7 @@
 package scalaz
 
 sealed abstract class LeibnizF[A[_], B[_]] {
-  def apply[X](a: A[X]): B[X] = subst[λ[F[_] => F[X]]](a)
+  def apply[X](a: A[X]): B[X] = subst[({type l[F[_]] = F[X]})#l](a)
   def subst[F[_[_]]](p: F[A]): F[B]
 }
 
@@ -18,11 +18,11 @@ object LeibnizF {
     f: LeibnizF[B, C],
     g: LeibnizF[A, B]
   ): LeibnizF[A, C] =
-    f.subst[λ[X[_] => LeibnizF[A, X]]](g)
+    f.subst[({type l[X[_]] = LeibnizF[A, X]})#l](g)
 
   /** Equality is symmetric */
   def symm[A[_], B[_]](
     f: LeibnizF[A, B]
   )  : LeibnizF[B, A] =
-    f.subst[λ[X[_]=> LeibnizF[X, A]]](refl)
+    f.subst[({type l[X[_]] = LeibnizF[X, A]})#l](refl)
 }

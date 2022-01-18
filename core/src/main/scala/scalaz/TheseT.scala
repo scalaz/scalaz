@@ -72,7 +72,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   = TheseT(F.map(run)(_.bimap(f, g)))
 
   def traverse[G[_], D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, A, D]]
-  = G.map(F.traverse(run)(o => Traverse[A \&/ *].traverse(o)(g)))(TheseT(_))
+  = G.map(F.traverse(run)(o => Traverse[\&/[A, *]].traverse(o)(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]
@@ -105,7 +105,7 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
       fa.traverse(f)
   }
 
-  implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[*[_], A, *]] = new Hoist[TheseT[*[_], A, *]] {
+  implicit def TheseTHoist[A: Semigroup]: Hoist[({type l[a[_], b] = TheseT[a, A, b]})#l] = new Hoist[({type l[a[_], b] = TheseT[a, A, b]})#l] {
     override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
       λ[TheseT[M, A, *] ~> TheseT[N, A, *]](_ mapT f.apply)
 

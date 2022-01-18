@@ -74,8 +74,8 @@ sealed abstract class SelectTInstances1 extends SelectTInstances2 {
 }
 
 sealed abstract class SelectTInstances extends SelectTInstances1 {
-  implicit def selectTMonadTrans[R]: MonadTrans[Lambda[(x[_], y) => SelectT[R, x, y]]] =
-    new MonadTrans[Lambda[(x[_], y) => SelectT[R, x, y]]] {
+  implicit def selectTMonadTrans[R]: MonadTrans[({type l[x[_], y] = SelectT[R, x, y]})#l] =
+    new MonadTrans[({type l[x[_], y] = SelectT[R, x, y]})#l] {
       override def liftM[G[_]: Monad, A](a: G[A]) =
         SelectT(_ => a)
 

@@ -361,8 +361,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
   implicit def TheseIsCovariantLeft[A]: IsCovariant[\&/[*, A]] =
     IsCovariant.force[\&/[*, A]]
 
-  implicit def TheseInstance0[L: Semigroup]: Monad[L \&/ *] with BindRec[L \&/ *] =
-    new Monad[L \&/ *] with BindRec[L \&/ *] {
+  implicit def TheseInstance0[L: Semigroup]: Monad[\&/[L, *]] with BindRec[\&/[L, *]] =
+    new Monad[\&/[L, *]] with BindRec[\&/[L, *]] {
       def tailrecM[A, B](a: A)(f: A => L \&/ (A \/ B)): L \&/ B =
         \&/.tailrecM(a)(f)
 
@@ -428,8 +428,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
 sealed abstract class TheseInstances1 {
 
-  implicit def TheseInstance1[L]: Traverse[L \&/ *] with Cobind[L \&/ *] =
-    new Traverse[L \&/ *] with Cobind[L \&/ *] {
+  implicit def TheseInstance1[L]: Traverse[\&/[L, *]] with Cobind[\&/[L, *]] =
+    new Traverse[\&/[L, *]] with Cobind[\&/[L, *]] {
       def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
         fa traverse f
 

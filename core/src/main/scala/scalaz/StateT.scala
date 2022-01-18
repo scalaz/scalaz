@@ -238,7 +238,7 @@ sealed abstract class StateTInstances1 extends StateTInstances2 {
 }
 
 sealed abstract class StateTInstances0 extends StateTInstances1 {
-  implicit def StateMonadTrans[S]: Hoist[λ[(g[_], a) => StateT[S, g, a]]] =
+  implicit def StateMonadTrans[S]: Hoist[({type l[a[_], b] = StateT[S, a, b]})#l] =
     new StateTHoist[S] {}
 
   implicit def stateComonad[S](implicit S: Monoid[S]): Comonad[State[S, *]] =
@@ -386,12 +386,15 @@ private trait StateTMonadError[S, F[_], E] extends MonadError[StateT[S, F, *], E
     StateT(s => F.point((s, a)))
 }
 
-private trait StateTHoist[S] extends Hoist[StateT[S, *[_], *]] {
+private trait StateTHoist[S] extends Hoist[({type l[a[_], b] = StateT[S, a, b]})#l] {
 
   def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[S, G, A] =
     StateT(s => G.map(ga)(a => (s, a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateT[S, M, *] ~> StateT[S, N, *]](_ mapT f.apply)
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateT[S, M, *] ~> StateT[S, N, *]) {
+    def apply[A](action: StateT[S, M, A]) =
+      action.mapT(f.apply)
+  }
 
   implicit def apply[G[_] : Monad]: Monad[StateT[S, G, *]] = StateT.stateTMonadState[S, G]
 }

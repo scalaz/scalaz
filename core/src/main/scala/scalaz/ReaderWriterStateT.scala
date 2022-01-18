@@ -124,7 +124,7 @@ abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 
       override def W = W0
     }
 
-  implicit def rwstHoist[R, W, S](implicit W0: Monoid[W]): Hoist[λ[(α[_], β) => ReaderWriterStateT[R, W, S, α, β]]] =
+  implicit def rwstHoist[R, W, S](implicit W0: Monoid[W]): Hoist[({type l[α[_], β] = ReaderWriterStateT[R, W, S, α, β]})#l] =
     new ReaderWriterStateTHoist[R, W, S] {
       implicit def W = W0
     }
