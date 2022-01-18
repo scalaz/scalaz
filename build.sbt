@@ -136,6 +136,7 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
 
 // TODO https://github.com/typelevel/scalacheck/pull/868
 lazy val disableScala3 = Def.settings(
+  mimaPreviousArtifacts := Set.empty,
   libraryDependencies := {
     if (scalaBinaryVersion.value == "3") {
       Nil
