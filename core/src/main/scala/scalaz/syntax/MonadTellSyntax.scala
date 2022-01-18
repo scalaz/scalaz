@@ -22,8 +22,6 @@ trait ToMonadTellOps0[TC[F[_], S] <: MonadTell[F, S]] {
   ////
 }
 
-trait ToMonadTellOps[TC[F[_], S] <: MonadTell[F, S]] extends ToMonadTellOps0[TC] with ToMonadOps[λ[F[_] => TC[F, S] forSome { type S }]]
-
 trait MonadTellSyntax[F[_], S] extends MonadSyntax[F] {
   implicit def ToMonadTellOps[A](v: F[A]): MonadTellOps[F, S, A] =
     new MonadTellOps[F, S, A](v)(MonadTellSyntax.this.F)

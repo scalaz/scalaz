@@ -55,13 +55,13 @@ object Free extends FreeInstances {
     roll(s)
 
   /** Return from the computation with the given value. */
-  private case class Return[S[_], A](a: A) extends Free[S, A]
+  private[scalaz] case class Return[S[_], A](a: A) extends Free[S, A]
 
   /** Suspend the computation with the given suspension. */
-  private case class Suspend[S[_], A](a: S[A]) extends Free[S, A]
+  private[scalaz] case class Suspend[S[_], A](a: S[A]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  private case class Gosub[S[_], A0, B](a0: Free[S, A0], f0: A0 => Free[S, B]) extends Free[S, B] {
+  private[scalaz] case class Gosub[S[_], A0, B](a0: Free[S, A0], f0: A0 => Free[S, B]) extends Free[S, B] {
     type A = A0
     def a: Free[S, A] = a0
     def f: A => Free[S, B] = f0
@@ -99,7 +99,7 @@ object Free extends FreeInstances {
  * A free monad for a type constructor `S`.
  * Binding is done using the heap instead of the stack, allowing tail-call elimination.
  */
-sealed abstract class Free[S[_], A] {
+sealed abstract class Free[S[_], A] extends FreeFunctions[S, A] {
   final def map[B](f: A => B): Free[S, B] =
     flatMap(a => Return(f(a)))
 
@@ -212,24 +212,6 @@ sealed abstract class Free[S[_], A] {
         x
     }
     case x => x
-  }
-
-  /**
-   * Re-associate any left-nested binds to the right, pull the first suspension to the top
-   * and then pass the result to one of the callbacks.
-   */
-  @tailrec private[scalaz] final def foldStep[B](
-    onReturn: A => B,
-    onSuspend: S[A] => B,
-    onGosub: ((S[X], X => Free[S, A]) forSome { type X }) => B
-  ): B = this match {
-    case Gosub(fz, f) => fz match {
-      case Gosub(fy, g) => fy.flatMap(y => g(y).flatMap(f)).foldStep(onReturn, onSuspend, onGosub)
-      case Suspend(sz) => onGosub((sz, f))
-      case Return(z) => f(z).foldStep(onReturn, onSuspend, onGosub)
-    }
-    case Suspend(sa) => onSuspend(sa)
-    case Return(a) => onReturn(a)
   }
 
   /**
@@ -459,56 +441,6 @@ sealed abstract class FreeInstances extends FreeInstances0 {
 private sealed trait FreeBind[F[_]] extends Bind[Free[F, *]] {
   override def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
   def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
-}
-
-private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
-  def F: Foldable[F]
-
-  override final def foldMap[A, B: Monoid](fa: Free[F, A])(f: A => B): B =
-    fa.foldStep(
-      f,
-      fa => F.foldMap(fa)(f),
-      { case (fx, g) => F.foldMap(fx)(x => foldMap(g(x))(f)) }
-    )
-
-  override final def foldLeft[A, B](fa: Free[F, A], z: B)(f: (B, A) => B): B =
-    fa.foldStep(
-      a => f(z, a),
-      fa => F.foldLeft(fa, z)(f),
-      { case (fx, g) => F.foldLeft(fx, z)((b, x) => foldLeft(g(x), b)(f)) }
-    )
-
-  override final def foldRight[A, B](fa: Free[F, A], z: => B)(f: (A, => B) => B): B =
-    fa.foldStep(
-      a => f(a, z),
-      fa => F.foldRight(fa, z)(f),
-      { case (fx, g) => F.foldRight(fx, z)((x, b) => foldRight(g(x), b)(f)) }
-    )
-}
-
-private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
-  def F: Foldable1[F]
-
-  override final def foldMap1[A, B: Semigroup](fa: Free[F, A])(f: A => B): B =
-    fa.foldStep(
-      f,
-      fa => F.foldMap1(fa)(f),
-      { case (fx, g) => F.foldMap1(fx)(x => foldMap1(g(x))(f)) }
-    )
-
-  override final def foldMapRight1[A, B](fa: Free[F, A])(z: A => B)(f: (A, => B) => B): B =
-    fa.foldStep(
-      z,
-      fa => F.foldMapRight1(fa)(z)(f),
-      { case (fx, g) => F.foldMapRight1(fx)(x => foldMapRight1(g(x))(z)(f))((x, b) => foldRight(g(x), b)(f)) }
-    )
-
-  override final def foldMapLeft1[A, B](fa: Free[F, A])(z: A => B)(f: (B, A) => B): B =
-    fa.foldStep(
-      z,
-      fa => F.foldMapLeft1(fa)(z)(f),
-      { case (fx, g) => F.foldMapLeft1(fx)(x => foldMapLeft1(g(x))(z)(f))((b, x) => foldLeft(g(x), b)(f)) }
-    )
 }
 
 private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, *]] with FreeFoldable[F]{

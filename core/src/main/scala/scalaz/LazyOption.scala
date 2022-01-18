@@ -105,6 +105,10 @@ private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private final case class LazyNone[A] private() extends LazyOption[A]
 
+private object LazyNone {
+  private[scalaz] val none = LazyNone[Any]()
+}
+
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
@@ -181,13 +185,12 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
 }
 
 object LazyOption extends LazyOptionInstances {
-  private val none = LazyNone[Any]()
 
   def lazySome[A](a: => A): LazyOption[A] =
     LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =
-    none.asInstanceOf[LazyOption[A]]
+    LazyNone.none.asInstanceOf[LazyOption[A]]
 
   def fromOption[A](oa: Option[A]): LazyOption[A] = oa match {
     case Some(x) => lazySome(x)

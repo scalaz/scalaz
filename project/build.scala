@@ -189,7 +189,13 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.15.2",
+    scalaCheckVersion := {
+      if (scalaBinaryVersion.value == "3") {
+        "1.15.4"
+      } else {
+        "1.15.2"
+      }
+    },
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
@@ -219,7 +225,8 @@ object build {
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((0 | 3, _)) =>
         Seq(
-          "-Ykind-projector"
+          "-source", "3.0-migration",
+          "-Ykind-projector",
         )
     }.toList.flatten,
     scalacOptions ++= unusedWarnOptions.value,
