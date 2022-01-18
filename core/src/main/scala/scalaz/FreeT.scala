@@ -53,7 +53,7 @@ object FreeT extends FreeTInstances {
         case Suspend(-\/(a)) =>
           Free.point(a)
         case a @ Gosub(_, _) =>
-          to(a.a).flatMap(a.f.andThen(to(_)))
+          to_(a.a).flatMap(a.f.andThen(to_(_)))
       }
       override def from[A](ga: Free[S, A]) =
         ga.toFreeT

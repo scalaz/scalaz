@@ -16,7 +16,7 @@ import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import com.typesafe.tools.mima.core.{ProblemFilters, IncompatibleSignatureProblem}
+import com.typesafe.tools.mima.core.{ProblemFilters, IncompatibleSignatureProblem, InheritedNewAbstractMethodProblem}
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
@@ -85,9 +85,13 @@ object build {
       s"${key}:$a->$g/"
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
@@ -156,6 +160,7 @@ object build {
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.15"
   private def Scala213 = "2.13.8"
+  private def Scala3 = "3.1.0"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -184,10 +189,11 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     addCommandAlias("SetScala2_11", s"++ ${Scala211}! -v"),
     addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
+    addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -372,15 +378,23 @@ object build {
       if (scalaBinaryVersion.value == "2.11") {
         Seq(
           ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.from_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.from_"),
         )
       } else {
         Nil
       }
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
@@ -406,9 +420,13 @@ object build {
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     },
   )
 
