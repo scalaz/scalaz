@@ -419,6 +419,15 @@ object build {
 
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,
+    Compile / doc / scalacOptions --= {
+      // TODO remove this workaround
+      // https://github.com/scala-native/scala-native/issues/2503
+      if (scalaBinaryVersion.value == "3") {
+        (Compile / doc / scalacOptions).value.filter(_.contains("-Xplugin"))
+      } else {
+        Nil
+      }
+    },
     mimaPreviousArtifacts := {
       if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
         Set.empty
