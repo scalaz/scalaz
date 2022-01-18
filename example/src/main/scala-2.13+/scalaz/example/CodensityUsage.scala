@@ -23,7 +23,7 @@ object CodensityUsage extends SafeApp {
   val prg = for {
     r1 <- resource("R1")
     r2 <- resource("R2")
-    rs <- (3 to 6).toList.traverseU(s => resource(s"R$s"))
+    rs <- (3 to 6).toList.traverse(s => resource(s"R$s"))
     _ <- IO.putStrLn("Acquired resources:").liftM[Codensity]
     _ <- (r1 :: r2 :: rs).traverse(IO.putStrLn).liftM[Codensity]
   } yield ()

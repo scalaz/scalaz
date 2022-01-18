@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 import ConcurrentTest._
 
 object FutureTest extends SpecLite {
-  implicit def FutureEqual[A: Equal] =
+  implicit def FutureEqual[A: Equal]: Equal[Future[A]] =
     Equal[A].contramap((_: Future[A]).unsafePerformSync)
 
   checkAll(monad.laws[Future])

@@ -101,7 +101,11 @@ object FreeStateT {
   def run[M[_]: Applicative: BindRec, S, A](fs: FreeStateT[M, S, A])(s: S): M[(S, A)] = {
     type F[X] = (S, S => M[(S, X)])
     type G[X] = M[(S, X)]
-    fs.foldRunM(s)(λ[F ~> G] { case (s, f) => f(s) })
+    fs.foldRunM(s)(
+      new ~>[F, G] {
+        def apply[B](x: F[B]) =
+          x._2(x._1)
+    })
   }
 }
 

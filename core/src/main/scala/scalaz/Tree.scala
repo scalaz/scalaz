@@ -196,7 +196,7 @@ sealed abstract class TreeInstances {
 
   implicit def treeOrder[A](implicit A0: Order[A]): Order[Tree[A]] =
     new Order[Tree[A]] with TreeEqual[A] {
-      def A = A0
+      def A: Order[A] = A0
       import std.stream._
       override def order(x: Tree[A], y: Tree[A]) =
         A.order(x.rootLabel, y.rootLabel) match {

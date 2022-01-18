@@ -11,7 +11,7 @@ sealed abstract class Liskov[-A, +B] {
 
   def subst[F[-_]](p: F[B]): F[A]
 
-  final def *[+[+_, +_], C, D](that: Liskov[C, D]): Liskov[A + C, B + D] = Liskov.lift2(this, that)
+  final def *[x[+_, +_], C, D](that: Liskov[C, D]): Liskov[A x C, B x D] = Liskov.lift2(this, that)
 
   final def andThen[C](that: Liskov[B, C]): Liskov[A, C] = Liskov.trans(that, this)
 

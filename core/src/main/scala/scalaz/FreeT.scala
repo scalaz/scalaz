@@ -52,11 +52,11 @@ object FreeT extends FreeTInstances {
     new IsoFunctorTemplate[FreeT[S, Id.Id, *], Free[S, *]] {
       override def to[A](fa: FreeT[S, Id.Id, A]) = fa match {
         case Suspend(\/-(a)) =>
-          Free.roll(S.map(a)(to(_)))
+          Free.roll(S.map(a)(to_(_)))
         case Suspend(-\/(a)) =>
           Free.point(a)
         case a @ Gosub() =>
-          to(a.a).flatMap(a.f.andThen(to(_)))
+          to_(a.a).flatMap(a.f.andThen(to_(_)))
       }
       override def from[A](ga: Free[S, A]) =
         ga.toFreeT
@@ -176,7 +176,9 @@ sealed abstract class FreeTInstances5 extends FreeTInstances6 {
       override def ask =
         FreeT.liftM(M1.ask)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
-        fa.hoistM(λ[M ~> M](M1.local(f)(_)))
+        fa.hoistM(new (M ~> M){
+          def apply[A](a: M[A]) = M1.local(f)(a)
+        })
     }
 }
 
@@ -213,10 +215,12 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
       implicit def M: Functor[M] = M0
     }
 
-  implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, *[_], *]] =
-    new Hoist[FreeT[S, *[_], *]] {
+  implicit def freeTHoist[S[_]: Functor]: Hoist[({type l[a[_], b] = FreeT[S, a, b]})#l] =
+    new Hoist[({type l[a[_], b] = FreeT[S, a, b]})#l] {
       def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-        λ[FreeT[S, M, *] ~> FreeT[S, N, *]](_ hoistM f)
+        new (FreeT[S, M, *] ~> FreeT[S, N, *]) {
+          def apply[A](fa: FreeT[S, M, A]) = fa.hoistM(f)
+        }
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
       def apply[G[_]: Monad] =

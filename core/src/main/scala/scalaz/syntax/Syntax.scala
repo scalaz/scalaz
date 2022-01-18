@@ -17,7 +17,7 @@ trait Syntaxes {
 
   object order extends ToOrderOps
 
-  object enum extends ToEnumOps
+  object `enum` extends ToEnumOps
 
   object isEmpty extends ToIsEmptyOps
 

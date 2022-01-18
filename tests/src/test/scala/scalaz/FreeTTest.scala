@@ -11,7 +11,7 @@ import scalaz.syntax.bind._
 case class FreeTListOption[A](f: FreeT[List, Option, A])
 
 object FreeTListOption {
-  implicit def freeTListOptionMonad = new MonadPlus[FreeTListOption] with Traverse[FreeTListOption] with BindRec[FreeTListOption] {
+  implicit def freeTListOptionMonad: MonadPlus[FreeTListOption] with Traverse[FreeTListOption] with BindRec[FreeTListOption] = new MonadPlus[FreeTListOption] with Traverse[FreeTListOption] with BindRec[FreeTListOption] {
     def point[A](a: => A): FreeTListOption[A] =
       FreeTListOption(Monad[FreeT[List, Option, *]].point(a))
 
@@ -102,8 +102,8 @@ object FreeTTest extends SpecLite {
         (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
       )
 
-      a.f.interpretS(NaturalTransformation.refl)
-      a.f.interpretT(NaturalTransformation.refl)
+      a.f.interpretS(NaturalTransformation.refl[List])
+      a.f.interpretT(NaturalTransformation.refl[List])
       ()
     }
   }
@@ -111,11 +111,6 @@ object FreeTTest extends SpecLite {
   "isoFree" ! forAll { (a: FreeOption[Int]) =>
     val iso = FreeT.isoFree[Option]
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
-  }
-
-  private def compilationTest = {
-    val a: String \/ Int = \/-(42)
-    val b: FreeT[Maybe, String \/ *, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
   }
 
   object instances {
@@ -129,7 +124,7 @@ object FreeTTest extends SpecLite {
     def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, *], E]
     def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, *]]
     def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, *]]
-    def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, *[_], *]]
+    def monadTrans[S[_]: Functor] = MonadTrans[({type l[a[_], b] = FreeT[S, a, b]})#l]
 
     // checking absence of ambiguity
     def functor[S[_]: Functor, F[_]: Functor] = Functor[FreeT[S, F, *]]

@@ -163,7 +163,9 @@ abstract class ScalazArbitrary1 {
     Cogen[List[A]].contramap(_.toList)
 
   implicit def cogenTreeLoc[A: Cogen]: Cogen[TreeLoc[A]] =
-    Divide[Cogen].deriving4(Function.unlift(TreeLoc.unapply))
+    Divide[Cogen].deriving4((x: TreeLoc[A]) =>
+      (x.tree, x.lefts, x.rights, x.parents)
+    )
 
   implicit def cogenStrictTree[A: Cogen]: Cogen[StrictTree[A]] =
     Cogen[List[A]].contramap(_.toList)

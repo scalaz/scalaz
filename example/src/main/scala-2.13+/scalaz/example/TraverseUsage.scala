@@ -64,7 +64,7 @@ object TraverseUsage extends App {
   // could not find implicit value for parameter ev: scalaz.Leibniz.===[scalaz.Validation[String,Int],G[B]
 
   // these however work:
-  val result: ValidationNel[String, Vector[Int]] = validations.sequenceU
+  val result: ValidationNel[String, Vector[Int]] = validations.sequence
   assert(result === NonEmptyList("failure2","failure4").failure[Vector[Int]])
 
   val onlyEvenAllowed: Int => ValidationNel[String, Int] = x => if(x % 2 === 0) x.successNel else (x.toString + " is not even").failureNel
@@ -72,8 +72,8 @@ object TraverseUsage extends App {
   val evens = IList(2,4,6,8)
   val notAllEvens = List(1,2,3,4)
 
-  assert(evens.traverseU(onlyEvenAllowed) === IList(2,4,6,8).success)
-  assert(notAllEvens.traverseU(onlyEvenAllowed) === NonEmptyList("1 is not even","3 is not even").failure)
+  assert(evens.traverse(onlyEvenAllowed) === IList(2,4,6,8).success)
+  assert(notAllEvens.traverse(onlyEvenAllowed) === NonEmptyList("1 is not even","3 is not even").failure)
 
   // there is a traverseS method which allows us to traverse a
   // structure with a function while carrying a state through the

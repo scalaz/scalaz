@@ -296,7 +296,7 @@ object Task {
         new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) =>
           a.map((_, residuals.map(new Task(_))))
         })
-      val AE = Apply[Throwable \/ *]
+      val AE = Apply[\/[Throwable, *]]
       override def reduceUnordered[A, M](fs: Seq[Task[A]])(implicit R: Reducer[A, M]): Task[M] = {
         import R.monoid
         val RR: Reducer[Throwable \/ A, Throwable \/ M] =
@@ -304,7 +304,7 @@ object Task {
             _.map(R.unit),
             c => AE.apply2(c, _)(R.cons(_, _)),
             m => AE.apply2(m, _)(R.snoc(_, _))
-          )(Monoid.liftMonoid[Throwable \/ *, M])
+          )(Monoid.liftMonoid[\/[Throwable, *], M])
         new Task(F.reduceUnordered(fs.map(_.get))(RR))
       }
       def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))

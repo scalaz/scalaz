@@ -31,7 +31,7 @@ trait TryInstances {
   import scalaz.std.{`try` => t}
 
   val tryDisjunctionIso: Try <~> λ[α => Throwable \/ α] =
-    new IsoFunctorTemplate[Try, Throwable \/ *] {
+    new IsoFunctorTemplate[Try, \/[Throwable, *]] {
       def to[A](fa: Try[A]) = t.toDisjunction(fa)
       def from[A](ga: Throwable \/ A) = t.fromDisjunction(ga)
     }

@@ -1,6 +1,5 @@
 package scalaz
 
-import org.scalacheck.Prop._
 import scalacheck.ScalazArbitrary._
 import scalacheck.ScalazProperties._
 import std.anyVal._

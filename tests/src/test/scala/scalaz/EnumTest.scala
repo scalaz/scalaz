@@ -1,7 +1,7 @@
 package scalaz
 
 import scalaz.std.AllInstances._
-import scalaz.syntax.enum._
+import scalaz.syntax.`enum`._
 
 object EnumTest extends SpecLite {
 

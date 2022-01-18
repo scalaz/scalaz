@@ -79,7 +79,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
-    G.map(F.traverse(run)(o => Traverse[A \/ *].traverse(o)(f)))(EitherT(_))
+    G.map(F.traverse(run)(o => Traverse[\/[A, *]].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
@@ -368,7 +368,7 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
       implicit def F = F0
     }
 
-  implicit def eitherTHoist[A]: Hoist[λ[(α[_], β) => EitherT[α, A, β]]] =
+  implicit def eitherTHoist[A]: Hoist[({type l[α[_], β] = EitherT[α, A, β]})#l] =
     new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] =
@@ -467,9 +467,11 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[F, *, *]] with 
     fab.bitraverse(f, g)
 }
 
-private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]]] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    λ[EitherT[M, A, *] ~> EitherT[N, A, *]](_ mapT f)
+private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[α, A, β]})#l] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new ~>[EitherT[M, A, *], EitherT[N, A, *]] {
+    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] =
+      mb.mapT(f.apply)
+  }
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 
@@ -522,8 +524,8 @@ private trait EitherTParallelApplicative[F[_], E] extends Applicative.Par[Either
     Parallel(EitherT(Parallel.unwrap(F.point(\/.right[E, A](a)))))
   
   def ap[A, B](fa: => EitherT[F, E, A] @@ Parallel)(f: => EitherT[F, E, A => B] @@ Parallel): EitherT[F, E, B] @@ Parallel = {
-    val pfa = Parallel.subst1[EitherT[*[_], E, A], F](Parallel.unwrap(fa))
-    val pf = Parallel.subst1[EitherT[*[_], E, A => B], F](Parallel.unwrap(f))
-    Parallel(Parallel.unsubst1[F, EitherT[*[_], E, B]](pfa app pf))
+    val pfa = Parallel.subst1[({type l[a[_]] = EitherT[a, E, A]})#l, F](Parallel.unwrap(fa))
+    val pf = Parallel.subst1[({type l[a[_]] = EitherT[a, E, A => B]})#l, F](Parallel.unwrap(f))
+    Parallel(Parallel.unsubst1[F, ({type l[a[_]] = EitherT[a, E, B]})#l](pfa app pf))
   }
 }

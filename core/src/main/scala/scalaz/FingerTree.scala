@@ -387,7 +387,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Prepends an element to the left of the tree. O(1). */
   def +:(a: => A): FingerTree[V, A] = {
-    implicit val nm = nodeMeasure[A, V]
+    implicit val nm: Reducer[Node[V, A], V] = nodeMeasure[A, V]
     val az = Need(a)
     fold(
       v => single(measurer.cons(az.value, v), az.value),
@@ -783,7 +783,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Maps the given function across the tree, annotating nodes in the resulting tree according to the provided `Reducer`. */
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
-    implicit val nm = nodeMeasure[B, V2]
+    implicit val nm: Reducer[Node[V2, B], V2] = nodeMeasure[B, V2]
     fold(
       v => empty,
       (v, x) => single(f(x)),
@@ -1017,7 +1017,7 @@ object FingerTree extends FingerTreeInstances {
   def deep[V, A](v: V, pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A])
              (implicit ms: Reducer[A, V]): FingerTree[V, A] =
     new FingerTree[V, A] {
-      implicit val nMeasure = nodeMeasure[A, V]
+      implicit val nMeasure: Reducer[Node[V, A], V] = nodeMeasure[A, V]
       private[this] val mz = Need(m)
       def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz.value, sf)
@@ -1099,7 +1099,10 @@ sealed abstract class IndSeqInstances {
   implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
     new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, *]]{
       def G = implicitly
-      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, *]](_.self)
+      override val naturalTrans = new (IndSeq ~> FingerTree[Int, *]) {
+        def apply[A](a: IndSeq[A]) =
+          a.self
+      }
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
         implicit val r: Reducer[B, Int] = UnitReducer((_: B) => 1)

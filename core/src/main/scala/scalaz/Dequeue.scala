@@ -201,8 +201,8 @@ object Dequeue extends DequeueInstances {
   */
 private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[A] {
   override def isEmpty = false
-  override def frontMaybe = Maybe.Just(single)
-  override def backMaybe = Maybe.Just(single)
+  override def frontMaybe: Maybe[A] = Maybe.Just(single)
+  override def backMaybe: Maybe[A] = Maybe.Just(single)
 }
 
 /**
@@ -211,13 +211,13 @@ private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[
   */
 private[scalaz] final case class FullDequeue[A](front: NonEmptyIList[A], fsize: Int, back: NonEmptyIList[A], backSize: Int) extends Dequeue[A]  {
   override def isEmpty = false
-  override def frontMaybe = Maybe.just(front.head)
-  override def backMaybe = Maybe.just(back.head)
+  override def frontMaybe: Maybe[A] = Maybe.just(front.head)
+  override def backMaybe: Maybe[A] = Maybe.just(back.head)
 }
 /**
   * a queue which has no elements
   */
-private[scalaz] final case object EmptyDequeue extends Dequeue[Nothing] {
+private[scalaz] case object EmptyDequeue extends Dequeue[Nothing] {
   override val isEmpty = true
   override val frontMaybe = Maybe.empty
   override val backMaybe = Maybe.empty
