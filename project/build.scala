@@ -68,9 +68,6 @@ object build {
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
-  // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
-  def scalac210Options = Seq("-Yno-generic-signatures")
-
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
@@ -199,7 +196,6 @@ object build {
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,10)) => scalac210Options
       case Some((2,v)) if v >= 12 => Seq("-opt:l:method")
       case _ => Nil
     }),
@@ -339,12 +335,6 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    libraryDependencies ++= (scalaBinaryVersion.value match {
-      case "2.10" =>
-        compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch) :: Nil
-      case _ =>
-        Nil
-    }),
     kindProjectorVersion := "0.13.2",
     libraryDependencies ++= {
       if (scalaBinaryVersion.value == "3") {
