@@ -374,10 +374,6 @@ object build {
       if (scalaBinaryVersion.value == "2.11") {
         Seq(
           ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
-          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.to_"),
-          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.from_"),
-          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.to_"),
-          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.from_"),
         )
       } else {
         Nil
