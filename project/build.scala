@@ -85,13 +85,9 @@ object build {
       s"${key}:$a->$g/"
     },
     mimaPreviousArtifacts := {
-      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
-        Set.empty
-      } else {
-        scalazMimaBasis.?.value.map {
-          organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
-        }.toSet
-      }
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
+      }.toSet
     }
   )
 
@@ -388,13 +384,9 @@ object build {
       }
     },
     mimaPreviousArtifacts := {
-      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
-        Set.empty
-      } else {
-        scalazMimaBasis.?.value.map {
-          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-        }.toSet
-      }
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+      }.toSet
     }
   )
 
@@ -429,13 +421,9 @@ object build {
       }
     },
     mimaPreviousArtifacts := {
-      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.3.5"))) {
-        Set.empty
-      } else {
-        scalazMimaBasis.?.value.map {
-          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
-        }.toSet
-      }
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+      }.toSet
     },
   )
 
