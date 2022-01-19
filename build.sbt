@@ -192,14 +192,9 @@ def scalacheckBindingProject(
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/jvm/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 13 =>
-            scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
-            }.toSet
-          case _ =>
-            Set.empty
-        }
+        scalazMimaBasis.?.value.map { v =>
+          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
+        }.toSet
       }
     )
     .jsSettings(
@@ -207,14 +202,9 @@ def scalacheckBindingProject(
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/js/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 13 =>
-            scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % fullVersion(v)
-            }.toSet
-          case _ =>
-            Set.empty
-        }
+        scalazMimaBasis.?.value.map { v =>
+          organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % fullVersion(v)
+        }.toSet
       }
     )
     .nativeSettings(
@@ -223,14 +213,9 @@ def scalacheckBindingProject(
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/native/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 13 =>
-            scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
-            }.toSet
-          case _ =>
-            Set.empty
-        }
+        scalazMimaBasis.?.value.map { v =>
+          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
+        }.toSet
       },
       disableScala3, // TODO
     )
