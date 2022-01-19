@@ -81,7 +81,7 @@
     <h2>Download</h2>
     <p>
       You can download this project in
-      <a href="https://github.com/scalaz/scalaz/archive/series/7.3.x.zip">zip</a> formats.
+      <a href="https://github.com/scalaz/scalaz/archive/master.zip">zip</a> formats.
     </p>
     <p>You can also clone the project with <a href="https://git-scm.com">Git</a>
       by running:
@@ -135,7 +135,7 @@
     },
     {
       "2.13" : [],
-      "2.12" : versions(7, 30, "7.2."),
+      "2.12" : versions(7, 34, "7.2."),
       "2.11" : [].concat(
         versions(0, 6, "7.2."),
         ["7.2.0-RC1"],
@@ -168,7 +168,7 @@
       for(var j = 0; j < t.length; j++){
         var tag = t[j];
         var name = "scalaz_" + scalaVersions[i].version;
-        var javadocIo = "https://static.javadoc.io/org.scalaz/" + name;
+        var javadocIo = "https://www.javadoc.io/doc/org.scalaz/" + name;
         var url = javadocIo + "/" + tag + "/" + scalaVersions[i].suffix;
         $("#scaladoc").append("<li><a target='_blank' href='" + url + "'>" + tag + "</a></li>");
       }
