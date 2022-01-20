@@ -20,15 +20,15 @@ val minSuccessfulTests = settingKey[Int]("")
 
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_15, testsJS
+  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_15, testsJS, exampleJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_15, testsJVM, concurrent, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_15, testsJVM, concurrent, exampleJVM
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, scalacheckBindingNative_1_15, testsNative
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative_1_15, testsNative, exampleNative
 )
 
 lazy val scalaz = Project(
@@ -106,13 +106,14 @@ lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
 lazy val iterateeNative = iteratee.native
 
-lazy val exampleBase = CrossProject(id = "example", base = file("example"))(JVMPlatform)
+lazy val example = CrossProject(id = "example", base = file("example"))(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(ScalazCrossType)
-  .withoutSuffixFor(JVMPlatform)
   .settings(
     standardSettings,
     name := "scalaz-example",
-    notPublish,
+    notPublish
+  )
+ .jvmSettings(
     TaskKey[Unit]("runAllMain") := {
       val r = (run / runner).value
       val classpath = (Compile / fullClasspath).value
@@ -122,10 +123,33 @@ lazy val exampleBase = CrossProject(id = "example", base = file("example"))(JVMP
       )
     },
   )
+  .jsSettings(
+    scalaJSUseMainModuleInitializer := true,
+    commands += Command.command("runAllMain") { state1 =>
+      val extracted = Project.extract(state1)
+      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+      classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+    },
+  )
+  .nativeSettings(
+    nativeSettings,
+    commands += Command.command("runAllMain") { state1 =>
+      val extracted = Project.extract(state1)
+      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+      classes.sorted.flatMap(c => s"""set Compile / selectMainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+    },
+  )
+  .settings(
+    mimaPreviousArtifacts := Set.empty,
+  )
+  .jvmConfigure(_ dependsOn concurrent)
+  .dependsOn(
+    iteratee
+  )
 
-lazy val example = exampleBase.jvm.dependsOn(
-  coreJVM, iterateeJVM, concurrent
-)
+lazy val exampleJVM = example.jvm
+lazy val exampleJS = example.js
+lazy val exampleNative = example.native
 
 // TODO https://github.com/typelevel/scalacheck/pull/868
 lazy val disableScala3 = Def.settings(

@@ -42,5 +42,30 @@ jobs:
         "SetScala${{ matrix.scala }}" \
         "test" \
         "project /" \
-        $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
-    - run: rm -rf "$HOME/.ivy2/local" || true
+        $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+    - run: |
+        case ${{ matrix.project }} in
+          "rootJVM")
+            ./sbt -v \
+               "SetScala${{ matrix.scala }}" \
+               "project exampleJVM" \
+               runAllMain
+            ;;
+          "rootJS")
+            ./sbt -v \
+               "SetScala${{ matrix.scala }}" \
+               "project exampleJS" \
+               runAllMain
+            ;;
+          "rootNative")
+            ./sbt -v \
+               "SetScala${{ matrix.scala }}" \
+               "project exampleNative" \
+               runAllMain
+            ;;
+          *)
+            echo "unknown project"
+            exit 1
+        esac
+    - if: always()
+      run: rm -rf "$HOME/.ivy2/local" || true
