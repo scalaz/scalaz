@@ -145,7 +145,7 @@ def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 Here is an instance definition for `Option`. Notice that the method `map` has been overridden.
 
 ```scala
-  implicit val option = new Traverse[Option] with MonadPlus[Option] {
+  implicit val option: Traverse[Option] with MonadPlus[Option] = new Traverse[Option] with MonadPlus[Option] {
     def point[A](a: => A) = Some(a)
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
