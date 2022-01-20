@@ -171,6 +171,10 @@ object build {
     },
     scalaVersion := Scala212,
     crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
+    addCommandAlias("SetScala2_11", s"++ ${Scala211}! -v"),
+    addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
+    addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
+    addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
