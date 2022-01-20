@@ -9,16 +9,15 @@ jobs:
   scala-steward:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    if: ${{ github.repository_owner == 'scalaz' }}
     steps:
     - name: Generate token
-      if: ${{ !github.event.repository.fork }}
       id: generate_token
       uses: tibdex/github-app-token@v1
       with:
         app_id: 89659
         private_key: ${{ secrets.SCALAZ_BOT_KEY }}
     - name: Launch Scala Steward
-      if: ${{ !github.event.repository.fork }}
       uses: scala-steward-org/scala-steward-action@v2.16.0
       with:
         github-token: ${{ steps.generate_token.outputs.token }}
