@@ -23,5 +23,5 @@ object ChanUsage extends App {
       a <- chan.read
       b <- chan.read
     } yield a + b
-  assert(io.unsafePerformIO === 25150)
+  assert(io.unsafePerformIO() === 25150)
 }

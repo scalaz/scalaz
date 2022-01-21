@@ -173,19 +173,19 @@ object KleisliTest extends SpecLite {
     }
 
     "catch exceptions captured via fail()" in {
-      C.attempt(bad).run(1).unsafePerformIO must_== -\/(err)
+      C.attempt(bad).run(1).unsafePerformIO() must_== -\/(err)
     }
 
     "catch ambient exceptions (1/2)" in {
-      C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_== -\/(err)
+      C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO() must_== -\/(err)
     }
 
     "catch ambient exceptions (2/2)" in {
-      C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_== -\/(err)
+      C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO() must_== -\/(err)
     }
 
     "properly handle success" in {
-      C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
+      C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO() must_== \/-(3)
     }
 
   }

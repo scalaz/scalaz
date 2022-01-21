@@ -22,7 +22,7 @@ object MVarUsage extends App {
         _ <- forkIO(calc(mvar))
         a <- mvar.take
       } yield a
-    assert(io.unsafePerformIO === 42)
+    assert(io.unsafePerformIO() === 42)
   }
 
   def inout(): Unit = {
@@ -41,7 +41,7 @@ object MVarUsage extends App {
         _   <- in.put(7)
         a   <- out.take
       } yield a
-    assert(io.unsafePerformIO === 42)
+    assert(io.unsafePerformIO() === 42)
   }
 
   def pingpong(): Unit = {
