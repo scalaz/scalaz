@@ -26,7 +26,7 @@ object OptionTTest extends SpecLite {
       OptionT.optionT(ass).run == ass
   }
 
-  "listT" ! forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toList)}
+  "listT" ! forAll { (a: OptionTList[Int]) => a.toListT.run must_=== a.run.map(_.toList)}
 
   object instances {
     def functor[F[_] : Functor] = Functor[OptionT[F, *]]

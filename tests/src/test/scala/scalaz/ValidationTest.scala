@@ -106,7 +106,7 @@ object ValidationTest extends SpecLite {
     List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], "Fail".failure[Int]))
   }
 
-  "toMaybe" ! forAll { x: Validation[String, Int] =>
+  "toMaybe" ! forAll { (x: Validation[String, Int]) =>
     val m = x.toMaybe
     if (x.isSuccess) m.isJust else m.isEmpty
   }

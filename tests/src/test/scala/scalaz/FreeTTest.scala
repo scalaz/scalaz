@@ -67,12 +67,12 @@ object FreeTTest extends SpecLite {
       Equal[FreeTListOption[Unit]].equal(expected, result)
     }
 
-    "hoistM" ! forAll { a: FreeTListOption[Int] =>
+    "hoistM" ! forAll { (a: FreeTListOption[Int]) =>
       val b = FreeTListOption(a.f.hoistM(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
-    "hoistN" ! forAll { a: FreeTListOption[Int] =>
+    "hoistN" ! forAll { (a: FreeTListOption[Int]) =>
       val b = FreeTListOption(a.f.hoistN(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
     }
@@ -87,12 +87,12 @@ object FreeTTest extends SpecLite {
       ()
     }
 
-    "interpretS" ! forAll { a: FreeTListOption[Int] =>
+    "interpretS" ! forAll { (a: FreeTListOption[Int]) =>
       val b = FreeTListOption(a.f.interpretS(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
-    "interpretT" ! forAll { a: FreeTListOption[Int] =>
+    "interpretT" ! forAll { (a: FreeTListOption[Int]) =>
       val b = FreeTListOption(a.f.interpretT(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
     }

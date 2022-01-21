@@ -278,14 +278,14 @@ object TaskTest extends SpecLite {
     }
   }
 
-  "retries a retriable task n times" ! forAll { xs: List[Byte] =>
+  "retries a retriable task n times" ! forAll { (xs: List[Byte]) =>
     import scala.concurrent.duration._
     var x = 0
     Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.unsafePerformSync
     x == (xs.length + 1)
   }
 
-  "fromMaybe empty fails" ! forAll { t: Throwable =>
+  "fromMaybe empty fails" ! forAll { (t: Throwable) =>
     Task.fromMaybe(Maybe.empty)(t).unsafePerformSyncAttempt.isLeft
   }
 
@@ -293,7 +293,7 @@ object TaskTest extends SpecLite {
     Task.fromMaybe(Maybe.just(n))(t).unsafePerformSyncAttempt.isRight
   }
 
-  "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
+  "fromDisjunction matches attemptRun" ! forAll { (x: Throwable \/ Int) =>
     Task.fromDisjunction(x).unsafePerformSyncAttempt must_== x
   }
 }

@@ -20,7 +20,7 @@ object EphemeralStreamTest extends SpecLite {
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
 
-  "reverse" ! forAll{ e: EphemeralStream[Int] =>
+  "reverse" ! forAll{ (e: EphemeralStream[Int]) =>
     e.reverse.toList must_===(e.toList.reverse)
     e.reverse.reverse must_===(e)
   }

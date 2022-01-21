@@ -66,7 +66,7 @@ object IListTest extends SpecLite {
     ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
-  "mapAccumLeft" ! forAll { xs: IList[Int] =>
+  "mapAccumLeft" ! forAll { (xs: IList[Int]) =>
     val f = (_: Int) + 1
     xs.mapAccumLeft(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs -> xs.map(f))
   }
@@ -209,7 +209,7 @@ object IListTest extends SpecLite {
     ns.indexWhere(f).getOrElse(-1) must_=== ns.toList.indexWhere(f)
   }
 
-  "initOption" ! forAll { ns: IList[Int] =>
+  "initOption" ! forAll { (ns: IList[Int]) =>
     ns.initOption.map(_.toList) must_=== (try Some(ns.toList.init) catch { case e: Exception => None })
   }
 
@@ -344,7 +344,7 @@ object IListTest extends SpecLite {
     ns.tails.map(_.toList).toList must_=== ns.toList.tails.toList
   }
 
-  "tailOption" ! forAll { ns: IList[Int] =>
+  "tailOption" ! forAll { (ns: IList[Int]) =>
     ns.tailOption.map(_.toList) must_=== (try Some(ns.toList.tail) catch { case e: Exception => None })
   }
 
@@ -364,31 +364,31 @@ object IListTest extends SpecLite {
     ns.takeWhile(f).toList must_=== ns.toList.takeWhile(f)
   }
 
-  "toEphemeralStream" ! forAll { ns: List[Int] =>
+  "toEphemeralStream" ! forAll { (ns: List[Int]) =>
     IList(ns: _*).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
   }
 
-  "toList" ! forAll { ns: List[Int] =>
+  "toList" ! forAll { (ns: List[Int]) =>
     IList(ns: _*).toList must_=== ns
   }
 
-  "toMap" ! forAll { ps: List[(String, Int)] =>
+  "toMap" ! forAll { (ps: List[(String, Int)]) =>
     IList(ps: _*).toMap must_=== ==>>(ps: _*)
   }
 
-  "toNel" ! forAll { ns: List[Int] =>
+  "toNel" ! forAll { (ns: List[Int]) =>
     IList(ns: _*).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
-  "toStream" ! forAll { ns: List[Int] =>
+  "toStream" ! forAll { (ns: List[Int]) =>
     IList(ns: _*).toStream must_=== ns.toStream
   }
 
-  "toVector" ! forAll { ns: Vector[Int] =>
+  "toVector" ! forAll { (ns: Vector[Int]) =>
     IList(ns: _*).toVector must_=== ns
   }
 
-  "toZipper" ! forAll { ns: List[Int] =>
+  "toZipper" ! forAll { (ns: List[Int]) =>
     IList(ns: _*).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
   }
 

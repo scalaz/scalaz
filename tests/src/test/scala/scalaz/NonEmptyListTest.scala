@@ -38,7 +38,7 @@ object NonEmptyListTest extends SpecLite {
     Foldable[NonEmptyList].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
-  "findLeft" ! forAll{ a: NonEmptyList[Int] =>
+  "findLeft" ! forAll{ (a: NonEmptyList[Int]) =>
     val f = (_: Int) % 3 == 0
     Foldable[NonEmptyList].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.list)(f)
   }
@@ -48,7 +48,7 @@ object NonEmptyListTest extends SpecLite {
     Foldable[NonEmptyList].findRight(a)(f) must_=== Foldable[IList].findRight(a.list)(f)
   }
 
-  "distinct" ! forAll { xs: NonEmptyList[Int] =>
+  "distinct" ! forAll { (xs: NonEmptyList[Int]) =>
     Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }
 

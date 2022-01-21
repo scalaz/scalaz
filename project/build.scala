@@ -55,7 +55,7 @@ object build {
     enableCrossBuild = true
   )
 
-  lazy val setMimaVersion: ReleaseStep = { st: State =>
+  lazy val setMimaVersion: ReleaseStep = { (st: State) =>
     val extracted = Project.extract(st)
     val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
     IO.write(extracted get releaseVersionFile, s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
