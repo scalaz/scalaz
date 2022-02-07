@@ -34,7 +34,9 @@ object Codensity extends CodensityInstances {
     * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
     * [[scalaz.MonadPlus]] laws should hold.
     */
-  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, *]] =
+  implicit def codensityMonadPlus[F[_]](implicit
+      F: PlusEmpty[F]
+  ): MonadPlus[Codensity[F, *]] =
     new CodensityMonad[F] with MonadPlus[Codensity[F, *]] {
       def empty[A] =
         new Codensity[F, A] {
