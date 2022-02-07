@@ -159,6 +159,12 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => M.point(Done())
   }
 
+  def weakMemoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
+    case Yield(a, s) => Yield(a, EphemeralStream.weakMemo(s()))
+    case Skip(s)     => Skip(EphemeralStream.weakMemo(s()))
+    case Done()      => Done()
+  }
+
   def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
     M.bind(step) {
       case Yield(a, s) => s().foldLeft(f(z, a))(f)
