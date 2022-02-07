@@ -377,6 +377,7 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
+      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
     )
     .jvmSettings(
       jvm_js_settings,
