@@ -18,8 +18,10 @@ object CodensityTest extends SpecLite {
 
   checkAll("List", monadPlus.laws[Codensity[List, *]])
   checkAll("List", monadTrans.laws[Codensity, List])
+  checkAll("List", bindRec.laws[Codensity[List, *]])
   checkAll("Option", monadPlus.laws[Codensity[Option, *]])
   checkAll("Option", monadTrans.laws[Codensity, Option])
+  checkAll("Option", bindRec.laws[Codensity[Option, *]])
 
   object instances {
     def functor[F[_]: MonadPlus] = Functor[Codensity[F, *]]
@@ -28,5 +30,6 @@ object CodensityTest extends SpecLite {
     def plus[F[_]: MonadPlus] = Plus[Codensity[F, *]]
     def monad[F[_]: MonadPlus] = Monad[Codensity[F, *]]
     def monade[F[_]] = Monad[Codensity[F, *]]
+    def bindRec[F[_]] = BindRec[Codensity[F, *]]
   }
 }
