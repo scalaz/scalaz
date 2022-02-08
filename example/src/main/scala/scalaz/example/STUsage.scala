@@ -1,16 +1,15 @@
 package scalaz.example
 
 import reflect.ClassTag
+import scalaz._
+import std.list._
+import std.string._
+import std.anyVal._
+import syntax.equal._
+import effect._
+import ST._
 
-object STUsage extends App {
-  import scalaz._
-  import std.list._
-  import std.string._
-  import std.anyVal._
-  import syntax.equal._
-  import effect._
-  import ST._
-
+object STUsage {
   // Creates a new mutable reference and mutates it
   def e1[A] = for {
     r <- newVar[A](0)
@@ -31,16 +30,18 @@ object STUsage extends App {
     def apply[A] = e1
   }
 
-  val compiles = runST(test)
+  def main(args: Array[String]): Unit = {
+    val compiles = runST(test)
 
-  // Does not compile because it would expose a mutable reference.
-  // val doesNotCompile = runST(test2)
+    // Does not compile because it would expose a mutable reference.
+    // val doesNotCompile = runST(test2)
 
-  // Bin-sort a list into an immutable array.
-  // Uses a non-observable mutable array in the background.
-  def binSort[A: ClassTag](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
-    accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
+    // Bin-sort a list into an immutable array.
+    // Uses a non-observable mutable array in the background.
+    def binSort[A: ClassTag](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
+      accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
 
-  assert(binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List("", "one", "twenty four"))
-  assert(compiles === 1)
+    assert(binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List("", "one", "twenty four"))
+    assert(compiles === 1)
+  }
 }

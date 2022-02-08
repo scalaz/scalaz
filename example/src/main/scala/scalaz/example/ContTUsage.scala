@@ -3,7 +3,7 @@ package scalaz.example
 import scalaz._
 import scalaz.syntax.all._
 
-object ContTUsage extends App {
+object ContTUsage {
 
   def syntaxUsage[M[_]: Bind, R, A, B, C](ma: M[A], cmb: ContT[R, M, B], f: (A, B) => M[C]): ContT[R, M, C] = for {
     a <- ma.cps[R]

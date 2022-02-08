@@ -2,14 +2,16 @@ package scalaz.example
 
 import scalaz._
 
-object StringUsage extends App{
-  import std.string._
+object StringUsage {
+  def main(args: Array[String]): Unit = {
+    import std.string._
 
-  assert(charsNel("foo").isJust)
-  assert(charsNel("").isEmpty)
+    assert(charsNel("foo").isJust)
+    assert(charsNel("").isEmpty)
 
-  import stringSyntax._
+    import stringSyntax._
 
-  assert("foo".charsNel.isJust)
-  assert("".charsNel.isEmpty)
+    assert("foo".charsNel.isJust)
+    assert("".charsNel.isEmpty)
+  }
 }

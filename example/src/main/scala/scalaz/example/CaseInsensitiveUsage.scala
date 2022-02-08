@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz.{CaseInsensitive => CI}
 
-object CaseInsensitiveUsage extends App {
+object CaseInsensitiveUsage {
 
   def maps(): Unit = {
     val nums: Map[CI[String], Int] = Map(CI("ONE") -> 1, CI("Two") -> 2)
@@ -18,6 +18,8 @@ object CaseInsensitiveUsage extends App {
     assert(nums(CI("TWO")))
   }
 
-  maps()
-  sets()
+  def main(args: Array[String]): Unit = {
+    maps()
+    sets()
+  }
 }

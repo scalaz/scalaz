@@ -4,7 +4,7 @@ import scalaz._
 import scalaz.std.option._
 import scalaz.syntax.all._
 
-object MonadTransUsage extends App {
+object MonadTransUsage {
 
   def syntaxUsage[A, B, C](ga: Option[A], gfb: Option[MaybeT[Option, B]], f: (A, B) => Option[C]): MaybeT[Option, C] = {
     for {
