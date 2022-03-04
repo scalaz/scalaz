@@ -11,7 +11,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.6")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.1.0")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.9.0")
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.3")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.4")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.12")
 
 // https://github.com/sbt/sbt/issues/2217
