@@ -20,6 +20,11 @@ object StreamTTest extends SpecLite {
       (x #:: StreamT.fromLazyList[Id.Id, Byte](xs)) must_=== StreamT.fromLazyList[Id.Id, Byte](x #:: xs)
   }
 
+  "memoize" ! forAll {
+    (xs: LazyList[Byte]) =>
+      StreamT.fromLazyList[Id.Id, Byte](xs).memoize must_=== StreamT.fromLazyList[Id.Id, Byte](xs)
+  }
+
   "scanLeft" ! forAll {
     (xs: LazyList[Byte], x: Byte, f: (Byte, Byte) => Byte) =>
       StreamT.fromLazyList[Id.Id, Byte](xs).scanLeft(x)(f) must_=== StreamT.fromLazyList[Id.Id, Byte](xs.scanLeft(x)(f))

@@ -3,7 +3,7 @@ package scalaz.example
 import scalaz._
 import Scalaz._
 
-object DisjunctionUsage extends App {
+object DisjunctionUsage {
 
   /*
      Example #1: Infix Notation
@@ -30,41 +30,43 @@ object DisjunctionUsage extends App {
     case _ => -\/(false)
   }
 
-  val x = 5
-  val expectingCorrect = infixNotation(x)
-  assert(expectingCorrect.toOption.get === "Correct!")
+  def main(args: Array[String]): Unit = {
+    val x = 5
+    val expectingCorrect = infixNotation(x)
+    assert(expectingCorrect.toOption.get === "Correct!")
 
 
-  val y = 6
-  val expectingFalse = infixNotation(y)
-  assert(expectingFalse.swap.toOption.get === false)
+    val y = 6
+    val expectingFalse = infixNotation(y)
+    assert(expectingFalse.swap.toOption.get === false)
 
 
-  /*
-     Example #2: Bracket Notation
-        Rather than using Infix's Left \/ Right,
-        Bracket is \/[Left, Right]. Some IDEs generate Bracket Notation,
-        which could lead newcomers to Scalaz to wrongly think that this
-        a good way to write these types. Should an IDE generate
-        Bracket Notation by default, please replace with Infix Notation.
-   */
-  def bracketNotation(p: Int): \/[Boolean, String] = p match {
-    case 5 => "Correct!".right
-    case _ => false.left
+    /*
+       Example #2: Bracket Notation
+          Rather than using Infix's Left \/ Right,
+          Bracket is \/[Left, Right]. Some IDEs generate Bracket Notation,
+          which could lead newcomers to Scalaz to wrongly think that this
+          a good way to write these types. Should an IDE generate
+          Bracket Notation by default, please replace with Infix Notation.
+     */
+    def bracketNotation(p: Int): \/[Boolean, String] = p match {
+      case 5 => "Correct!".right
+      case _ => false.left
+    }
+
+    assert(bracketNotation(1).swap.toOption.get === false)
+    assert(bracketNotation(5).toOption.get === "Correct!")
+
+
+    // Create a value of A \/ B
+    val disjunctionVal: Int \/ String = -\/(99)
+    assert(disjunctionVal.isInstanceOf[Int \/ String])
+
+    def patternMatch(d: Int \/ String): String = d match {
+      case \/-(_) => "Found a string."
+      case -\/(_) => "Found a number."
+    }
+
+    assert(patternMatch(disjunctionVal) === "Found a number.")
   }
-
-  assert(bracketNotation(1).swap.toOption.get === false)
-  assert(bracketNotation(5).toOption.get === "Correct!")
-
-
-  // Create a value of A \/ B
-  val disjunctionVal: Int \/ String = -\/(99)
-  assert(disjunctionVal.isInstanceOf[Int \/ String])
-
-  def patternMatch(d: Int \/ String): String = d match {
-    case \/-(_) => "Found a string."
-    case -\/(_) => "Found a number."
-  }
-
-  assert(patternMatch(disjunctionVal) === "Found a number.")
 }
