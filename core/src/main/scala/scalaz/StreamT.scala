@@ -449,6 +449,14 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
 }
 
 object StreamT extends StreamTInstances {
+
+  implicit def toDeferrer[M[_], A](l: => StreamT[M, A]): Deferrer[M, A] = new Deferrer(() => l)
+
+  final class Deferrer[M[_], A] private[StreamT] (private val l: () => StreamT[M, A]) extends AnyVal {
+    def #::(elem: => A)(implicit M: Applicative[M]): StreamT[M, A] = 
+      StreamT(M.pure(Yield(elem, l)))
+  }
+
   def apply[M[_], A](step: M[Step[A, StreamT[M, A]]]): StreamT[M, A] = new StreamT[M, A](step)
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
