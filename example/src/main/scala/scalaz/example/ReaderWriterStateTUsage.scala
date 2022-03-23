@@ -180,10 +180,12 @@ object CABRunLengthEncoder {
   }
 }
 
-object ReaderWriterStateTUsage extends App {
+object ReaderWriterStateTUsage {
 
-  val inputTokens = List(A,B,C,A,A,B,B,B,B,C,A,A,A,C,C,C,C,B)
-  val encoded = CABRunLengthEncoder.encode(2, inputTokens)
+  def main(args: Array[String]): Unit = {
+    val inputTokens = List(A,B,C,A,A,B,B,B,B,C,A,A,A,C,C,C,C,B)
+    val encoded = CABRunLengthEncoder.encode(2, inputTokens)
 
-  println("encoded " + inputTokens.mkString  + " as " + encoded)
+    println("encoded " + inputTokens.mkString  + " as " + encoded)
+  }
 }

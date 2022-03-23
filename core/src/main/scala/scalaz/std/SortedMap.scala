@@ -15,7 +15,7 @@ trait SortedMapInstances0 {
       val m2Instance: SortedMap[K, V] = m2
       // semigroups are not commutative, so order may matter.
       val (from, to, semigroup) = {
-        if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
+        if (m1.sizeIs > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
         else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
       }
 

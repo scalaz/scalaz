@@ -2,13 +2,15 @@ package scalaz.example
 
 import scalaz._
 
-object MixedBag extends App {
-  monoid()
-  traverseBigList()
-  traverseBigLazyList()
-  tree()
-  kleisiArrow()
-  dListExample()
+object MixedBag {
+  def main(args: Array[String]): Unit = {
+    monoid()
+    traverseBigList()
+    traverseBigLazyList()
+    tree()
+    kleisiArrow()
+    dListExample()
+  }
 
   def monoid(): Unit = {
     import std.anyVal._

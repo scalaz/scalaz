@@ -1,6 +1,6 @@
 package scalaz.example
 
-object TrampolineUsage extends App {
+object TrampolineUsage {
 
   import scalaz._, Scalaz._, Free._
 
@@ -24,31 +24,33 @@ object TrampolineUsage extends App {
   def runQuickSort[F[_] : Applicative : Comonad, T: Order](xs: List[T]): List[T] =
     quickSort[F, T](xs).go(f => Comonad[F].copoint(f))(Applicative[F])
 
-  val xs = List.fill(32)(util.Random.nextInt())
+  def main(args: Array[String]): Unit = {
+    val xs = List.fill(32)(util.Random.nextInt())
 
-  {
-    // Trampoline is Free[Function0, A].
+    {
+      // Trampoline is Free[Function0, A].
 
-    // use the heap
-    val sorted = runQuickSort[Function0, Int](xs)
-    println(sorted)
+      // use the heap
+      val sorted = runQuickSort[Function0, Int](xs)
+      println(sorted)
 
-    val step = new ~>[λ[α => (Int, Function0[α])], (Int, *)] {
-      def apply[A](x: (Int, Function0[A])) = {
-        (x._1 + 1, x._2.apply())
+      val step = new ~>[λ[α => (Int, Function0[α])], (Int, *)] {
+        def apply[A](x: (Int, Function0[A])) = {
+          (x._1 + 1, x._2.apply())
+        }
       }
+
+      val (steps, sorted1) = quickSort[Function0, Int](xs).foldRun(0)(step)
+      println("sort using heap took %d steps".format(steps))
     }
 
-    val (steps, sorted1) = quickSort[Function0, Int](xs).foldRun(0)(step)
-    println("sort using heap took %d steps".format(steps))
-  }
+    {
+      // Use the stack.
+      val sorted = runQuickSort[Id, Int](xs)
+      println(sorted)
+    }
 
-  {
-    // Use the stack.
-    val sorted = runQuickSort[Id, Int](xs)
-    println(sorted)
   }
-
 
   // Ackermann function. Blows the stack for very small inputs.
   def ack(m: Int, n: Int): Int =

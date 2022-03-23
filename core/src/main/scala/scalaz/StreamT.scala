@@ -165,6 +165,16 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => Done()
   }
 
+  def memoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
+    case Yield(a, s) =>
+      lazy val tail = s()
+      Yield(a, tail)
+    case Skip(s) =>
+      lazy val tail = s()
+      Skip(tail)
+    case Done() => Done()
+  }
+
   def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
     M.bind(step) {
       case Yield(a, s) => s().foldLeft(f(z, a))(f)
