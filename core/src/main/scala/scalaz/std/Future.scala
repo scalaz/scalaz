@@ -51,6 +51,13 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
     }
   }
 
+  override def firstCompletedOf[A](as: Iterable[Future[A]]): Option[Future[A]] =
+    if (as.isEmpty) {
+      None
+    } else {
+      Some(Future.firstCompletedOf(as))
+    }
+
   override def mapBoth[A,B,C](a: Future[A], b: Future[B])(f: (A,B) => C): Future[C] =
     (a zip b).map(f.tupled)
 

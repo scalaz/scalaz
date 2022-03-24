@@ -17,6 +17,13 @@ abstract class Codensity[F[_], A] { self =>
   def toRan: Ran[F, F, A] = new Ran[F, F, A] {
     def apply[B](f: A => F[B]) = self(f)
   }
+
+  def memoize(implicit F: Monad[F]): Codensity[F, A] = {
+    new Codensity[F, A] {
+      private lazy val memoized = self.improve
+      def apply[B](f: A => F[B]): F[B] = F.bind(memoized)(f)
+    }
+  }
 }
 
 object Codensity extends CodensityInstances {
@@ -34,7 +41,9 @@ object Codensity extends CodensityInstances {
     * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
     * [[scalaz.MonadPlus]] laws should hold.
     */
-  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, *]] =
+  implicit def codensityMonadPlus[F[_]](implicit
+      F: PlusEmpty[F]
+  ): MonadPlus[Codensity[F, *]] =
     new CodensityMonad[F] with MonadPlus[Codensity[F, *]] {
       def empty[A] =
         new Codensity[F, A] {

@@ -63,6 +63,19 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 
   // derived functions
 
+  /** 
+   * A commutative operation which chooses nondeterministically to obtain
+   * a value from any of the elements of `as` and discards other values.
+   * 
+   * @note
+   *   A [[Nondeterminism]] instance could choose to override this function
+   *   when a native implementation is available.
+   */
+  def firstCompletedOf[A](as: Iterable[F[A]]): Option[F[A]] = {
+    import std.iterable._
+    chooseAny(Foldable[Iterable].toIList(as)).map(map(_)(_._1))
+  }
+
   /**
    * Apply a function to the results of `a` and `b`, nondeterminstically
    * ordering their effects.

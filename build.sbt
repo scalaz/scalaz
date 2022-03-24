@@ -216,7 +216,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
     minSuccessfulTests := 33,
   )
   .jsSettings(
-    minSuccessfulTests := 10
+    minSuccessfulTests := 10,
+    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
