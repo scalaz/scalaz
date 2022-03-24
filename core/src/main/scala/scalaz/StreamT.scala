@@ -5,7 +5,7 @@ import Id._
 /**
  * StreamT monad transformer.
  */
-sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
+sealed class StreamT[M[_], A](val step: M[StreamT.Step[M, A]]) {
 
   import StreamT._
 
@@ -44,7 +44,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     M.map(unconsRec)(_.map(_._2))
 
   def trans[N[_]](t: M ~> N)(implicit M: Functor[M]): StreamT[N, A] =
-    StreamT(t(M.map[Step[A, StreamT[M, A]], Step[A, StreamT[N, A]]](this.step) {
+    StreamT(t(M.map[Step[M, A], Step[N, A]](this.step) {
       case Yield(a, s) => Yield(a, s() trans t)
       case Skip(s)     => Skip(s() trans t)
       case Done()      => Done()
@@ -159,6 +159,12 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => M.point(Done())
   }
 
+  def weakMemoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
+    case Yield(a, s) => Yield(a, EphemeralStream.weakMemo(s()))
+    case Skip(s)     => Skip(EphemeralStream.weakMemo(s()))
+    case Done()      => Done()
+  }
+
   def memoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     case Yield(a, s) =>
       lazy val tail = s()
@@ -205,7 +211,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
    * of this stream will be evaluated, and depending on the structure of
    * this stream, up to two elements might be evaluated.
    */
-  def asLazyList(implicit ev: M[Step[A, StreamT[M, A]]] === Id[Step[A, StreamT[Id, A]]]): LazyList[A] = {
+  def asLazyList(implicit ev: M[Step[M, A]] === Id[Step[Id, A]]): LazyList[A] = {
     def go(s: StreamT[Id, A]): LazyList[A] = s.unconsRec match {
       case None          => LazyList.empty[A]
       case Some((a, s1)) => LazyList.cons(a, go(s1))
@@ -260,9 +266,9 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       case Done()       => M.pure(\/-(()))
     })
 
-  private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
+  private def stepMap[B](f: Step[M, A] => Step[M, B])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
 
-  private def stepBind[B](f: Step[A, StreamT[M, A]] => M[Step[B, StreamT[M, B]]])(implicit M: Monad[M]): StreamT[M, B] = StreamT(M.bind(step)(f))
+  private def stepBind[B](f: Step[M, A] => M[Step[M, B]])(implicit M: Monad[M]): StreamT[M, B] = StreamT(M.bind(step)(f))
 
   private def rev(implicit M: Monad[M]): M[LazyList[A]] = {
     def loop(xs: StreamT[M, A], ys: LazyList[A]): M[LazyList[A]] =
@@ -321,7 +327,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   }
 
   def mergeMap[B](f: A => StreamT[M, B])(implicit M: Nondeterminism[M]): StreamT[M, B] = {
-    def mergeMapInitStep(fsa: M[Step[A, StreamT[M, A]]]): M[Step[B, StreamT[M, B]]] = {
+    def mergeMapInitStep(fsa: M[Step[M, A]]): M[Step[M, B]] = {
       M.map(fsa) {
         case Yield(a, s) =>
           Skip(() => StreamT(mergeMapStep(s().step, f(a).step)))
@@ -331,7 +337,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
           Done()
       }
     }
-    def mergeMapStep(fsa: M[Step[A, StreamT[M, A]]], fsb: M[Step[B, StreamT[M, B]]]): M[Step[B, StreamT[M, B]]] = {
+    def mergeMapStep(fsa: M[Step[M, A]], fsb: M[Step[M, B]]): M[Step[M, B]] = {
       M.map(M.choose(fsa, fsb)) {
         case -\/((sa, fsb)) =>
           sa match {
@@ -365,7 +371,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     * <img style="max-width: 100%" src="http://reactivex.io/documentation/operators/images/flatMapLatest.png"/>
     */
   def flatMapLatest[B](f: A => StreamT[M, B])(implicit M: Nondeterminism[M]): StreamT[M, B] = {
-    def flatMapLatestInitStep(fsa: M[Step[A, StreamT[M, A]]]): M[Step[B, StreamT[M, B]]] = {
+    def flatMapLatestInitStep(fsa: M[Step[M, A]]): M[Step[M, B]] = {
       M.map(fsa) {
         case Yield(a, s) =>
           Skip(() => StreamT(flatMapLatestStep(s().step, f(a).step)))
@@ -375,7 +381,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
           Done()
       }
     }
-    def flatMapLatestStep(fsa: M[Step[A, StreamT[M, A]]], fsb: M[Step[B, StreamT[M, B]]]): M[Step[B, StreamT[M, B]]] = {
+    def flatMapLatestStep(fsa: M[Step[M, A]], fsb: M[Step[M, B]]): M[Step[M, B]] = {
       M.map(M.choose(fsa, fsb)) {
         case -\/((sa, fsb)) =>
           sa match {
@@ -457,7 +463,7 @@ object StreamT extends StreamTInstances {
       StreamT(M.pure(Yield(elem, l)))
   }
 
-  def apply[M[_], A](step: M[Step[A, StreamT[M, A]]]): StreamT[M, A] = new StreamT[M, A](step)
+  def apply[M[_], A](step: M[Step[M, A]]): StreamT[M, A] = new StreamT[M, A](step)
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
 
@@ -465,7 +471,7 @@ object StreamT extends StreamTInstances {
     StreamT[M, A](M.map(a)(Yield(_, empty[M, A](M))))
 
   def fromLazyList[M[_], A](mas: M[LazyList[A]])(implicit M: Applicative[M]): StreamT[M, A] = {
-    def loop(as: LazyList[A]): Step[A, StreamT[M, A]] = as match {
+    def loop(as: LazyList[A]): Step[M, A] = as match {
       case head #:: tail => Yield(head, apply(M.point(loop(tail))))
       case _ => Done()
     }
@@ -502,7 +508,7 @@ object StreamT extends StreamTInstances {
       }
     )
 
-  private def mergeStep[M[_], A](s1: Step[A, StreamT[M, A]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): Step[A, StreamT[M, A]] = {
+  private def mergeStep[M[_], A](s1: Step[M, A], fs2: M[Step[M, A]])(implicit M: Nondeterminism[M]): Step[M, A] = {
       s1 match {
         case Yield(a, s) => 
           Yield(a, () => StreamT(mergeFStep(s().step, fs2)))
@@ -513,7 +519,7 @@ object StreamT extends StreamTInstances {
       }
     }
 
-  private def mergeFStep[M[_], A](fs1: M[Step[A, StreamT[M, A]]], fs2: M[Step[A, StreamT[M, A]]])(implicit M: Nondeterminism[M]): M[Step[A, StreamT[M, A]]] = {
+  private def mergeFStep[M[_], A](fs1: M[Step[M, A]], fs2: M[Step[M, A]])(implicit M: Nondeterminism[M]): M[Step[M, A]] = {
     M.map(M.choose(fs1, fs2)) {
       case -\/((s1, fs2)) =>
         mergeStep(s1, fs2)
@@ -522,19 +528,19 @@ object StreamT extends StreamTInstances {
     }
   }
 
-  sealed abstract class Step[A, S] extends Product with Serializable
+  sealed abstract class Step[M[_], A] extends Product with Serializable
 
-  final case class Yield[A, S](a: A, s: () => S) extends Step[A, S]
+  final case class Yield[M[_], A](a: A, s: () => StreamT[M, A]) extends Step[M, A]
   object Yield {
-    def apply[A, S](a: A, s: => S): Step[A, S] = new Yield(a, () => s)
+    def apply[M[_], A](a: A, s: => StreamT[M, A]): Step[M, A] = new Yield(a, () => s)
   }
-  final case class Skip[A, S](s: () => S) extends Step[A, S]
+  final case class Skip[M[_], A](s: () => StreamT[M, A]) extends Step[M, A]
   object Skip {
-    def apply[A, S](s: => S): Step[A, S] = new Skip(() => s)
+    def apply[M[_], A](s: => StreamT[M, A]): Step[M, A] = new Skip(() => s)
   }
-  final case class Done[A, S] private () extends Step[A, S]
+  final case class Done[M[_], A] private () extends Step[M, A]
   object Done {
-    def apply[A, S](): Step[A, S] = done_.asInstanceOf[Done[A, S]]
+    def apply[M[_], A](): Step[M, A] = done_.asInstanceOf[Done[M, A]]
     // https://github.com/scala/bug/issues/11953
     private[this] final val done_ : Done[Nothing, Nothing] = new Done[Nothing, Nothing]()
   }

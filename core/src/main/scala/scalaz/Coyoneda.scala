@@ -254,10 +254,10 @@ sealed abstract class CoyonedaInstances11 extends CoyonedaInstances12 {
       def G = Nondeterminism[F]
       def iso = Coyoneda.iso
     }
-
 }
+
 sealed abstract class CoyonedaInstances12 {
-  implicit def coyonedaNondeterminism[S, F[_]](implicit F: MonadError[F, S]): MonadError[Coyoneda[F, *], S] =
+  implicit def coyonedaMonadError[S, F[_]](implicit F: MonadError[F, S]): MonadError[Coyoneda[F, *], S] =
     new IsomorphismMonadError[Coyoneda[F, *], F, S] with CoyonedaBind[F] {
       def G = F
       def iso = Coyoneda.iso
