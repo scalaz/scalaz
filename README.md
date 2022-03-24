@@ -10,19 +10,19 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.3.5, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x and Scala.js, scala-native.
+The current stable version is 7.3.6, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x, 3.x and Scala.js, scala-native.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.5"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.6"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.3.5).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.3.6).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.3.5.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.3.6.jar`.
 
 ## Quick Start
 
@@ -145,7 +145,7 @@ def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 Here is an instance definition for `Option`. Notice that the method `map` has been overridden.
 
 ```scala
-  implicit val option = new Traverse[Option] with MonadPlus[Option] {
+  implicit val option: Traverse[Option] with MonadPlus[Option] = new Traverse[Option] with MonadPlus[Option] {
     def point[A](a: => A) = Some(a)
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
