@@ -5,9 +5,12 @@ import Id._
 /**
  * StreamT monad transformer.
  */
-sealed class StreamT[M[_], A](val step: M[StreamT.Step[M, A]]) {
+@FunctionalInterface
+abstract class StreamT[M[_], A] {
 
   import StreamT._
+
+  def step: M[StreamT.Step[M, A]]
 
   def uncons(implicit M: Monad[M]): M[Option[(A, StreamT[M, A])]] =
     M.bind(step) {
@@ -463,9 +466,11 @@ object StreamT extends StreamTInstances {
       StreamT(M.pure(Yield(elem, l)))
   }
 
-  def apply[M[_], A](step: M[Step[M, A]]): StreamT[M, A] = new StreamT[M, A](step)
+  def apply[M[_], A](step0: => M[Step[M, A]]): StreamT[M, A] = new StreamT[M, A] {
+    def step = step0
+  }
 
-  def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
+  def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M point Done())
 
   def liftM[M[_], A](a: M[A])(implicit M: Applicative[M]): StreamT[M, A] =
     StreamT[M, A](M.map(a)(Yield(_, empty[M, A](M))))
