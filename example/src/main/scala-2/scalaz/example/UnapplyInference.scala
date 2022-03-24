@@ -1,8 +1,10 @@
 package scalaz.example
 
 /**Examples showing the use of Unapply to reduce the need for type annotations */
-object UnapplyInference extends App {
-  eitherTBifunctor()
+object UnapplyInference {
+  def main(args: Array[String]): Unit = {
+    eitherTBifunctor()
+  }
 
   def eitherTBifunctor(): Unit = {
     import scalaz._, Scalaz._

@@ -2,35 +2,37 @@ package scalaz.example
 
 import scalaz._
 
-object FibStateExample extends App {
-  val S = scalaz.StateT.stateMonad[(Int, Int)]
-  import S._ // for support if init, put, get, gets, ...
-  import scalaz.syntax.monad._ // for support of replicateM
+object FibStateExample {
+  def main(args: Array[String]): Unit = {
+    val S = scalaz.StateT.stateMonad[(Int, Int)]
+    import S._ // for support if init, put, get, gets, ...
+    import scalaz.syntax.monad._ // for support of replicateM
 
-  val initialState = (0, 1)
+    val initialState = (0, 1)
 
-  val (nextFib: State[(Int, Int), Int]) : State[(Int, Int), Int] = for {
-    s <- get
-    (a,b) = s
-    n = a + b
-    _ <- put ((b, n))
-  } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
-            // yield b instead to get (1,1,2,3...)
+    val (nextFib: State[(Int, Int), Int]) : State[(Int, Int), Int] = for {
+      s <- get
+      (a,b) = s
+      n = a + b
+      _ <- put ((b, n))
+    } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
+              // yield b instead to get (1,1,2,3...)
 
-  def getNFibs(k: Int): State[(Int, Int), IList[Int]] = {
-    nextFib.replicateM(k)
+    def getNFibs(k: Int): State[(Int, Int), IList[Int]] = {
+      nextFib.replicateM(k)
+    }
+
+    def getNthFib(k:Int): State[(Int, Int), Int] = {
+      if (k == 0)
+        pure(0) // will be thrown away
+      else
+        getNthFib(k - 1) >> nextFib
+    }
+
+    // run two examples through the magic of App
+    println( getNthFib(5).eval( initialState ) )
+    println( getNFibs(10).eval( initialState ) )
   }
-
-  def getNthFib(k:Int): State[(Int, Int), Int] = {
-    if (k == 0)
-      pure(0) // will be thrown away
-    else
-      getNthFib(k - 1) >> nextFib
-  }
-
-  // run two examples through the magic of App
-  println( getNthFib(5).eval( initialState ) )
-  println( getNFibs(10).eval( initialState ) )
 }
 
 /** Simple call-by-need (i.e. lazy) interpreter for Lambda Calculus based off of
@@ -39,7 +41,7 @@ object FibStateExample extends App {
   * (i.e. you cannot shadow variable names), and renames variables after substitution
   * to maintain this invariant.
   */
-object LaunchburyInterpreter extends App {
+object LaunchburyInterpreter {
   import scalaz.std.list._
   import scalaz.std.string._
   import scalaz.syntax.monad._
@@ -58,16 +60,21 @@ object LaunchburyInterpreter extends App {
   case class Var(name: String) extends Expr
   case class Let(bindings: IMap[String, Expr], term: Expr) extends Expr
 
-  // \x.x
-  val example1 = Lambda("x", Var("x"))
-  // let z = \y.y in (\x.x) z
-  val example2 = Let( IMap( "z" -> Lambda("y", Var("y")) )
-                    , Apply(example1, "z")
-                    )
-
   case class ReduceState( heap: IMap[String, Expr]
                         , freshVars: LazyList[String]
                         )
+
+  def main(args: Array[String]): Unit = {
+    // \x.x
+    val example1 = Lambda("x", Var("x"))
+    // let z = \y.y in (\x.x) z
+    val example2 = Let( IMap( "z" -> Lambda("y", Var("y")) )
+                      , Apply(example1, "z")
+                      )
+
+    // run an example through the magic of App
+    println(evaluate(example2))
+  }
 
   private val initialState = ReduceState( IMap()
                                         , LazyList.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
@@ -135,14 +142,12 @@ object LaunchburyInterpreter extends App {
                                   _ <- modify(s => s.copy(heap = s.heap + ((x, e3))))
                                   freshendE <- freshen(e3)
                                 } yield freshendE
-     case Let(bs, e2)   => { val heapAdd = ((binding:(String, Expr)) =>
-                                              modify(s => s.copy(heap = s.heap + binding)))
-                             bs.toList.traverseS(heapAdd) >> reduce(e2)
-                           }
-   }
- }
+      case Let(bs, e2)   => { val heapAdd = ((binding:(String, Expr)) =>
+                                               modify(s => s.copy(heap = s.heap + binding)))
+                              bs.toList.traverseS(heapAdd) >> reduce(e2)
+                            }
+    }
+  }
 
- def evaluate(e:Expr): Expr = reduce(e).eval(initialState)
- // run an example through the magic of App
- println(evaluate(example2))
+  def evaluate(e:Expr): Expr = reduce(e).eval(initialState)
 }
