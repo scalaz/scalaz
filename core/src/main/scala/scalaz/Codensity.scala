@@ -17,6 +17,13 @@ abstract class Codensity[F[_], A] { self =>
   def toRan: Ran[F, F, A] = new Ran[F, F, A] {
     def apply[B](f: A => F[B]) = self(f)
   }
+
+  def memoize(implicit F: Monad[F]): Codensity[F, A] = {
+    new Codensity[F, A] {
+      private lazy val memoized = self.improve
+      def apply[B](f: A => F[B]): F[B] = F.bind(memoized)(f)
+    }
+  }
 }
 
 object Codensity extends CodensityInstances {
