@@ -159,6 +159,12 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => M.point(Done())
   }
 
+  def weakMemoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
+    case Yield(a, s) => Yield(a, EphemeralStream.weakMemo(s()))
+    case Skip(s)     => Skip(EphemeralStream.weakMemo(s()))
+    case Done()      => Done()
+  }
+
   def memoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     case Yield(a, s) =>
       lazy val tail = s()
