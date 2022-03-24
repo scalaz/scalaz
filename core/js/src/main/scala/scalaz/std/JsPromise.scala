@@ -45,6 +45,13 @@ object jsPromise extends JSPromiseInstances {
         }.toJSIterable) 
     }
 
+    override def firstCompletedOf[A](as: Iterable[js.Promise[A]]): Option[js.Promise[A]] =
+      if (as.isEmpty) {
+        None
+      } else {
+        Some(js.Promise.race(as.toJSIterable))
+      }
+
     override def gather[A](fs: IList[js.Promise[A]]): js.Promise[IList[A]] =
       map(js.Promise.all(Foldable[IList].toList(fs).toJSIterable)) { jsIterable =>
         IList.fromList(jsIterable.toList)

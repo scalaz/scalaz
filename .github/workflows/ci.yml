@@ -11,34 +11,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        scala: [2, 3]
+        project: [rootJVM, rootJS, rootNative]
+        java: [8]
         include:
-          - java: 8
-            scala: 2
-            project: rootJVM
-          - java: 8
-            scala: 2
-            project: rootJS
-          - java: 8
-            scala: 2
-            project: rootNative
-
           - java: 11
             scala: 2
             project: rootJVM
-
           - java: 17
             scala: 2
             project: rootJVM
-
-          - java: 8
-            scala: 3
-            project: rootJVM
-          - java: 8
-            scala: 3
-            project: rootJS
-
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-java@v2
       with:
         java-version: ${{matrix.java}}
@@ -55,5 +39,29 @@ jobs:
            "project ${{ matrix.project }}"
            test
            "project /"
-           $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
+           $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+    - run: |
+        case ${{ matrix.project }} in
+          "rootJVM")
+            ./sbt -v \
+               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
+               "project exampleJVM" \
+               runAllMain
+            ;;
+          "rootJS")
+            ./sbt -v \
+               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
+               "project exampleJS" \
+               runAllMain
+            ;;
+          "rootNative")
+            ./sbt -v \
+               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
+               "project exampleNative" \
+               runAllMain
+            ;;
+          *)
+            echo "unknown project"
+            exit 1
+        esac
     - run: rm -rf "$HOME/.ivy2/local" || true

@@ -80,6 +80,48 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done()      => Done()
   }
 
+  private def scanLeftTail[B](head: B)(op: (B, A) => B)(implicit M: Functor[M]): StreamT[M, B] =
+    stepMap[B] {
+      case Yield(a, s) =>
+        val next = op(head, a)
+        Yield(next, () => s().scanLeftTail(next)(op))
+      case Skip(s) =>
+        Skip(() => s().scanLeftTail(head)(op))
+      case Done() =>
+        Done()
+    }
+
+  /** Produces a [[StreamT]] containing cumulative results of applying the
+    * operator going left to right, including the initial value.
+    *
+    *
+    *  @tparam B      the type of the elements in the resulting collection
+    *  @param head    the initial value
+    *  @param op      the binary operator applied to the intermediate result and the element
+    *  @return        collection with intermediate results
+    */
+  def scanLeft[B](head: B)(op: (B, A) => B)(implicit M: Applicative[M]): StreamT[M, B] =
+    head :: scanLeftTail(head)(op)
+
+  /** Computes a prefix scan of the elements of the collection.
+    *
+    *  Note: The neutral element `B` may be applied more than once.
+    *
+    *  @tparam B         element type of the resulting collection
+    *  @param op         the associative operator for the scan
+    *
+    *  @return           a new [[StreamT]] containing the prefix scan of the elements in this $coll
+    */
+  def scan[B >: A](op: (B, B) => B)(implicit M: Functor[M]): StreamT[M, B] =
+    stepMap[B] {
+      case Yield(a, s) =>
+        Yield(a, () => s().scanLeftTail[B](a)(op))
+      case Skip(s) =>
+        Skip(() => s().scan(op))
+      case Done() =>
+        Done()
+    }
+
   def take(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap[A] {
     case Yield(a, s) => if (n <= 0) Done() else Yield(a, s() take (n - 1))
     case Skip(s)     => Skip(s() take n)
@@ -115,6 +157,16 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Yield(a, s) => M.map(f(a))(Yield(_, s() mapM f))
     case Skip(s)     => M.point(Skip(s() mapM f))
     case Done()      => M.point(Done())
+  }
+
+  def memoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
+    case Yield(a, s) =>
+      lazy val tail = s()
+      Yield(a, tail)
+    case Skip(s) =>
+      lazy val tail = s()
+      Skip(tail)
+    case Done() => Done()
   }
 
   def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
@@ -397,6 +449,14 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
 }
 
 object StreamT extends StreamTInstances {
+
+  implicit def toDeferrer[M[_], A](l: => StreamT[M, A]): Deferrer[M, A] = new Deferrer(() => l)
+
+  final class Deferrer[M[_], A] private[StreamT] (private val l: () => StreamT[M, A]) extends AnyVal {
+    def #::(elem: => A)(implicit M: Applicative[M]): StreamT[M, A] = 
+      StreamT(M.pure(Yield(elem, l)))
+  }
+
   def apply[M[_], A](step: M[Step[A, StreamT[M, A]]]): StreamT[M, A] = new StreamT[M, A](step)
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
