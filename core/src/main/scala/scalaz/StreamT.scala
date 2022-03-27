@@ -94,15 +94,15 @@ abstract class StreamT[M[_], A] {
       case Done()      => Done()
     }
 
-  private def scanLeftTail[B](
+  def postScanLeft[B](
       head: B
   )(op: (B, A) => B)(implicit M: Functor[M]): StreamT[M, B] =
     stepMap[B] {
       case Yield(a, s) =>
         val next = op(head, a)
-        Yield(next, s.scanLeftTail(next)(op))
+        Yield(next, s.postScanLeft(next)(op))
       case Skip(s) =>
-        Skip(s.scanLeftTail(head)(op))
+        Skip(s.postScanLeft(head)(op))
       case Done() =>
         Done()
     }
@@ -122,7 +122,7 @@ abstract class StreamT[M[_], A] {
   def scanLeft[B](head: B)(op: (B, A) => B)(implicit
       M: Applicative[M]
   ): StreamT[M, B] =
-    head :: scanLeftTail(head)(op)
+    head :: postScanLeft(head)(op)
 
   /** Computes a prefix scan of the elements of the collection.
     *
@@ -140,7 +140,7 @@ abstract class StreamT[M[_], A] {
   def scan[B >: A](op: (B, B) => B)(implicit M: Functor[M]): StreamT[M, B] =
     stepMap[B] {
       case Yield(a, s) =>
-        Yield(a, s.scanLeftTail[B](a)(op))
+        Yield(a, s.postScanLeft[B](a)(op))
       case Skip(s) =>
         Skip(s.scan(op))
       case Done() =>
