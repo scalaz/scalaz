@@ -2,6 +2,7 @@
 .idea
 .idea_modules
 .metals
+metals.sbt
 target
 project/boot
 *.swp
