@@ -13,6 +13,16 @@ object StreamTTest extends SpecLite {
       StreamT.fromLazyList[Id.Id, Byte](xs).weakMemoize must_=== StreamT.fromLazyList[Id.Id, Byte](xs)
   }
 
+  "noSkipRec" ! forAll {
+    (xs: LazyList[Byte]) =>
+      StreamT.fromLazyList[Id.Id, Byte](xs).noSkipRec must_=== StreamT.fromLazyList[Id.Id, Byte](xs)
+  }
+
+  "noSkip" ! forAll {
+    (xs: LazyList[Byte]) =>
+      StreamT.fromLazyList[Id.Id, Byte](xs).noSkip must_=== StreamT.fromLazyList[Id.Id, Byte](xs)
+  }
+
   "recursive" in {
     val s = Scalaz.fix[StreamT[Id.Id, Int]] { stream =>
       1 #:: stream.map(_ * 2)

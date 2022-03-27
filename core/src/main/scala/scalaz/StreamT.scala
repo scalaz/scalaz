@@ -4,11 +4,42 @@ import Id._
 
 /** StreamT monad transformer.
   */
-abstract class StreamT[M[_], A] {
+abstract class StreamT[M[_], A] { self =>
 
   import StreamT._
 
   def step: M[StreamT.Step[M, A]]
+
+  /** Returns a new [[StreamT]] that does not contain [[StreamT.Skip]] steps,
+    * while yields the same elements as `this`.
+    */
+  def noSkip(implicit M: Monad[M]): StreamT[M, A] = new StreamT[M, A] {
+    def step = M.bind(self.step) {
+      case Yield(a, s) =>
+        M.point(Yield(a, s.noSkip))
+      case Skip(s) =>
+        s.noSkip.step
+      case Done() =>
+        M.point(Done())
+    }
+  }
+
+  /** Returns a new [[StreamT]] that does not contain [[StreamT.Skip]] steps,
+    * while yields the same elements as `this`.
+    *
+    * @note
+    *   Unlike [[noSkip]], this [[noSkipRec]] is stack safe.
+    */
+  def noSkipRec(implicit M: BindRec[M]): StreamT[M, A] = new StreamT[M, A] {
+    def step =
+      M.tailrecM(self) { s =>
+        M.map(s.step) {
+          case Yield(a, s1) => \/-(Yield(a, s1.noSkipRec))
+          case Skip(s1)     => -\/(s1)
+          case Done()       => \/-(Done())
+        }
+      }
+  }
 
   def uncons(implicit M: Monad[M]): M[Option[(A, StreamT[M, A])]] =
     M.bind(step) {
