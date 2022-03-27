@@ -66,6 +66,7 @@ class FutureTest extends SpecLite {
 
   // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
   checkAll(monadError.laws[Future, Throwable](implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
+  checkAll(bindRec.laws[Future](implicitly, futureArb, Arbitrary.arbFunction1(futureArb, implicitly), futureArb, futureEqual))
 
   // Scope these away from the rest as Comonad[Future] is a little evil.
   // Should fail to compile by default: implicitly[Comonad[Future]]
