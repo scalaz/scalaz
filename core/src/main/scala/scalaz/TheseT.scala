@@ -41,7 +41,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 
   def exists(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ exists p)
   def forall(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ forall p)
-  def toListT(implicit F: Functor[F]): ListT[F, B] = ListT(toIList)
+  def toCommutativeListT(implicit F: Functor[F]): CommutativeListT[F, B] = CommutativeListT(toIList)
   def toIList(implicit F: Functor[F]): F[IList[B]] = F.map(run)(_.toIList)
   def toList(implicit F: Functor[F]): F[List[B]] = F.map(run)(_.toList)
 
