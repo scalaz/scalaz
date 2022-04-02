@@ -533,6 +533,10 @@ sealed abstract class StreamTInstances0 {
 }
 
 sealed abstract class StreamTInstances extends StreamTInstances0 {
+  implicit def StreamTIsCovariant[F[_]](implicit
+      F: IsCovariant[F]
+  ): IsCovariant[StreamT[F, *]] = IsCovariant.force[StreamT[F, *]]
+
   implicit def StreamTMonoid[F[_], A](implicit
       F0: Applicative[F]
   ): Monoid[StreamT[F, A]] =
