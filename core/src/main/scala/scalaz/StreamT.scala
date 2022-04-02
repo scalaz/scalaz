@@ -606,6 +606,58 @@ object StreamT extends StreamTInstances {
     unfold(s)(stepper)
   }
 
+  /** Converts a [[StreamT]] that emits [[StreamT]]s into a single [[StreamT]]
+    * that emits the items emitted by the most-recently-emitted of those
+    * [[StreamT]]s.
+    *
+    * <img style="max-width: 100%"
+    * src="http://reactivex.io/documentation/operators/images/switch.png" />
+    */
+  def switch[M[_]: Nondeterminism, A](
+      streams: StreamT[M, StreamT[M, A]]
+  ): StreamT[M, A] = {
+    def switchInitStep(
+        mTailStep: M[Step[M, StreamT[M, A]]]
+    ): M[Step[M, A]] = {
+      Nondeterminism[M].map(mTailStep) {
+        case Yield(a, s) =>
+          Skip(StreamT(switchStep(a.step, s.step)))
+        case Skip(s) =>
+          Skip(StreamT(switchInitStep(s.step)))
+        case Done() =>
+          Done()
+      }
+    }
+    def switchStep(
+        mHeadStep: M[Step[M, A]],
+        mTailStep: M[Step[M, StreamT[M, A]]]
+    ): M[Step[M, A]] = {
+      Nondeterminism[M].map(
+        Nondeterminism[M].choose(mTailStep, mHeadStep)
+      ) {
+        case -\/((tail, mHeadStep)) =>
+          tail match {
+            case Yield(a, s) =>
+              Skip(StreamT(switchStep(a.step, s.step)))
+            case Skip(s) =>
+              Skip(StreamT(switchStep(mHeadStep, s.step)))
+            case Done() =>
+              Skip(StreamT(mHeadStep))
+          }
+        case \/-((mTailStep, headStream)) =>
+          headStream match {
+            case Yield(b, s) =>
+              Yield(b, StreamT(switchStep(s.step, mTailStep)))
+            case Skip(s) =>
+              Skip(StreamT(switchStep(s.step, mTailStep)))
+            case Done() =>
+              Skip(StreamT(switchInitStep(mTailStep)))
+          }
+      }
+    }
+    StreamT(switchInitStep(streams.step))
+  }
+
   def wrapEffect[M[_]: Functor, A](m: M[StreamT[M, A]]): StreamT[M, A] =
     StreamT(Functor[M].map(m)(Skip(_)))
 
