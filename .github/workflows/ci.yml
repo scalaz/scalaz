@@ -28,13 +28,13 @@ jobs:
         java-version: ${{matrix.java}}
         distribution: adopt
     - uses: coursier/cache-action@v6
-    - run: ./sbt -v
+    - run: ./sbt -J-XX:MaxRAMPercentage=90.0 -v
            checkGenTypeClasses
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"
            Test/compile
            $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
-    - run: ./sbt -v
+    - run: ./sbt -J-XX:MaxRAMPercentage=90.0 -v
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"
            test
@@ -43,19 +43,19 @@ jobs:
     - run: |
         case ${{ matrix.project }} in
           "rootJVM")
-            ./sbt -v \
+            ./sbt -J-XX:MaxRAMPercentage=90.0 -v \
                $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
                "project exampleJVM" \
                runAllMain
             ;;
           "rootJS")
-            ./sbt -v \
+            ./sbt -J-XX:MaxRAMPercentage=90.0 -v \
                $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
                "project exampleJS" \
                runAllMain
             ;;
           "rootNative")
-            ./sbt -v \
+            ./sbt -J-XX:MaxRAMPercentage=90.0 -v \
                $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
                "project exampleNative" \
                runAllMain
