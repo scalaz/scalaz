@@ -57,8 +57,9 @@ object LiftIO {
 
   implicit def streamTLiftIO[F[_]: LiftIO: Applicative]: LiftIO[StreamT[F, *]] =
     new LiftIO[StreamT[F, *]] {
-      def liftIO[A](ioa: IO[A]) =
-        StreamT(LiftIO[F].liftIO(ioa.map(StreamT.Yield(_, StreamT.empty[F, A]))))
+      def liftIO[A](ioa: IO[A]) = { () =>
+        LiftIO[F].liftIO(ioa.map(StreamT.Yield(_, StreamT.empty[F, A])))
+      }
     }
 
   implicit def kleisliLiftIO[F[_]: LiftIO, E]: LiftIO[Kleisli[F, E, *]] =
