@@ -8,17 +8,17 @@ abstract class StreamT[M[_], A] { self =>
 
   import StreamT._
 
-  def step: M[StreamT.Step[M, A]]
+  def step(): M[StreamT.Step[M, A]]
 
   /** Returns a new [[StreamT]] that does not contain [[StreamT.Skip]] steps,
     * while yields the same elements as `this`.
     */
-  def noSkip(implicit M: Monad[M]): StreamT[M, A] = new StreamT[M, A] {
-    def step = M.bind(self.step) {
+  def noSkip(implicit M: Monad[M]): StreamT[M, A] = { () =>
+    M.bind(self.step()) {
       case Yield(a, s) =>
         M.point(Yield(a, s.noSkip))
       case Skip(s) =>
-        s.noSkip.step
+        s.noSkip.step()
       case Done() =>
         M.point(Done())
     }
@@ -30,19 +30,18 @@ abstract class StreamT[M[_], A] { self =>
     * @note
     *   Unlike [[noSkip]], this [[noSkipRec]] is stack safe.
     */
-  def noSkipRec(implicit M: BindRec[M]): StreamT[M, A] = new StreamT[M, A] {
-    def step =
-      M.tailrecM(self) { s =>
-        M.map(s.step) {
-          case Yield(a, s1) => \/-(Yield(a, s1.noSkipRec))
-          case Skip(s1)     => -\/(s1)
-          case Done()       => \/-(Done())
-        }
+  def noSkipRec(implicit M: BindRec[M]): StreamT[M, A] = { () =>
+    M.tailrecM(self) { s =>
+      M.map(s.step()) {
+        case Yield(a, s1) => \/-(Yield(a, s1.noSkipRec))
+        case Skip(s1)     => -\/(s1)
+        case Done()       => \/-(Done())
       }
+    }
   }
 
   def uncons(implicit M: Monad[M]): M[Option[(A, StreamT[M, A])]] =
-    M.bind(step) {
+    M.bind(step()) {
       case Yield(a, s) => M.point(Some((a, s)))
       case Skip(s)     => s.uncons
       case Done()      => M.point(None)
@@ -50,7 +49,7 @@ abstract class StreamT[M[_], A] { self =>
 
   def unconsRec(implicit M: BindRec[M]): M[Option[(A, StreamT[M, A])]] =
     M.tailrecM(this)(s =>
-      M.map(s.step) {
+      M.map(s.step()) {
         case Yield(a, s1) => \/-(Some((a, s1)))
         case Skip(s1)     => -\/(s1)
         case Done()       => \/-(None)
@@ -84,12 +83,13 @@ abstract class StreamT[M[_], A] { self =>
   def tailOptionRec(implicit M: BindRec[M]): M[Option[StreamT[M, A]]] =
     M.map(unconsRec)(_.map(_._2))
 
-  def trans[N[_]](t: M ~> N)(implicit M: Functor[M]): StreamT[N, A] =
-    StreamT(t(M.map[Step[M, A], Step[N, A]](this.step) {
+  def trans[N[_]](t: M ~> N)(implicit M: Functor[M]): StreamT[N, A] = { () =>
+    t(M.map[Step[M, A], Step[N, A]](this.step()) {
       case Yield(a, s) => Yield(a, s trans t)
       case Skip(s)     => Skip(s trans t)
       case Done()      => Done()
-    }))
+    })
+  }
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap[A] {
@@ -100,8 +100,8 @@ abstract class StreamT[M[_], A] { self =>
 
   def collect[B](
       pf: PartialFunction[A, B]
-  )(implicit M: Functor[M]): StreamT[M, B] =
-    StreamT(M.map(step) {
+  )(implicit M: Functor[M]): StreamT[M, B] = { () =>
+    M.map(step()) {
       case Yield(pf(b), s) =>
         Yield(b, s.collect(pf))
       case Yield(_, s) =>
@@ -110,7 +110,8 @@ abstract class StreamT[M[_], A] { self =>
         Skip(s.collect(pf))
       case Done() =>
         Done()
-    })
+    }
+  }
 
   def drop(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap[A] {
     case Yield(a, s) => if (n > 0) Skip(s drop (n - 1)) else Yield(a, s)
@@ -220,18 +221,11 @@ abstract class StreamT[M[_], A] { self =>
 
   def weakMemoize(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     case Yield(a, s) =>
-      val memo = EphemeralStream.weakMemo(s.step)
-      Yield(
-        a,
-        new StreamT[M, A] {
-          val step = memo()
-        }
-      )
+      val memo = EphemeralStream.weakMemo(s.step())
+      Yield(a, () => memo())
     case Skip(s) =>
-      val memo = EphemeralStream.weakMemo(s.step)
-      Skip(new StreamT[M, A] {
-        val step = memo()
-      })
+      val memo = EphemeralStream.weakMemo(s.step())
+      Skip(() => memo())
     case Done() => Done()
   }
 
@@ -240,18 +234,20 @@ abstract class StreamT[M[_], A] { self =>
       Yield(
         a,
         new StreamT[M, A] {
-          lazy val step = s.step
+          lazy val lazyStep = s.step()
+          def step() = lazyStep
         }
       )
     case Skip(s) =>
       Skip(new StreamT[M, A] {
-        lazy val step = s.step
+        lazy val lazyStep = s.step()
+        def step() = lazyStep
       })
     case Done() => Done()
   }
 
   def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
-    M.bind(step) {
+    M.bind(step()) {
       case Yield(a, s) => s.foldLeft(f(z, a))(f)
       case Skip(s)     => s.foldLeft(z)(f)
       case Done()      => M.point(z)
@@ -259,7 +255,7 @@ abstract class StreamT[M[_], A] { self =>
 
   def foldLeftRec[B](z: B)(f: (B, A) => B)(implicit M: BindRec[M]): M[B] =
     M.tailrecM((this, z))(sb =>
-      M.map(sb._1.step) {
+      M.map(sb._1.step()) {
         case Yield(a, s) => -\/((s, f(sb._2, a)))
         case Skip(s)     => -\/((s, sb._2))
         case Done()      => \/-(sb._2)
@@ -294,7 +290,7 @@ abstract class StreamT[M[_], A] { self =>
       case Some((a, s1)) => LazyList.cons(a, go(s1))
     }
 
-    go(StreamT(ev(step)))
+    go(() => ev(step()))
   }
 
   def foldRight[B](z: => B)(f: (=> A, => B) => B)(implicit M: Monad[M]): M[B] =
@@ -314,14 +310,14 @@ abstract class StreamT[M[_], A] { self =>
   def foldRightM[B](
       z: => M[B]
   )(f: (=> A, => M[B]) => M[B])(implicit M: Monad[M]): M[B] =
-    M.bind(step) {
+    M.bind(step()) {
       case Yield(a, s) => f(a, s.foldRightM(z)(f))
       case Skip(s)     => s.foldRightM(z)(f)
       case Done()      => z
     }
 
   def foldMap[B](f: A => B)(implicit M: Foldable[M], B: Monoid[B]): B =
-    M.foldMap(step) {
+    M.foldMap(step()) {
       case Yield(a, s) => B.append(f(a), s.foldMap(f))
       case Skip(s)     => s.foldMap(f)
       case Done()      => B.zero
@@ -333,7 +329,7 @@ abstract class StreamT[M[_], A] { self =>
   def lengthRec(implicit M: BindRec[M]): M[Int] =
     foldLeftRec(0)((c, a) => 1 + c)
 
-  def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step) {
+  def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step()) {
     case Yield(a, s) => M.bind(f(a))(_ => s foreach f)
     case Skip(s)     => s.foreach(f)
     case Done()      => M.pure(())
@@ -343,7 +339,7 @@ abstract class StreamT[M[_], A] { self =>
       f: A => M[Unit]
   )(implicit M: Monad[M], B: BindRec[M]): M[Unit] =
     B.tailrecM(this)(s =>
-      M.bind(s.step) {
+      M.bind(s.step()) {
         case Yield(a, s1) => M.map(f(a))(_ => -\/(s1))
         case Skip(s1)     => M.pure(-\/(s1))
         case Done()       => M.pure(\/-(()))
@@ -352,15 +348,15 @@ abstract class StreamT[M[_], A] { self =>
 
   private def stepMap[B](f: Step[M, A] => Step[M, B])(implicit
       M: Functor[M]
-  ): StreamT[M, B] = StreamT(M.map(step)(f))
+  ): StreamT[M, B] = () => M.map(step())(f)
 
   private def stepBind[B](f: Step[M, A] => M[Step[M, B]])(implicit
       M: Monad[M]
-  ): StreamT[M, B] = StreamT(M.bind(step)(f))
+  ): StreamT[M, B] = () => M.bind(step())(f)
 
   private def rev(implicit M: Monad[M]): M[LazyList[A]] = {
     def loop(xs: StreamT[M, A], ys: LazyList[A]): M[LazyList[A]] =
-      M.bind(xs.step) {
+      M.bind(xs.step()) {
         case Yield(a, s) => loop(s, a #:: ys)
         case Skip(s)     => loop(s, ys)
         case Done()      => M.point(ys)
@@ -370,7 +366,7 @@ abstract class StreamT[M[_], A] { self =>
 
   private def revRec(implicit M: BindRec[M]): M[LazyList[A]] =
     M.tailrecM((this, LazyList.empty[A])) { case (xs, ys) =>
-      M.map(xs.step) {
+      M.map(xs.step()) {
         case Yield(a, s) => -\/((s, a #:: ys))
         case Skip(s)     => -\/((s, ys))
         case Done()      => \/-(ys)
@@ -421,7 +417,7 @@ abstract class StreamT[M[_], A] { self =>
   def mergeWith(
       f2: => StreamT[M, A]
   )(implicit M: Nondeterminism[M]): StreamT[M, A] = {
-    StreamT(mergeFStep(this.step, f2.step))
+    (() => mergeFStep(this.step(), f2.step()))
   }
 
   def mergeMap[B](
@@ -430,9 +426,9 @@ abstract class StreamT[M[_], A] { self =>
     def mergeMapInitStep(fsa: M[Step[M, A]]): M[Step[M, B]] = {
       M.map(fsa) {
         case Yield(a, s) =>
-          Skip(StreamT(mergeMapStep(s.step, f(a).step)))
+          Skip(() => mergeMapStep(s.step(), f(a).step()))
         case Skip(s) =>
-          Skip(StreamT(mergeMapInitStep(s.step)))
+          Skip(() => mergeMapInitStep(s.step()))
         case Done() =>
           Done()
       }
@@ -442,24 +438,24 @@ abstract class StreamT[M[_], A] { self =>
         case -\/((sa, fsb)) =>
           sa match {
             case Yield(a, s) =>
-              Skip(StreamT(mergeMapStep(s.step, mergeFStep(f(a).step, fsb))))
+              Skip(() => mergeMapStep(s.step(), mergeFStep(f(a).step(), fsb)))
             case Skip(s) =>
-              Skip(StreamT(mergeMapStep(s.step, fsb)))
+              Skip(() => mergeMapStep(s.step(), fsb))
             case Done() =>
-              Skip(StreamT(fsb))
+              Skip(() => fsb)
           }
         case \/-((fsa, sb)) =>
           sb match {
             case Yield(b, s) =>
-              Yield(b, StreamT(mergeMapStep(fsa, s.step)))
+              Yield(b, () => mergeMapStep(fsa, s.step()))
             case Skip(s) =>
-              Skip(StreamT(mergeMapStep(fsa, s.step)))
+              Skip(() => mergeMapStep(fsa, s.step()))
             case Done() =>
-              Skip(StreamT(mergeMapInitStep(fsa)))
+              Skip(() => mergeMapInitStep(fsa))
           }
       }
     }
-    StreamT(mergeMapInitStep(this.step))
+    (() => mergeMapInitStep(this.step()))
   }
 
   /** The [[flatMapLatest]] operator behaves much like the [[mergeMap]] except
@@ -476,9 +472,9 @@ abstract class StreamT[M[_], A] { self =>
     def flatMapLatestInitStep(fsa: M[Step[M, A]]): M[Step[M, B]] = {
       M.map(fsa) {
         case Yield(a, s) =>
-          Skip(StreamT(flatMapLatestStep(s.step, f(a).step)))
+          Skip(() => flatMapLatestStep(s.step(), f(a).step()))
         case Skip(s) =>
-          Skip(StreamT(flatMapLatestInitStep(s.step)))
+          Skip(() => flatMapLatestInitStep(s.step()))
         case Done() =>
           Done()
       }
@@ -491,24 +487,24 @@ abstract class StreamT[M[_], A] { self =>
         case -\/((sa, fsb)) =>
           sa match {
             case Yield(a, s) =>
-              Skip(StreamT(flatMapLatestStep(s.step, f(a).step)))
+              Skip(() => flatMapLatestStep(s.step(), f(a).step()))
             case Skip(s) =>
-              Skip(StreamT(flatMapLatestStep(s.step, fsb)))
+              Skip(() => flatMapLatestStep(s.step(), fsb))
             case Done() =>
-              Skip(StreamT(fsb))
+              Skip(() => fsb)
           }
         case \/-((fsa, sb)) =>
           sb match {
             case Yield(b, s) =>
-              Yield(b, StreamT(flatMapLatestStep(fsa, s.step)))
+              Yield(b, () => flatMapLatestStep(fsa, s.step()))
             case Skip(s) =>
-              Skip(StreamT(flatMapLatestStep(fsa, s.step)))
+              Skip(() => flatMapLatestStep(fsa, s.step()))
             case Done() =>
-              Skip(StreamT(flatMapLatestInitStep(fsa)))
+              Skip(() => flatMapLatestInitStep(fsa))
           }
       }
     }
-    StreamT(flatMapLatestInitStep(this.step))
+    (() => flatMapLatestInitStep(this.step()))
   }
 }
 
@@ -593,7 +589,7 @@ object StreamT extends StreamTInstances {
     new Deferrer[M, A] {
       def #::(elem: => A)(implicit M: Applicative[M]): StreamT[M, A] =
         new StreamT[M, A] {
-          def step = M.pure(Yield(elem, stream))
+          def step() = M.pure(Yield(elem, stream))
         }
 
     }
@@ -604,7 +600,7 @@ object StreamT extends StreamTInstances {
 
   def apply[M[_], A](step0: => M[Step[M, A]]): StreamT[M, A] =
     new StreamT[M, A] {
-      def step = step0
+      def step() = step0
     }
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] =
@@ -656,9 +652,9 @@ object StreamT extends StreamTInstances {
     ): M[Step[M, A]] = {
       Nondeterminism[M].map(mTailStep) {
         case Yield(a, s) =>
-          Skip(StreamT(switchStep(a.step, s.step)))
+          Skip((() => switchStep(a.step(), s.step())))
         case Skip(s) =>
-          Skip(StreamT(switchInitStep(s.step)))
+          Skip((() => switchInitStep(s.step())))
         case Done() =>
           Done()
       }
@@ -673,55 +669,55 @@ object StreamT extends StreamTInstances {
         case -\/((tail, mHeadStep)) =>
           tail match {
             case Yield(a, s) =>
-              Skip(StreamT(switchStep(a.step, s.step)))
+              Skip((() => switchStep(a.step(), s.step())))
             case Skip(s) =>
-              Skip(StreamT(switchStep(mHeadStep, s.step)))
+              Skip((() => switchStep(mHeadStep, s.step())))
             case Done() =>
-              Skip(StreamT(mHeadStep))
+              Skip((() => mHeadStep))
           }
         case \/-((mTailStep, headStream)) =>
           headStream match {
             case Yield(b, s) =>
-              Yield(b, StreamT(switchStep(s.step, mTailStep)))
+              Yield(b, (() => switchStep(s.step(), mTailStep)))
             case Skip(s) =>
-              Skip(StreamT(switchStep(s.step, mTailStep)))
+              Skip((() => switchStep(s.step(), mTailStep)))
             case Done() =>
-              Skip(StreamT(switchInitStep(mTailStep)))
+              Skip((() => switchInitStep(mTailStep)))
           }
       }
     }
-    StreamT(switchInitStep(streams.step))
+    (() => switchInitStep(streams.step()))
   }
 
-  def wrapEffect[M[_]: Functor, A](m: M[StreamT[M, A]]): StreamT[M, A] =
-    StreamT(Functor[M].map(m)(Skip(_)))
+  def wrapEffect[M[_]: Functor, A](m: M[StreamT[M, A]]): StreamT[M, A] = { () =>
+    Functor[M].map(m)(Skip(_))
+  }
 
   def runStreamT[S, A](stream: StreamT[State[S, *], A], s0: S): StreamT[Id, A] =
     runStreamT[S, Id, A](stream, s0)
 
   def runStreamT[S, M[_], A](stream: StreamT[StateT[S, M, *], A], s0: S)(
       implicit M: Bind[M]
-  ): StreamT[M, A] =
-    StreamT(
-      M.map(stream.step(s0)) { case (a, s) =>
-        s match {
-          case Yield(a1, s1) => Yield(a1, runStreamT(s1, a))
-          case Skip(s1)      => Skip(runStreamT(s1, a))
-          case Done()        => Done()
-        }
+  ): StreamT[M, A] = { () =>
+    M.map(stream.step()(s0)) { case (a, s) =>
+      s match {
+        case Yield(a1, s1) => Yield(a1, runStreamT(s1, a))
+        case Skip(s1)      => Skip(runStreamT(s1, a))
+        case Done()        => Done()
       }
-    )
+    }
+  }
 
   private def mergeStep[M[_], A](s1: Step[M, A], fs2: M[Step[M, A]])(implicit
       M: Nondeterminism[M]
   ): Step[M, A] = {
     s1 match {
       case Yield(a, s) =>
-        Yield(a, StreamT(mergeFStep(s.step, fs2)))
+        Yield(a, () => mergeFStep(s.step(), fs2))
       case Skip(s) =>
-        Skip(StreamT(mergeFStep(s.step, fs2)))
+        Skip(() => mergeFStep(s.step(), fs2))
       case Done() =>
-        Skip(StreamT(fs2))
+        Skip(() => fs2)
     }
   }
 
