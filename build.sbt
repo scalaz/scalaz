@@ -151,35 +151,6 @@ lazy val exampleJVM = example.jvm
 lazy val exampleJS = example.js
 lazy val exampleNative = example.native
 
-// TODO https://github.com/typelevel/scalacheck/pull/868
-lazy val disableScala3 = Def.settings(
-  mimaPreviousArtifacts := Set.empty,
-  libraryDependencies := {
-    if (scalaBinaryVersion.value == "3") {
-      Nil
-    } else {
-      libraryDependencies.value
-    }
-  },
-  Seq(Compile, Test).map { x =>
-    (x / sources) := {
-      if (scalaBinaryVersion.value == "3") {
-        Nil
-      } else {
-        (x / sources).value
-      }
-    }
-  },
-  Test / test := {
-    if (scalaBinaryVersion.value == "3") {
-      ()
-    } else {
-      (Test / test).value
-    }
-  },
-  publish / skip := scalaBinaryVersion.value == "3",
-)
-
 def scalacheckBindingProject(
   id: String,
   base: String,
@@ -241,7 +212,6 @@ def scalacheckBindingProject(
           organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
         }.toSet
       },
-      disableScala3, // TODO
     )
 }
 
@@ -273,7 +243,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .nativeSettings(
     nativeSettings,
-    disableScala3, // TODO
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33

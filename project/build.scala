@@ -186,7 +186,7 @@ object build {
     scalaCheckVersion_1_15 := {
       scalaBinaryVersion.value match {
         case "3" =>
-          "1.15.4"
+          "1.16.0"
         case _ =>
           "1.15.2"
       }
