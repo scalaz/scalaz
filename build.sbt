@@ -208,9 +208,13 @@ def scalacheckBindingProject(
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/native/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        scalazMimaBasis.?.value.map { v =>
-          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
-        }.toSet
+        if (scalazMimaBasis.?.value == Some("7.2.34")) {
+          Set.empty
+        } else {
+          scalazMimaBasis.?.value.map { v =>
+            organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % fullVersion(v)
+          }.toSet
+        }
       },
     )
 }
