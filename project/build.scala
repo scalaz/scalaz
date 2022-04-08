@@ -200,7 +200,7 @@ object build {
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := {
       if (scalaBinaryVersion.value == "3") {
-        "1.15.4"
+        "1.16.0"
       } else {
         "1.15.2"
       }
