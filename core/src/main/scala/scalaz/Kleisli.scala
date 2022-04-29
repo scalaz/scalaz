@@ -192,7 +192,7 @@ sealed abstract class KleisliInstances5 extends KleisliInstances6 {
 
   implicit def kleisliAlt[F[_]: Alt: Applicative, A]: Alt[Kleisli[F, A, *]] =
     new KleisliApplicative[F, A] with Alt[Kleisli[F, A, *]] {
-      implicit def F = Applicative[F]
+      override def F = Applicative[F]
 
       def alt[B](f1: => Kleisli[F, A, B], f2: => Kleisli[F, A, B]) =
         Kleisli(a => Alt[F].alt(f1.run(a), f2.run(a)))
