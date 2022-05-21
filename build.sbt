@@ -47,11 +47,11 @@ lazy val scalaz = Project(
   },
   Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
-  jvmProjects ++ jsProjects : _*
+  jvmProjects ++ jsProjects ++ nativeProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
-  rootNativeId,
+  "rootNative",
   file("rootNative")
 ).settings(
   standardSettings,

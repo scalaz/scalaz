@@ -29,8 +29,6 @@ import xerial.sbt.Sonatype.autoImport._
 object build {
   type Sett = Def.Setting[_]
 
-  val rootNativeId = "rootNative"
-
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
       val extracted = st.extract
@@ -272,7 +270,6 @@ object build {
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
