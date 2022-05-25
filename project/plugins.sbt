@@ -14,7 +14,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.2.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.4")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.0")
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.12")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.13")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
