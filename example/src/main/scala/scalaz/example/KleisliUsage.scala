@@ -25,7 +25,7 @@ object KleisliUsage {
       Continent("Asia",
         List(
           Country("India",
-            List(City("New Dehli"), City("Calcutta"))))))
+            List(City("New Delhi"), City("Calcutta"))))))
 
     def continents(name: String): List[Continent] =
       data.filter(k => k.name.contains(name))
