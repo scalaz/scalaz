@@ -482,10 +482,10 @@ object ZipperTest extends SpecLite {
   }
 
   "positions should return a zippers with all possible positions of a zipper" ! forAll { (z: Zipper[Int]) =>
-    val indeces = z.positions.map { _.index }.toLazyList
-    indeces.min must_===(0)
-    indeces.max must_===(z.length -1)
-    indeces.sorted must_===(indeces)
+    val indices = z.positions.map { _.index }.toLazyList
+    indices.min must_===(0)
+    indices.max must_===(z.length -1)
+    indices.sorted must_===(indices)
     z.positions.map { _.toLazyList }.toLazyList.distinct.length must_===(1)
   }
 
