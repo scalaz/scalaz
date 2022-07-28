@@ -538,7 +538,7 @@ object ContravariantCoyonedaUsage {
       s.foldMap{case (st, i) => recItem[BinOrd](i, sortTypeBinOrd(st))}
 
     // The drawback here is that I can’t just build a separate stack
-    // willynilly for `Binfmt'.  I have to prove at each step that *the
+    // willy nilly for `Binfmt'.  I have to prove at each step that *the
     // same* `I' is used for the `Binfmt' and the `Order' for this to be
     // useful.  Once again, an idea of a fold step that can be fused
     // with the `Order' construction safely can be abstracted out here.
