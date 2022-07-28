@@ -128,7 +128,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * Nondeterministically gather results from the given sequence of actions
    * to a list. Same as calling `reduceUnordered` with the `List` `Monoid`.
    *
-   * To preserve the order of the output list while allowing nondetermininstic
+   * To preserve the order of the output list while allowing nondeterministic
    * ordering of effects, use `gather`.
    */
   def gatherUnordered[A](fs: IList[F[A]]): F[IList[A]] =
