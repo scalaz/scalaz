@@ -12,11 +12,11 @@ A `Equal` must satisfy the following [laws](https://en.wikipedia.org/wiki/Identi
 - Reflexivity:
   - `x === x` for any `x`.
 - The indiscernibility of identicals:
-  - For any `x` and `y`, if `x === y`, then `x` and `y` are indiscernable
+  - For any `x` and `y`, if `x === y`, then `x` and `y` are indiscernible
 - The identity of indiscernibles:
-  - For any `x` and `y`, if `x` and `y` are indiscernable, then `x === y`
+  - For any `x` and `y`, if `x` and `y` are indiscernible, then `x === y`
 
-*Indiscernibility* formalizes the intuitive notion of two objects having the exact same properties. Two values `x, y: A` are indiscernable if there exists no function `f: A => Boolean` such that `f(x)` is `true` and `f(y)` is `false`.
+*Indiscernibility* formalizes the intuitive notion of two objects having the exact same properties. Two values `x, y: A` are indiscernible if there exists no function `f: A => Boolean` such that `f(x)` is `true` and `f(y)` is `false`.
 
 These laws entail symmetry and transitivity, which should be easier to test, since they don't universally quantify over all possible predicates in the language:
 
