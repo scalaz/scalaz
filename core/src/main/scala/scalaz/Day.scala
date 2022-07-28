@@ -7,7 +7,7 @@ package scalaz
   *
   * Day convolution is a special form of Functor multiplication.
   * In monoidal category of endofunctors Applicative is a monoid object when Day covolution is used as tensor.
-  * If we use Functor composition as tensor then then monoid form a Monad instead of Applicative.
+  * If we use Functor composition as tensor then the monoid form a Monad instead of Applicative.
   *
   * Can be seen as generalization of method apply2 from Apply:
   * {{{
