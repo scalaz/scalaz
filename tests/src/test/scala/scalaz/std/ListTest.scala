@@ -49,7 +49,7 @@ object ListTest extends SpecLite {
       a.groupWhenM[Id](p).map(_.list.toList).flatten must_===(a)
   }
 
-  "groupByWhenM[Id] ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
+  "groupByWhenM[Id] ∀(i,j) | 0<i<result.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhenM[Id](p).forall { group =>
         list.adjacentPairs(group.list.toList).forall(p.tupled)
@@ -88,7 +88,7 @@ object ListTest extends SpecLite {
       a.groupWhen(p).map(_.list.toList).flatten must_===(a)
   }
 
-  "groupByWhen ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
+  "groupByWhen ∀(i,j) | 0<i<result.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).forall { group =>
         list.adjacentPairs(group.list.toList).forall(p.tupled)
