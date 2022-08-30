@@ -156,7 +156,6 @@ object build {
       val date = extracted get dynverCurrentDate
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
       "-deprecation",
