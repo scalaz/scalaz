@@ -45,7 +45,7 @@ sealed abstract class Input[E] {
   def exists(p: (=> E) => Boolean): Boolean =
     fold(false, p, false)
 
-  override final def toString = fold("Empty", el => el.toString, "EOF")
+  override final def toString = fold("Empty", _.toString, "EOF")
 }
 
 object Input extends InputInstances with InputFunctions {

@@ -49,7 +49,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(s.zero, (v, x) => f(x), (v, pr, m, sf) =>
-      s.append(s.append(pr.foldMap(f), m.foldMap(x => x.foldMap(f))), sf.foldMap(f)))
+      s.append(s.append(pr.foldMap(f), m.foldMap(_.foldMap(f))), sf.foldMap(f)))
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = {
     foldMap(a => Endo.endoByName[B](f(a, _))).apply(z)
@@ -470,7 +470,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     fold(
       empty[V2, B],
       (v, x) => single(f(x)),
-      (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
+      (v, pr, mt, sf) => deep(pr map f, mt.map(_.map(f)), sf map f))
   }
 
   /**

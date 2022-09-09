@@ -382,7 +382,7 @@ object ZipperTest extends SpecLite {
   "findZ shouldn't change elements" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
     zipper(xs, f, ys).findZ(p).map {
-      z => z.toLazyList == zipper(xs, f, ys).toLazyList
+      _.toLazyList == zipper(xs, f, ys).toLazyList
     } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
   }
 

@@ -12,7 +12,7 @@ class DensityTest extends SpecLite {
     Functor[Arbitrary].map(A)(Density.liftDensity(_))
 
   implicit def nelDensityArb[F[_], A](implicit AR: Arbitrary[A], W: Comonad[F]): Arbitrary[Density[F,A] => A] =
-    Functor[Arbitrary].map(AR)(_ => d => d.runDensity)
+    Functor[Arbitrary].map(AR)(_ => _.runDensity)
 
   implicit def endoIntEqual[T,R[_]]: Equal[Density[R, T]] = Equal.equal( (a, b) => a.runDensity == b.runDensity)
 
@@ -24,7 +24,7 @@ class DensityTest extends SpecLite {
   implicit val pairIntDensity: Density[PairInt, Int] = new Density[PairInt, Int] {
     type X = Unit
     val fb: PairInt[Unit] = (0, ())
-    def f: PairInt[Unit] => Int = a => a._1
+    def f: PairInt[Unit] => Int = _._1
   }
 
   checkAll("Density[PairInt, *] density laws", density.laws[PairInt])
