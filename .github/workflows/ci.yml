@@ -23,7 +23,7 @@ jobs:
             project: rootJVM
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-java@v3.4.1
+    - uses: actions/setup-java@v3.5.0
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
