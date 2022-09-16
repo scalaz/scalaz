@@ -136,7 +136,7 @@ lazy val scalacheckBinding =
       unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.16.0",
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.17.0",
       osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
