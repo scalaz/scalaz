@@ -154,7 +154,7 @@ object build {
   )
 
   private def Scala211 = "2.11.12"
-  private def Scala212 = "2.12.16"
+  private def Scala212 = "2.12.17"
   private def Scala213 = "2.13.8"
   private def Scala3 = "3.1.0"
 
