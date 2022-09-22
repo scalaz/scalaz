@@ -158,7 +158,7 @@ sealed abstract class CoyonedaInstances2 extends CoyonedaInstances3 {
 sealed abstract class CoyonedaInstances3 extends CoyonedaInstances4 {
   implicit def coyonedaMonadPlus[F[_]: MonadPlus]: MonadPlus[Coyoneda[F, *]] =
     new IsomorphismMonadPlus[Coyoneda[F, *], F] with CoyonedaBind[F] {
-      def G = MonadPlus[F]
+      override def G: MonadPlus[F] = MonadPlus[F]
       def iso = Coyoneda.iso
     }
 }
@@ -174,7 +174,7 @@ sealed abstract class CoyonedaInstances4 extends CoyonedaInstances5 {
 sealed abstract class CoyonedaInstances5 extends CoyonedaInstances6 {
   implicit def coyonedaMonad[F[_]: Monad]: Monad[Coyoneda[F, *]] =
     new IsomorphismMonad[Coyoneda[F, *], F] with CoyonedaBind[F] {
-      def G = Monad[F]
+      override def G: Monad[F] = Monad[F]
       def iso = Coyoneda.iso
     }
 
@@ -251,7 +251,7 @@ sealed abstract class CoyonedaInstances10 extends CoyonedaInstances11 {
 sealed abstract class CoyonedaInstances11 extends CoyonedaInstances12 {
   implicit def coyonedaNondeterminism[F[_]: Nondeterminism]: Nondeterminism[Coyoneda[F, *]] =
     new IsomorphismNondeterminism[Coyoneda[F, *], F] with CoyonedaBind[F] {
-      def G = Nondeterminism[F]
+      override def G: Nondeterminism[F] = Nondeterminism[F]
       def iso = Coyoneda.iso
     }
 }
@@ -259,7 +259,7 @@ sealed abstract class CoyonedaInstances11 extends CoyonedaInstances12 {
 sealed abstract class CoyonedaInstances12 {
   implicit def coyonedaMonadError[S, F[_]](implicit F: MonadError[F, S]): MonadError[Coyoneda[F, *], S] =
     new IsomorphismMonadError[Coyoneda[F, *], F, S] with CoyonedaBind[F] {
-      def G = F
+      override def G: MonadError[F, S] = F
       def iso = Coyoneda.iso
     }
 
