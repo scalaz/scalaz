@@ -141,7 +141,7 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
 
   implicit def optionTAlt[F[_]](implicit F0: Monad[F]): Alt[OptionT[F, *]] =
     new Alt[OptionT[F, *]] with OptionTApply[F] with OptionTPoint[F] {
-      def F = F0
+      override def F: Monad[F] = F0
 
       def alt[A](a: => OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
     }
