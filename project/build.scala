@@ -111,7 +111,7 @@ object build {
     Seq("-Ywarn-unused:imports")
   }
 
-  private def Scala213 = "2.13.8"
+  private def Scala213 = "2.13.9"
   private def Scala3 = "3.1.0"
 
   private[this] val buildInfoPackageName = "scalaz"
@@ -156,7 +156,6 @@ object build {
       val date = extracted get dynverCurrentDate
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
       "-deprecation",

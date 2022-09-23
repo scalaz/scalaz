@@ -36,7 +36,7 @@ object WriterUsage {
       } yield (moveHolmes)
 
     // map lets you map over the value side
-    val mapValue: Logger[Option[Address]] = sherlockHolmes.map(x => x.address)
+    val mapValue: Logger[Option[Address]] = sherlockHolmes.map(_.address)
     mapValue.value.map(println)
 
     // with mapWritten you can map over the written side.

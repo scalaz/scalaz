@@ -99,7 +99,7 @@ object LaunchburyInterpreter {
     val getFreshVar : State[ReduceState, String] = for {
                             s <- get
                             ReduceState(_, f #:: fs) = s
-                            _ <- modify(s => s.copy(freshVars = fs))
+                            _ <- modify(_.copy(freshVars = fs))
                           } yield f
     // Lambda and Let define new bound variables, so we substitute fresh variables into them
     // Var and Apply just recursively traverse the AST
