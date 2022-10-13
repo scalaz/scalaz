@@ -8,9 +8,9 @@ object StreamTTestJVM extends SpecLite {
       import scala.concurrent._, duration._
       implicit def ec: ExecutionContext = ExecutionContext.parasitic
 
-      val stream1 = Promise[StreamT.Step[Future, StreamT[Future, Int]]]
-      val stream2 = Promise[StreamT.Step[Future, StreamT[Future, Int]]]
-      val slow = Promise[StreamT.Step[Future, Int]]
+      val stream1 = Promise[StreamT.Step[Future, StreamT[Future, Int]]]()
+      val stream2 = Promise[StreamT.Step[Future, StreamT[Future, Int]]]()
+      val slow = Promise[StreamT.Step[Future, Int]]()
       val result = StreamT.switch(StreamT(stream1.future)).toLazyList
 
       stream1.success(StreamT.Yield(1 :: 2 :: StreamT(slow.future), StreamT(stream2.future)))
