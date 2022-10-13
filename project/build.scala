@@ -163,6 +163,14 @@ object build {
       "-feature",
       "-unchecked"
     ),
+    Compile / scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "2.13" =>
+          Seq("-Wperformance")
+        case _ =>
+          Nil
+      }
+    },
     scalacOptions ++= {
       val common = "implicitConversions,higherKinds,existentials"
       CrossVersion.partialVersion(scalaVersion.value) match {
