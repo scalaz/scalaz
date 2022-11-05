@@ -329,7 +329,7 @@ object GenTypeClass {
       } else {
         s"$syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent]"
       }
-      s"  val ${Util.initLower(typeClassName)}Syntax: $tpe =\n    new $tpe { def F = $typeClassName.this }"
+      s"  val ${ScalazUtil.initLower(typeClassName)}Syntax: $tpe =\n    new $tpe { def F = $typeClassName.this }"
     } else ""
 
     val applyMethod = if(kind.multipleParam) {
