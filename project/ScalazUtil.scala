@@ -1,5 +1,5 @@
 
-object Util {
+object ScalazUtil {
   def initLower(s: String) = {
     val (init, rest) = s.splitAt(1)
     init.toLowerCase + rest
