@@ -181,7 +181,6 @@ object build {
       val date = extracted get dynverCurrentDate
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion_1_15 := {
       scalaBinaryVersion.value match {
@@ -249,7 +248,7 @@ object build {
     typeClasses := Seq(),
     genToSyntax := {
       val tcs = typeClasses.value
-      val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
+      val objects = tcs.map(tc => "object %s extends To%sSyntax".format(ScalazUtil.initLower(tc.name), tc.name)).mkString("\n")
       val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
       objects + "\n\n" + all
     },
