@@ -12,7 +12,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.6")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.2.0")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.2.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.7")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.8")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.1")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.14")
 
