@@ -1,7 +1,6 @@
 package scalaz.example
 
 import scalaz.{Monoid, StateT}
-import scalaz.idInstance
 
 
 /**

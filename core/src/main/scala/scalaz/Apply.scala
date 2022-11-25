@@ -227,6 +227,8 @@ object Apply {
   ////
   type Par[F[_]] = Apply[λ[α => F[α] @@ Tags.Parallel]]
 
+  implicit def idInstance: Apply[Id.Id] = Id.id
+
   ////
 }
 

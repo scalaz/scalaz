@@ -98,6 +98,8 @@ object Monad {
 
   ////
 
+  implicit def idInstance: Monad[Id.Id] = Id.id
+
   ////
 }
 
