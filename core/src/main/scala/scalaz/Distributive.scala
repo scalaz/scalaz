@@ -62,6 +62,7 @@ object Distributive {
   type Cotraverse[F[_]] =
   Distributive[F]
 
+  implicit def idInstance: Distributive[Id.Id] = Id.id
   ////
 }
 

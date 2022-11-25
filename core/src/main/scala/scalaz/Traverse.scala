@@ -220,6 +220,8 @@ object Traverse {
 
   ////
 
+  implicit def idInstance: Traverse[Id.Id] = Id.id
+
   ////
 }
 

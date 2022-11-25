@@ -124,7 +124,7 @@ sealed abstract class UnwriterTInstances extends UnwriterTInstances0 {
     }
   implicit def unwriterComonad[W]: Comonad[Unwriter[W, *]] =
     new UnwriterComonad[W] {
-      implicit def F = implicitly
+      override def F = Id.id
     }
   implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[UnwriterT[F, W, *]] =
     new UnwriterTTraverse[F, W] {

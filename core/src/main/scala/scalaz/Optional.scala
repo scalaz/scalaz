@@ -63,6 +63,7 @@ object Optional {
     }
 
   ////
+  implicit def idInstance: Optional[Id.Id] = Id.id
 
   ////
 }

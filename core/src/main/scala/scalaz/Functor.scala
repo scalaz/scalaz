@@ -130,6 +130,7 @@ object Functor {
       Liskov.co[F, A, B](ev).apply(fa)
   }
 
+  implicit def idInstance: Functor[Id.Id] = Id.id
   ////
 }
 
