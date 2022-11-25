@@ -48,6 +48,8 @@ object Cozip {
   def cofzip5[F[_], A, B, C, D, E](x: F[(A \/ (B \/ (C \/ (D \/ E))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ F[E])))) = F.cozip5(x)
   def cofzip6[F[_], A, B, C, D, E, G](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ G)))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ F[G]))))) = F.cozip6(x)
   def cofzip7[F[_], A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) = F.cozip7(x)
+
+  implicit def idInstance: Cozip[Id.Id] = Id.id
   ////
 }
 
