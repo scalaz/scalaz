@@ -75,6 +75,7 @@ object Align {
     }
 
   ////
+  implicit def idInstance: Align[Id.Id] = Id.id
 
   ////
 }

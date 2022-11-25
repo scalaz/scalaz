@@ -372,5 +372,7 @@ object Foldable {
         foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
   }
 
+  implicit def idInstance: Foldable[Id.Id] = Id.id
+
   ////
 }

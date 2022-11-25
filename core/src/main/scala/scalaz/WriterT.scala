@@ -282,7 +282,7 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
 sealed abstract class WriterTInstances2 extends WriterTInstances3 {
   implicit def writerComonad[W]: Comonad[Writer[W, *]] =
     new WriterComonad[W] {
-      implicit def F = implicitly
+      override def F = implicitly
     }
 }
 

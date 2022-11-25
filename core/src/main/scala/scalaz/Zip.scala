@@ -81,5 +81,7 @@ object Zip {
 
   def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
       F.zip(t._1, t._2)
+
+  implicit def idInstance: Zip[Id.Id] = Id.id
   ////
 }

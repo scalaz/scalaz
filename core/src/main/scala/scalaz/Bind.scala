@@ -86,5 +86,7 @@ object Bind {
 
   ////
 
+  implicit def idInstance: Bind[Id.Id] = Id.id
+
   ////
 }
