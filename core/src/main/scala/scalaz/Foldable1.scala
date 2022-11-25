@@ -189,5 +189,7 @@ object Foldable1 {
 
   ////
 
+  implicit def idInstance: Foldable1[Id.Id] = Id.id
+
   ////
 }

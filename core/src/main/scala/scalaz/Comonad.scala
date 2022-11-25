@@ -41,6 +41,7 @@ object Comonad {
     }
 
   ////
+  implicit def idInstance: Comonad[Id.Id] = Id.id
 
   ////
 }

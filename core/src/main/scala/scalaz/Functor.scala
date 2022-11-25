@@ -124,5 +124,7 @@ object Functor {
 
   ////
 
+  implicit def idInstance: Functor[Id.Id] = Id.id
+
   ////
 }

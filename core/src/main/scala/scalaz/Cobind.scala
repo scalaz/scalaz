@@ -46,6 +46,7 @@ object Cobind {
     }
 
   ////
+  implicit def idInstance: Cobind[Id.Id] = Id.id
 
   ////
 }

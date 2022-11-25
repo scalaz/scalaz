@@ -132,5 +132,6 @@ object Applicative {
 
   implicit def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
 
+  implicit def idInstance: Applicative[Id.Id] = Id.id
   ////
 }

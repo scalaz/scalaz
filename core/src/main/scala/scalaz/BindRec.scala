@@ -60,6 +60,7 @@ object BindRec {
     }
 
   ////
+  implicit def idInstance: BindRec[Id.Id] = Id.id
 
   ////
 }
