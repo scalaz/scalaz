@@ -121,6 +121,8 @@ object Traverse1 {
 
   ////
 
+  implicit def idInstance: Traverse1[Id] = Id.id
+
   ////
 }
 

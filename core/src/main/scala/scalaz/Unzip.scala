@@ -76,6 +76,7 @@ object Unzip {
     }
 
   ////
+  implicit def idInstance: Unzip[Id.Id] = Id.id
   ////
 }
 

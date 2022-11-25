@@ -215,6 +215,8 @@ object Foldable1 {
       override def naturalTrans: F ~> G = D
     }
 
+  implicit def idInstance: Foldable1[Id.Id] = Id.id
+
   ////
 }
 

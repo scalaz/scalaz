@@ -90,6 +90,7 @@ object InvariantApplicative {
 
   ////
 
+  implicit def idInstance: InvariantApplicative[Id.Id] = Id.id
   ////
 }
 
