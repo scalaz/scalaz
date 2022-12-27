@@ -64,4 +64,13 @@ jobs:
             echo "unknown project"
             exit 1
         esac
+    - uses: mikepenz/action-junit-report@c06eeb43cf77da3d290b179c834b2d8725177971 # v3.7.0
+      with:
+        report_paths: '**/target/test-reports/*.xml'
+        require_tests: true
+        check_name: "${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}"
+    - uses: test-summary/action@v2
+      if: always()
+      with:
+        paths: '**/target/test-reports/*.xml'
     - run: rm -rf "$HOME/.ivy2/local" || true
