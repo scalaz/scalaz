@@ -10,19 +10,19 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.3.6, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x, 3.x and Scala.js, scala-native.
+The current stable version is 7.3.7, which is cross-built against Scala 2.11.x, 2.12.x, 2.13.x, 3.x and Scala.js, scala-native.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.6"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.7"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.3.6).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.3.7).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.3.6.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.3.7.jar`.
 
 ## Quick Start
 
