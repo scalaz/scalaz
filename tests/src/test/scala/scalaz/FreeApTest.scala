@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.{Arbitrary, Cogen, Gen}
 import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
@@ -15,6 +15,9 @@ object FreeApTest extends SpecLite {
       )
     )
 
+  private implicit def freeApCogen[F[_]: Applicative, A](implicit F: Cogen[F[A]]): Cogen[FreeAp[F, A]] =
+    Cogen[F[A]].contramap(_.retract)
+
   private implicit def freeApEq[F[_]: Applicative, A](implicit F: Equal[F[A]]): Equal[FreeAp[F, A]] = {
     (a: FreeAp[F, A], b: FreeAp[F, A]) =>
       F.equal(a.retract, b.retract)
@@ -24,12 +27,14 @@ object FreeApTest extends SpecLite {
     type FreeApOption[A] = FreeAp[Option, A]
     checkAll(applicative.laws[FreeApOption])
     checkAll(foldable.laws[FreeApOption])
+    checkAll(cobind.laws[FreeApOption])
   }
 
   "List" should {
     type FreeApList[A] = FreeAp[List, A]
     checkAll(applicative.laws[FreeApList])
     checkAll(foldable.laws[FreeApList])
+    checkAll(cobind.laws[FreeApList])
   }
 
   "OneAnd[Maybe]" should {
@@ -42,13 +47,17 @@ object FreeApTest extends SpecLite {
     type FreeApNel[A] = FreeAp[NonEmptyList, A]
     checkAll(applicative.laws[FreeApNel])
     checkAll(foldable1.laws[FreeApNel])
+    checkAll(comonad.laws[FreeApNel])
   }
 
   object instances {
     def applicative[F[_] ] = Applicative[FreeAp[F, *]]
     def foldable[F[_]: Foldable] = Foldable[FreeAp[F, *]]
     def foldable1[F[_]: Foldable1] = Foldable1[FreeAp[F, *]]
+    def cobind[F[_]: Cobind] = Cobind[FreeAp[F, *]]
+    def comonad[F[_]: Comonad] = Comonad[FreeAp[F, *]]
 
     def foldable[F[_]: Foldable1] = Foldable[FreeAp[F, *]]
+    def cobind[F[_]: Comonad] = Cobind[FreeAp[F, *]]
   }
 }

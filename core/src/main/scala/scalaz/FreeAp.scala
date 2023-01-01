@@ -95,9 +95,27 @@ sealed abstract class FreeApInstances1 {
             foldMap(x.k())(a => F.foldMap(x.v())(g => f(a(g))))
         }
     }
+
+  implicit def freeApCobind[F[_]: Cobind]: Cobind[FreeAp[F, *]] =
+    new FreeApCobind[F] {
+      override def F: Cobind[F] = Cobind[F]
+    }
 }
 
 sealed abstract class FreeApInstances extends FreeApInstances1 {
+
+  implicit def freeApComonad[F[_]: Comonad]: Comonad[FreeAp[F, *]] =
+    new FreeApCobind[F] with Comonad[FreeAp[F, *]] {
+      override def F: Comonad[F] = Comonad[F]
+
+      override def copoint[A](p: FreeAp[F, A]): A = p match {
+        case FreeAp.Pure(x) =>
+          x
+        case x @ FreeAp.Ap() =>
+          copoint(x.k()).apply(F.copoint(x.v()))
+      }
+    }
+
   implicit def freeApFoldable1[F[_]](implicit F: Foldable1[F]): Foldable1[FreeAp[F, *]] =
     new Foldable1[FreeAp[F, *]] {
       @tailrec
@@ -155,5 +173,22 @@ object FreeAp extends FreeApInstances {
       val v = () => value
       val k = () => function
     }
+}
+
+private trait FreeApCobind[F[_]] extends Cobind[FreeAp[F, *]] {
+  protected[this] def F: Cobind[F]
+
+  override def cobind[A, B](fa: FreeAp[F, A])(f: FreeAp[F, A] => B): FreeAp[F, B] =
+    fa match {
+      case FreeAp.Pure(_) =>
+        FreeAp.Pure(f(fa))
+      case x @ FreeAp.Ap() =>
+        FreeAp.lift(
+          F.cobind(x.v())(fa => f(FreeAp.lift(fa).ap(x.k())))
+        )
+    }
+
+  override final def map[A, B](fa: FreeAp[F, A])(f: A => B): FreeAp[F, B] =
+    fa map f
 }
 
