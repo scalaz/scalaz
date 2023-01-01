@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.annotation.tailrec
+
 /**
  * Free applicative functors. Less expressive than free monads, but more
  * flexible to inspect and interpret.
@@ -81,7 +83,43 @@ sealed abstract class FreeAp[F[_],A] {
   }
 }
 
-object FreeAp {
+sealed abstract class FreeApInstances1 {
+  implicit def freeApFoldable[F[_]](implicit F: Foldable[F]): Foldable[FreeAp[F, *]] =
+    new Foldable.FromFoldMap[FreeAp[F, *]] {
+      @tailrec
+      override def foldMap[A, B: Monoid](fa: FreeAp[F, A])(f: A => B): B =
+        fa match {
+          case FreeAp.Pure(x) =>
+            f(x)
+          case x @ FreeAp.Ap() =>
+            foldMap(x.k())(a => F.foldMap(x.v())(g => f(a(g))))
+        }
+    }
+}
+
+sealed abstract class FreeApInstances extends FreeApInstances1 {
+  implicit def freeApFoldable1[F[_]](implicit F: Foldable1[F]): Foldable1[FreeAp[F, *]] =
+    new Foldable1[FreeAp[F, *]] {
+      @tailrec
+      override def foldMap1[A, B: Semigroup](fa: FreeAp[F, A])(f: A => B): B =
+        fa match {
+          case FreeAp.Pure(x) =>
+            f(x)
+          case x @ FreeAp.Ap() =>
+            foldMap1(x.k())(a => F.foldMap1(x.v())(g => f(a(g))))
+        }
+
+      override def foldMapRight1[A, B](fa: FreeAp[F, A])(z: A => B)(f: (A, => B) => B): B =
+        fa match {
+          case FreeAp.Pure(x) =>
+            z(x)
+          case x @ FreeAp.Ap() =>
+            Foldable1[Free[F, *]].foldMapRight1(x.monadic)(z)(f)
+        }
+    }
+}
+
+object FreeAp extends FreeApInstances {
   implicit def freeInstance[F[_]]: Applicative[FreeAp[F, *]] =
     new Applicative[FreeAp[F, *]] {
       def point[A](a: => A) = FreeAp.point(a)
@@ -101,8 +139,8 @@ object FreeAp {
   def liftU[FA](x: => FA)(implicit FA: Unapply[Functor, FA]): FreeAp[FA.M, FA.A] =
     lift(FA(x))
 
-  private [scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
-  private abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
+  private[scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
+  private[scalaz] abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
     type I
     val v: () => F[I]
     val k: () => FreeAp[F, I => A]
