@@ -4,17 +4,19 @@ package std
 import _root_.java.util.concurrent.atomic.AtomicInteger
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{ Try, Success => TSuccess }
+import scala.util.{ Try, Success => TSuccess, Failure => TFailure }
+import scala.annotation.tailrec
+import scala.util.control.NonFatal
 
 trait FutureInstances1 {
-  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] =
+  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with BindRec[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
     Semigroup.liftSemigroup[Future, A]
 }
 
-private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] {
+private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with BindRec[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
@@ -76,6 +78,36 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
 
   def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
     fa.recoverWith { case e => f(e) }
+
+  def tailrecM[A, B](a: A)(f: A => Future[A \/ B]): Future[B] = {
+    @tailrec
+    def loop(a: A): Future[B] = {
+      val fa =
+        try {
+          f(a)
+        } catch {
+          case NonFatal(e) =>
+            Future.failed(e)
+        }
+      fa.value match {
+        case Some(TSuccess(-\/(a))) =>
+          loop(a)
+        case Some(TSuccess(\/-(b))) =>
+          Future.successful(b)
+        case Some(TFailure(e)) =>
+          Future.failed(e)
+        case None =>
+          fa.flatMap {
+            case \/-(b) =>
+              Future.successful(b)
+            case -\/(a) =>
+              tailrecM(a)(f)
+          }
+      }
+    }
+    loop(a)
+  }
+
 }
 
 object scalaFuture extends FutureInstances
