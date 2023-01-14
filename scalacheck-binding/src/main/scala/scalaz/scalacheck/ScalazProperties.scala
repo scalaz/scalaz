@@ -599,13 +599,13 @@ object ScalazProperties {
 
     def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse1[F], EF: Equal[F[Int]]): Properties =
       newProperties("traverse1") { p =>
-          p.include(traverse.laws[F])
-          p.include(foldable1.laws[F])
-          p.property("identity traverse1") = identityTraverse1[F, Int, Int]
+        p.include(traverse.laws[F])
+        p.include(foldable1.laws[F])
+        p.property("identity traverse1") = identityTraverse1[F, Int, Int]
 
         import std.list._, std.option._
 
-          p.property("sequential fusion (1)") = resizeProp(sequentialFusion1[F, Option, List, Int, Int, Int], 3)
+        p.property("sequential fusion (1)") = resizeProp(sequentialFusion1[F, Option, List, Int, Int, Int], 3)
         // TODO naturality1, parallelFusion1
       }
   }
