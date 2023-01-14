@@ -8,7 +8,7 @@ object MixedBag {
     traverseBigList()
     traverseBigLazyList()
     tree()
-    kleisiArrow()
+    kleisliArrow()
     dListExample()
   }
 
@@ -78,7 +78,7 @@ object MixedBag {
     m assert_=== "12345"
   }
 
-  def kleisiArrow(): Unit = {
+  def kleisliArrow(): Unit = {
     import Kleisli._
     import std.option._
     import syntax.compose._

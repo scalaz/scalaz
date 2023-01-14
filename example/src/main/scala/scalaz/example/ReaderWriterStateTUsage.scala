@@ -4,7 +4,7 @@ package scalaz.example
  A rather contrived example which shows how ReaderWriterStateT could be used.
  @author stew@vireo.org / stew@helloreverb.com
 
- We create a simple langauage named CAB
+ We create a simple language named CAB
  Strings in the CAB language is a series of A, B, or C tokens followed by a EOF:
  <cab> ::= 'C' | 'A' | 'B'
  <string> ::= <cab> <string> | '.'
