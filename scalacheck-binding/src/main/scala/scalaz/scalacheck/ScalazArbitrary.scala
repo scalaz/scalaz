@@ -492,7 +492,11 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Gen.sized(fingerTree[A] _)
   }
 
-  implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
+  implicit def IndSeqArbitrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
+
+  @deprecated(message = "use IndSeqArbitrary", since = "7.3.8")
+  def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] =
+    IndSeqArbitrary[A]
 
   import java.util.concurrent.Callable
 
