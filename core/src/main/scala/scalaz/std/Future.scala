@@ -87,7 +87,7 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
           f(a)
         } catch {
           case NonFatal(e) =>
-            Future.failed(e)
+            return Future.failed(e)
         }
       fa.value match {
         case Some(TSuccess(-\/(a))) =>
