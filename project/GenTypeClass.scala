@@ -215,8 +215,8 @@ object GenTypeClass {
     def sources: List[SourceFile] = mainFile :: syntaxFile.toList ::: parent.toList.flatMap(_.list)
   }
   object TypeClassSource {
-    final case class Parent(empty: SourceFile, parent: SourceFile) {
-      def list: List[SourceFile] = empty :: parent :: Nil
+    final case class Parent(parent: SourceFile) {
+      def list: List[SourceFile] = parent :: Nil
     }
   }
 
@@ -533,17 +533,11 @@ trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTyp
 """
       Some(
         TypeClassSource.Parent(
-          empty = SourceFile(
-            packages = tc.pack,
-            fileName = tc.parentName + ".scala",
-            source = parent,
-            baseDir = dir => dir.getParentFile / "scala-2.12-"
-          ),
           parent = SourceFile(
             packages = tc.pack,
             fileName = tc.parentName + ".scala",
             source = parent,
-            baseDir = dir => dir.getParentFile / "scala-2.12+"
+            baseDir = dir => dir.getParentFile / "scala"
           )
         )
       )

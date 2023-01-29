@@ -125,7 +125,6 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.17"
   private def Scala213 = "2.13.10"
   private def Scala3 = "3.1.0"
@@ -170,8 +169,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
-    addCommandAlias("SetScala2_11", s"++ ${Scala211}! -v"),
+    crossScalaVersions := Seq(Scala212, Scala213, Scala3),
     addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
     addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
@@ -353,15 +351,6 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := true,
-    mimaBinaryIssueFilters ++= {
-      if (scalaBinaryVersion.value == "2.11") {
-        Seq(
-          ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
-        )
-      } else {
-        Nil
-      }
-    },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
