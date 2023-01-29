@@ -122,6 +122,7 @@ object build {
   }
 
   private val stdOptions = Seq(
+    "-opt:l:method",
     "-deprecation",
     "-Xlint:adapted-args",
     "-encoding", "UTF-8",
@@ -130,19 +131,8 @@ object build {
     "-unchecked"
   )
 
-  private val Scala211_jvm_and_js_options = Seq(
-    "-Ybackend:GenBCode",
-    "-Ydelambdafy:method",
-    "-target:jvm-1.8"
-  )
-
   val unusedWarnOptions = Def.setting {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 11)) =>
-        Seq("-Ywarn-unused-import")
-      case _ =>
-        Seq("-Ywarn-unused:imports")
-    }
+    Seq("-Ywarn-unused:imports")
   }
 
   val lintOptions = Seq(
@@ -153,7 +143,6 @@ object build {
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
-  private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.17"
   private def Scala213 = "2.13.10"
   private def Scala3 = "3.1.0"
@@ -185,8 +174,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
-    addCommandAlias("SetScala2_11", s"++ ${Scala211}! -v"),
+    crossScalaVersions := Seq(Scala212, Scala213, Scala3),
     addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
     addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
@@ -204,10 +192,7 @@ object build {
         "1.15.2"
       }
     },
-    scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,11)) => Scala211_jvm_and_js_options
-      case _ => Seq("-opt:l:method")
-    }),
+    scalacOptions ++= stdOptions,
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v <= 12 =>
         Seq(
@@ -222,9 +207,6 @@ object build {
             "-opt:l:method,inline",
             "-opt-inline-from:scalaz.**"
           )
-
-        case Some((2, 11)) =>
-          Seq("-Xsource:2.12")
         case _ =>
           Nil
       }
@@ -369,15 +351,6 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := true,
-    mimaBinaryIssueFilters ++= {
-      if (scalaBinaryVersion.value == "2.11") {
-        Seq(
-          ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
-        )
-      } else {
-        Nil
-      }
-    },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
@@ -405,7 +378,6 @@ object build {
   }
 
   val nativeSettings = Seq(
-    scalacOptions --= Scala211_jvm_and_js_options,
     Compile / doc / scalacOptions --= {
       // TODO remove this workaround
       // https://github.com/scala-native/scala-native/issues/2503
@@ -441,9 +413,6 @@ object build {
     )
     .jvmSettings(
       jvm_js_settings,
-      libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
-      }.toList,
       typeClasses := TypeClass.core
     )
     .nativeSettings(
