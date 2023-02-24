@@ -25,64 +25,64 @@ class FutureTest extends SpecLite {
 
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
- {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A] contramap { (future: Future[A]) =>
-    val futureWithError = future.map(_.right[Throwable]).recover { case e => e.left[A] }
-    Await.result(futureWithError, duration)
-  }
-
-  implicit def futureShow[A: Show]: Show[Future[A]] = Contravariant[Show].contramap(Show[String \/ A]){
-    (future: Future[A]) =>
-      val futureWithError = future.map(_.right[String]).recover { case e => e.toString.left[A] }
-      Await.result(futureWithError, duration)
-  }
-
-  case class SomeFailure(n: Int) extends Exception {
-    override def toString = s"SomeFailure($n)"
-  }
-
-  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
-
-  implicit val cogenThrowable: Cogen[Throwable] =
-    Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
-
-  checkAll(monoid.laws[Future[Int]](implicitly, implicitly, futureArb))
-  checkAll(monoid.laws[Future[Int @@ Multiplication]](implicitly, implicitly, futureArb))
-
-
-  def futureSuccessArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
-    Arbitrary(A.arbitrary.map(Future.successful))
-
-  def futureArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
-    Arbitrary(Gen.oneOf(
-      futureSuccessArb[A].arbitrary,
-      ArbitraryThrowable.arbitrary.map(Future.failed)
-    ))
-
-  val `Arbitrary[Throwable => Future[Int]]` : Arbitrary[Throwable => Future[Int]] =
-    Arbitrary.arbFunction1(futureArb, implicitly)
-
-  // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
-  checkAll(monadError.laws[Future, Throwable](implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
-  checkAll(bindRec.laws[Future](implicitly, futureArb, Arbitrary.arbFunction1(futureArb, implicitly), futureArb, futureEqual))
-
-  // Scope these away from the rest as Comonad[Future] is a little evil.
-  // Should fail to compile by default: implicitly[Comonad[Future]]
   {
-    implicit val cm: Comonad[Future] = futureComonad(duration)
-    checkAll(comonad.laws[Future](implicitly, futureSuccessArb, implicitly, implicitly))
-  }
+    import scala.concurrent.ExecutionContext.Implicits.global
 
-  "issues 964" ! {
-    val f = Future.failed[Int => Int](SomeFailure(2))
-    val fa = Future.failed[Int](SomeFailure(1))
+    implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A] contramap { (future: Future[A]) =>
+      val futureWithError = future.map(_.right[Throwable]).recover { case e => e.left[A] }
+      Await.result(futureWithError, duration)
+    }
 
-    val B = Bind[scala.concurrent.Future]
-    B.bind(f)(g => B.map(fa)(g)) must_=== B.ap(fa)(f)
+    implicit def futureShow[A: Show]: Show[Future[A]] = Contravariant[Show].contramap(Show[String \/ A]){
+      (future: Future[A]) =>
+        val futureWithError = future.map(_.right[String]).recover { case e => e.toString.left[A] }
+        Await.result(futureWithError, duration)
+    }
+
+    case class SomeFailure(n: Int) extends Exception {
+      override def toString = s"SomeFailure($n)"
+    }
+
+    implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
+
+    implicit val cogenThrowable: Cogen[Throwable] =
+      Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
+
+    checkAll(monoid.laws[Future[Int]](implicitly, implicitly, futureArb))
+    checkAll(monoid.laws[Future[Int @@ Multiplication]](implicitly, implicitly, futureArb))
+
+
+    def futureSuccessArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
+      Arbitrary(A.arbitrary.map(Future.successful))
+
+    def futureArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
+      Arbitrary(Gen.oneOf(
+        futureSuccessArb[A].arbitrary,
+        ArbitraryThrowable.arbitrary.map(Future.failed)
+      ))
+
+    val `Arbitrary[Throwable => Future[Int]]` : Arbitrary[Throwable => Future[Int]] =
+      Arbitrary.arbFunction1(futureArb, implicitly)
+
+    // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
+    checkAll(monadError.laws[Future, Throwable](implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
+    checkAll(bindRec.laws[Future](implicitly, futureArb, Arbitrary.arbFunction1(futureArb, implicitly), futureArb, futureEqual))
+
+    // Scope these away from the rest as Comonad[Future] is a little evil.
+    // Should fail to compile by default: implicitly[Comonad[Future]]
+    {
+      implicit val cm: Comonad[Future] = futureComonad(duration)
+      checkAll(comonad.laws[Future](implicitly, futureSuccessArb, implicitly, implicitly))
+    }
+
+    "issues 964" ! {
+      val f = Future.failed[Int => Int](SomeFailure(2))
+      val fa = Future.failed[Int](SomeFailure(1))
+
+      val B = Bind[scala.concurrent.Future]
+      B.bind(f)(g => B.map(fa)(g)) must_=== B.ap(fa)(f)
+    }
   }
- }
 
   "Nondeterminism[Future]" should {
     implicit val es: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
