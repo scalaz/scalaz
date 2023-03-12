@@ -17,11 +17,11 @@ trait IterateeFunctions {
       s(el = e => iter.foldT[Iteratee[E, F[A]]](
         done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
         cont = k => k(elInput(e)).foldT(
-          done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
           cont = k2 => cont((in: Input[E]) => for {
             h <- k2(in)
             t <- this.repeatBuild[E, A, F](iter)
-          } yield mon.append(acc, mon.append(F.point(h), t)))
+          } yield mon.append(acc, mon.append(F.point(h), t))),
+          done = (a, _) => cont(step(mon.append(acc, F.point(a))))
         )),
         empty = cont(step(acc)),
         eof = done(acc, eofInput))
