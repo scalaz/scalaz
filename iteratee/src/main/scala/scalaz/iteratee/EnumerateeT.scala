@@ -44,9 +44,9 @@ trait EnumerateeTFunctions {
           step.fold(
             cont = contf => cont[O, F, StepT[I, F, A]] {
               (_: Input[O]).map(e => f(e)).fold(
-                el    = en => en.apply(step) >>== loop,
                 empty = contf(emptyInput) >>== loop,
-                eof   = done(step, emptyInput)
+                el = en => en.apply(step) >>== loop,
+                eof = done(step, emptyInput)
               )
             },
             done = (a, _) => done(sdone(a, emptyInput), emptyInput)
@@ -122,8 +122,8 @@ trait EnumerateeTFunctions {
         def step(k: StepEl, i: Long): (Input[E] => IterateeT[E, F, StepT[(E, Long), F, A]]) = {
           (in: Input[E]) =>
             in.map(e => (e, i)).fold(
-              el = e => k(elInput(e)) >>== doneOr(loop(i + 1))
-              , empty = cont(step(k, i))
+              empty = cont(step(k, i))
+              , el = e => k(elInput(e)) >>== doneOr(loop(i + 1))
               , eof = done(scont(k), in)
             )
         }
