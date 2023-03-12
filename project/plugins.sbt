@@ -19,3 +19,11 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.18")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
+
+if (sys.env.isDefinedAt("GITHUB_ACTION")) {
+  Def.settings(
+    addSbtPlugin("net.virtual-void" % "sbt-hackers-digest" % "0.1.2")
+  )
+} else {
+  Nil
+}
