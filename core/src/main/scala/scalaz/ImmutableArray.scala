@@ -42,13 +42,15 @@ sealed abstract class ImmutableArrayInstances extends ImmutableArrayInstances1 {
       override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)
       def foldMap[A, B](fa: ImmutableArray[A])(f: A => B)(implicit F: Monoid[B]): B = {
-        var i = 0
-        var b = F.zero
-        while(i < fa.length){
-          b = F.append(b, f(fa(i)))
-          i += 1
+        @annotation.tailrec
+        def loop(i: Int, b: B): B = {
+          if (i < fa.length) {
+            loop(i + 1, F.append(b, f(fa(i))))
+          } else {
+            b
+          }
         }
-        b
+        loop(0, F.zero)
       }
       def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)((a, b) => f(a, b))

@@ -52,7 +52,7 @@ object FreeMonadsUsage {
     type Ast[a] = Coproduct[StateAst, Console.Ast, a]
 
     // scala implicit search fail... needs a helping hand without SI-2712
-    implicit val injecter: StateAst :<: Ast = Inject.leftInjectInstance
+    implicit val injector: StateAst :<: Ast = Inject.leftInjectInstance
 
     type F[a] = Free[Ast, a]
     // these generators are not implicit by default for compile perf
@@ -66,7 +66,7 @@ object FreeMonadsUsage {
     type Ast[a] = Coproduct[TellAst, Console.Ast, a]
 
     // omg SI-2712...
-    implicit val injecter: TellAst :<: Ast = Inject.leftInjectInstance
+    implicit val injector: TellAst :<: Ast = Inject.leftInjectInstance
 
     type F[a] = Free[Ast, a]
     implicit val monad: MonadTell[F, String] = MonadTell.liftF
