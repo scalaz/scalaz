@@ -558,7 +558,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(IndexedStateT[S1, S2, F, A](_))
 
   implicit def eitherTArb[A, F[_], B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[A, F, B]] =
-      Functor[Arbitrary].map(A)(EitherT[A, F, B](_))
+    Functor[Arbitrary].map(A)(EitherT[A, F, B](_))
 
   implicit def theseTArb[F[_], A, B](implicit A: Arbitrary[F[A \&/ B]]): Arbitrary[TheseT[F, A, B]] =
     Functor[Arbitrary].map(A)(TheseT[F, A, B](_))
