@@ -26,8 +26,6 @@ import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
 
-import sbtdynver.DynVerPlugin.autoImport._
-
 import xerial.sbt.Sonatype.autoImport._
 
 object build {
@@ -178,12 +176,6 @@ object build {
     addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
     addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
-    commands += Command.command("setVersionUseDynver") { state =>
-      val extracted = Project extract state
-      val out = extracted get dynverGitDescribeOutput
-      val date = extracted get dynverCurrentDate
-      s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
-    },
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := {
       if (scalaBinaryVersion.value == "3") {
