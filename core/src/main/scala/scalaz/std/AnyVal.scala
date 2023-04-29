@@ -10,7 +10,7 @@ trait AnyValInstances {
 
   implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
     override def show(f: Unit): Cord = Cord()
-    override def shows(f: Unit) = ().toString
+    override def shows(f: Unit): String = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
 
@@ -39,13 +39,13 @@ trait AnyValInstances {
     override def show(f: Boolean): Cord = Cord(shows(f))
     override def shows(f: Boolean) = f.toString
 
-    def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x: Boolean, y: Boolean): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
     def succ(b: Boolean) = !b
 
     def pred(b: Boolean) = !b
 
-    override def succn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
+    override def succn(n: Int, b: Boolean): Boolean = if(n % 2 == 0) b else !b
 
     override def predn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
 
