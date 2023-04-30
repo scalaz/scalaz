@@ -104,14 +104,14 @@ private trait CokleisliArrow[F[_]]
     Cokleisli { (ac: F[A \/ C]) =>
       F.copoint(ac) match {
         case -\/(a) => -\/(fa run (F.map(ac)(_ => a)))
-        case \/-(b) => \/-(b)
+        case x @ \/-(_) => x.coerceLeft
       }
     }
 
   def right[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, C \/ A, C \/ B] =
     Cokleisli { (ac: F[C \/ A]) =>
       F.copoint(ac) match {
-        case -\/(b) => -\/(b)
+        case x @ -\/(_) => x.coerceRight
         case \/-(a) => \/-(fa run (F.map(ac)(_ => a)))
       }
     }
