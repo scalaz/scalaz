@@ -146,7 +146,7 @@ object CABRunLengthEncoder {
     */
   def emit: RunLength[Unit] =
     for {
-       state <- get
+      state  <- get
       config <- ask
            _ <- state.lastToken.cata(none = point(()),  // nothing to emit
                                     some = writeOutput(_, state.length, config.minRun))
