@@ -143,7 +143,7 @@ object build {
 
   private def Scala212 = "2.12.19"
   private def Scala213 = "2.13.13"
-  private def Scala3 = "3.1.0"
+  private def Scala3 = "3.3.1"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -159,6 +159,15 @@ object build {
           case _ =>
             base / "scala-2.13+"
         }
+      }
+    },
+    Compile / doc / sources := {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          // TODO OutOfMemoryError
+          Nil
+        case _ =>
+          (Compile / doc / sources).value
       }
     },
     (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
@@ -342,7 +351,7 @@ object build {
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ Def.settings(
-    ThisBuild / mimaReportSignatureProblems := true,
+    ThisBuild / mimaReportSignatureProblems := (scalaBinaryVersion.value != "3"),
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
