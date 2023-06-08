@@ -125,7 +125,7 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  private def Scala212 = "2.12.17"
+  private def Scala212 = "2.12.18"
   private def Scala213 = "2.13.10"
   private def Scala3 = "3.1.0"
 
