@@ -64,7 +64,7 @@ jobs:
             echo "unknown project"
             exit 1
         esac
-    - uses: mikepenz/action-junit-report@c0e4b81aaa0067314a2d0d06e19b512c9d8af4f5 # v3.7.7
+    - uses: mikepenz/action-junit-report@baaeba622e27b396105f35ec9ec4ee89ffcbd306 # v3.7.8
       if: always()
       with:
         report_paths: '**/target/test-reports/*.xml'
