@@ -7,16 +7,33 @@ import org.scalacheck.Prop.forAll
 
 object ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
-  type ConstInt[A] = Const[Int, A]
+
+
+  "::" ! forAll {
+    (xs: List[Byte], x: Byte) =>
+      (x :: ListT.fromList[Id.Id, Byte](xs)) must_=== ListT.fromList[Id.Id, Byte](x :: xs)
+  }
+
+  "scanLeft" ! forAll {
+    (xs: List[Byte], x: Byte, f: (Byte, Byte) => Byte) =>
+      ListT.fromList[Id.Id, Byte](xs).scanLeft(x)(f) must_=== ListT.fromList[Id.Id, Byte](xs.scanLeft(x)(f))
+  }
+
+  "collect" ! forAll {
+    (xs: List[Byte], pf: PartialFunction[Byte, Byte]) =>
+      ListT.fromList[Id.Id, Byte](xs).collect(pf) must_=== ListT.fromList[Id.Id, Byte](xs.collect(pf))
+  }
+
 
   "fromList / toList" ! forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).toList must_===(ass)
   }
 
-  "fromIList / toIList" ! forAll {
-    (ass: IList[IList[Int]]) =>
-    ListT.fromIList(ass).toIList must_===(ass)
+  "fromList / toList" ! forAll {
+    import Id._
+    (as: List[Int]) =>
+      ListT.fromList[Id, Int](as).toList must_===(as)
   }
 
   "filter all" ! forAll {
@@ -24,16 +41,16 @@ object ListTTest extends SpecLite {
       ass.filter(_ => true) must_===(ass)
   }
 
+  "isEmpty" ! forAll {
+    (s: List[Int]) =>
+      ListT.fromList(List(s)).isEmpty.forall(_ == s.isEmpty)
+  }
+
   "filter none" ! forAll {
     (ass: ListT[List, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
-      isEmpty.toList.forall(identity)
-  }
-
-  "find" ! forAll {
-    (ass: ListTOpt[Int]) =>
-      ass.find(_ > 0 ) must_=== MaybeT.maybeT(ass.run.map(_.find( _ > 0)))
+      isEmpty.forall(_ == true)
   }
 
   "drop" ! forAll {
@@ -46,61 +63,110 @@ object ListTTest extends SpecLite {
       ListT.fromList(ass).take(x).toList must_===(ass.map(_.take(x)))
   }
 
-  "map" ! forAll {
-    (ass: List[List[Int]]) =>
-      ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
+  "mapM" ! forAll {
+    (s: List[Int], l: List[Int]) =>
+      val s0 = s map (_ + 1)
+      ListT.fromList(List(s, s0)).mapM(i => l.map(_ + i)).toList must_==(
+        Traverse[List].traverse(s)(i => l.map(_ + i)) :::
+        Traverse[List].traverse(s0)(i => l.map(_ + i))
+      )
   }
 
-  "mapF consistent with map" ! forAll { (fa: ListTOpt[Int], f: Int => Int) =>
-    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[Option].point(i)))
+  "foldMap" ! forAll {
+    (s: List[Int]) =>
+      import scalaz.Scalaz._
+      ListT.fromList(s.some).foldMap(_.toString) must_==(s.foldMap(_.toString))
   }
 
-  "collect" ! forAll {
-    (ass: List[List[Int]]) =>
-      val pf : PartialFunction[Int, String] = { case (i : Int) if i > 2 => i.toString }
-      ListT.fromList(ass).collect(pf).toList must_===(ass.map(_.collect(pf)))
-  }
+  "trampolined ListT" should {
+    import Free.Trampoline
 
-  "flatMap" ! forAll {
-    (ass: List[List[Int]]) =>
-      (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
-      must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
-  }
+    val n = 100000L
+    val s = ListT.unfoldM[Trampoline, Long, Long](n)(i =>
+      Trampoline.done(if(i > 0) Some((i, i-1)) else None))
 
-  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[IList[String]]) =>
-    fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
-  }
+    val expected = n*(n+1)/2
 
-  // Exists to ensure that fromList and map don't stack overflow.
-  "large map" ! {
-    val list = (0 to 400).toList.map(_ => (0 to 400).toList)
-    ListT.fromList(list).map(_ * 2).toList must_===(list.map(_.map(_ * 2)))
-    ()
-  }
+    "not stack overflow on foldLeft" in {
+      s.foldLeft(0L)((x, y) => x + y).run must_=== expected
+    }
 
-  "listT" ! forAll {
-    (ass: Option[IList[Int]]) =>
-      ListT.listT(ass).run == ass
   }
 
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
-  checkAll(plusEmpty.laws[ListTOpt])
-  checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
-  checkAll(alt.laws[ListTOpt])
-  checkAll(monadTrans.laws[ListT, Option])
-  checkAll(decidable.laws[ListT[ConstInt, *]])
+  checkAll(foldable.laws[ListTOpt])
+
+  "ListT[Id, _] with 100,000 initial skips" should {
+    import Id.Id
+
+    val s = {
+      def nastyStream(n: Int, value: String): ListT[Id, String] =
+        if(n > 0) nastyStream(n-1, value)
+        else value :: ListT.empty[Id, String]
+
+      nastyStream(100000, "foo")
+    }
+
+    "not stack-overflow on unconsRec" in {
+      s.unconsRec.get._1 must_=== "foo"
+    }
+
+    "not stack-overflow on isEmptyRec" in {
+      s.isEmptyRec must_=== false
+    }
+
+    "not stack-overflow on headRec" in {
+      s.headRec must_=== "foo"
+    }
+
+    "not stack-overflow on headOptionRec" in {
+      s.headOptionRec must_=== Some("foo")
+    }
+
+    "not stack-overflow on tailMRec" in {
+      s.tailMRec.isEmpty must_=== true
+    }
+
+    "not stack-overflow on foreachRec" in {
+      var acc = ""
+      s.foreachRec(a => acc += a)
+      acc must_=== "foo"
+    }
+
+    "not stack-overflow on foldRightRec" in {
+      s.foldRightRec("")((a, b) => a + b) must_=== "foo"
+    }
+
+    "not stack-overflow on foldLeftRec" in {
+      s.foldLeftRec("")((b, a) => b + a) must_=== "foo"
+    }
+
+    "not stack-overflow on lengthRec" in {
+      s.lengthRec must_=== 1
+    }
+
+    "not stack-overflow on toListRec" in {
+      s.toListRec must_=== List("foo")
+    }
+
+  }
 
   object instances {
-    def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
-    def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
-    def monad[F[_]: Monad] = Monad[ListT[F, *]]
+    def semigroup[F[_]: Functor, A] = Semigroup[ListT[F, A]]
+    def monoid[F[_]: Applicative, A] = Monoid[ListT[F, A]]
     def functor[F[_]: Functor] = Functor[ListT[F, *]]
-    def alt[F[_]: Monad] = Alt[ListT[F, *]]
-    def decidable[F[_] : Divisible] = Decidable[ListT[F, *]]
+    def bind[F[_]: Functor] = Bind[ListT[F, *]]
+    def plus[F[_]: Functor] = Plus[ListT[F, *]]
+    def monad[F[_]: Applicative] = Monad[ListT[F, *]]
+    def monadPlus[F[_]: Applicative] = MonadPlus[ListT[F, *]]
+    def foldable[F[_]: Foldable] = Foldable[ListT[F, *]]
 
     // checking absence of ambiguity
-    def functor[F[_]: Monad] = Functor[ListT[F, *]]
+    def semigroup[F[_]: Applicative, A] = Semigroup[ListT[F, A]]
+    def functor[F[_]: Applicative] = Functor[ListT[F, *]]
+    def bind[F[_]: Applicative] = Bind[ListT[F, *]]
+    def plus[F[_]: Applicative] = Plus[ListT[F, *]]
   }
 }

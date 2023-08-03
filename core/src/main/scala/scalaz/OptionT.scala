@@ -101,7 +101,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
   /** @since 7.0.3 */
   def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[E, F, A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
 
-  def toListT(implicit F: Functor[F]) : ListT[F, A] =  ListT[F,A](F.map(run)(IList.fromOption))
+  def toCommutativeListT(implicit F: Functor[F]) : CommutativeListT[F, A] =  CommutativeListT[F,A](F.map(run)(IList.fromOption))
 
   /** @since 7.0.3 */
   def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[A, F, B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))

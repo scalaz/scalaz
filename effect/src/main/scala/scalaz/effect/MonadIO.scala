@@ -52,8 +52,8 @@ object MonadIO {
   implicit def idTMonadIO[F[_]: MonadIO]: MonadIO[IdT[F, *]] =
     fromLiftIO[IdT[F, *]](LiftIO.idTLiftIO, IdT.idTMonad)
 
-  implicit def listTMonadIO[F[_]: MonadIO]: MonadIO[ListT[F, *]] =
-    fromLiftIO[ListT[F, *]](LiftIO.listTLiftIO, ListT.listTMonadPlus)
+  implicit def commutativeListTMonadIO[F[_]: MonadIO]: MonadIO[CommutativeListT[F, *]] =
+    fromLiftIO[CommutativeListT[F, *]](LiftIO.commutativeListTLiftIO, CommutativeListT.commutativeListTMonadPlus)
 
   implicit def optionTMonadIO[F[_]: MonadIO]: MonadIO[OptionT[F, *]] =
     fromLiftIO[OptionT[F, *]](LiftIO.optionTLiftIO, OptionT.optionTMonadPlus)

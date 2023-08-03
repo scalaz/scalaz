@@ -590,9 +590,11 @@ object ScalazArbitrary {
 
   implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 
-  implicit def listTArb[F[_]: Applicative, A](implicit FA: Arbitrary[F[IList[A]]]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
+  implicit def commutativeListTArb[F[_]: Applicative, A](implicit FA: Arbitrary[F[IList[A]]]): Arbitrary[CommutativeListT[F, A]] = Functor[Arbitrary].map(FA)(CommutativeListT.fromIList(_))
 
   implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[LazyList[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromLazyList(_))
+
+  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
   implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] =
     Functor[Arbitrary].map(A0)(CaseInsensitive(_))

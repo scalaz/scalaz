@@ -35,9 +35,9 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = IdT(LiftIO[F].liftIO(ioa))
     }
 
-  implicit def listTLiftIO[F[_]: LiftIO]: LiftIO[ListT[F, *]] =
-    new LiftIO[ListT[F, *]] {
-      def liftIO[A](ioa: IO[A]) = ListT(LiftIO[F].liftIO(ioa.map(_ :: INil())))
+  implicit def commutativeListTLiftIO[F[_]: LiftIO]: LiftIO[CommutativeListT[F, *]] =
+    new LiftIO[CommutativeListT[F, *]] {
+      def liftIO[A](ioa: IO[A]) = CommutativeListT(LiftIO[F].liftIO(ioa.map(_ :: INil())))
     }
 
   implicit def optionTLiftIO[F[_]: LiftIO]: LiftIO[OptionT[F, *]] =
