@@ -66,7 +66,7 @@ trait SortedMapInstances0 {
 
   implicit def sortedMapBand[K, V](implicit S: Band[V], K: scala.Ordering[K]): Band[SortedMap[K, V]] =
     new SortedMapMonoid[K, V] with Band[SortedMap[K, V]] {
-      override def V = S
+      override def V: Band[V] = S
       override def O = K
     }
 }

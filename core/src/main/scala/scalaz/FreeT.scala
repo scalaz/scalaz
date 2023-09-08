@@ -239,7 +239,7 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
 
   implicit def freeTHoist[S[_]]: Hoist[({type l[a[_], b] = FreeT[S, a, b]})#l] =
     new Hoist[({type l[a[_], b] = FreeT[S, a, b]})#l] {
-      def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+      def hoist[M[_]: Monad, N[_]](f: M ~> N): FreeT[S, M, *] ~> FreeT[S, N, *] =
         new (FreeT[S, M, *] ~> FreeT[S, N, *]) {
           def apply[A](fa: FreeT[S, M, A]) = fa.hoist(f)
         }

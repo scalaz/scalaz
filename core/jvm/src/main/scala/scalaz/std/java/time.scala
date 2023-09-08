@@ -16,8 +16,8 @@ trait TimeInstances {
   implicit val zoneOffsetInstance: Order[ZoneOffset] = orderFromInt[ZoneOffset](_ compareTo _)
 
   implicit val dayOfWeekInstance: Enum[DayOfWeek] = new Enum[DayOfWeek] {
-    override val max = Some(DayOfWeek.SUNDAY)
-    override val min = Some(DayOfWeek.MONDAY)
+    override val max: Option[DayOfWeek] = Some(DayOfWeek.SUNDAY)
+    override val min: Option[DayOfWeek] = Some(DayOfWeek.MONDAY)
     override def pred(a: DayOfWeek) = a.minus(1)
     override def succ(a: DayOfWeek) = a.plus(1)
     override def order(x: DayOfWeek, y: DayOfWeek) =
@@ -65,8 +65,8 @@ trait TimeInstances {
   }
 
   implicit val monthInstance: Enum[Month] = new Enum[Month] {
-    override val max = Some(Month.DECEMBER)
-    override val min = Some(Month.JANUARY)
+    override val max: Option[Month] = Some(Month.DECEMBER)
+    override val min: Option[Month] = Some(Month.JANUARY)
     override def pred(a: Month): Month = a.minus(1)
     override def succ(a: Month): Month = a.plus(1)
     override def order(x: Month, y: Month) =

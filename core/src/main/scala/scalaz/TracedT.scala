@@ -79,7 +79,7 @@ sealed abstract class TracedTInstances0 extends TracedTInstances1 {
 
   implicit final def tracedTCohoist[C: Monoid]: Cohoist[({type l[w[_], b] = TracedT[w, C, b]})#l] =
     new Cohoist[({type l[w[_], b] = TracedT[w, C, b]})#l] {
-      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N): TracedT[M, C, *] ~> TracedT[N, C, *] =
         new (TracedT[M, C, *] ~> TracedT[N, C, *]) {
           def apply[A](fa: TracedT[M, C, A]) = fa.trans(f)
         }
@@ -96,7 +96,7 @@ sealed abstract class TracedTInstances extends TracedTInstances0 {
 
   implicit final def tracedTComonadStore[W[_], S, C: Monoid](implicit W0: ComonadStore[W, S]): ComonadStore[TracedT[W, C, *], S] =
     new ComonadStore[TracedT[W, C, *], S] with TracedTComonad[W, C] {
-      def W = W0
+      def W: Comonad[W] = W0
       def C = implicitly
       override def pos[A](w: TracedT[W, C, A]) =
         W0.pos(TracedT.tracedTCohoist[C].lower(w))

@@ -93,7 +93,7 @@ sealed abstract class DayInstances extends DayInstances1 {
       override def lower[G[_], A](a: Day[F, G, A])(implicit G: Cobind[G]): G[A] =
         G.map(a.gy)(a.xya(F.copoint(a.fx), _))
 
-      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N): Day[F, M, *] ~> Day[F, N, *] =
         new (Day[F, M, *] ~> Day[F, N, *]){
           def apply[A](a: Day[F, M, A]) = a trans2 f
         }

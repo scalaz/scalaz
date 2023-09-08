@@ -76,7 +76,7 @@ sealed abstract class OrderingInstances {
         pred(b)
       else
         pred(pred(b))
-    override def min = Some(LT)
-    override def max = Some(GT)
+    override def min: Option[Ordering] = Some(LT)
+    override def max: Option[Ordering] = Some(GT)
   }
 }
