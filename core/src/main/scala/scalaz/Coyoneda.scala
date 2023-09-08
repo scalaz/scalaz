@@ -44,7 +44,7 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
   /** `Coyoneda[F,_]` is the left Kan extension of `F` along `Id` */
   def toLan: Lan[Id, F, A] = new Lan[Id, F, A] {
     type I = coyo.I
-    val v = fi
+    val v: F[I] = fi
     def f(i: I) = k(i)
   }
 
@@ -106,7 +106,7 @@ object Coyoneda extends CoyonedaInstances {
   /** Turns a natural transformation F ~> G into CF ~> CG */
   def liftT[F[_], G[_]](fg: F ~> G): Coyoneda[F, *] ~> Coyoneda[G, *] =
     new (Coyoneda[F, *] ~> Coyoneda[G, *]) {
-      def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
+      def apply[A](c: Coyoneda[F, A]): Coyoneda[G, A] = c.trans(fg)
     }
 
 }

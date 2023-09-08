@@ -16,8 +16,8 @@ trait BigDecimalInstances {
     def pred(b: BigDecimal) = b - 1
     override def succn(a: Int, b: BigDecimal) = b + a
     override def predn(a: Int, b: BigDecimal) = b - a
-    override def min = None
-    override def max = None
+    override def min: Option[BigDecimal] = None
+    override def max: Option[BigDecimal] = None
   }
 
   import Tags.Multiplication

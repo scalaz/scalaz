@@ -91,10 +91,10 @@ trait EitherInstances extends EitherInstances0 {
           case Left(a) => f(a)
         }
 
-      def raiseError[A](e: L) =
+      def raiseError[A](e: L): Either[L, A] =
         Left(e)
 
-      def point[A](a: => A) = Right(a)
+      def point[A](a: => A): Either[L, A] = Right(a)
 
       def traverseImpl[G[_] : Applicative, A, B](fa: Either[L, A])(f: A => G[B]) = fa match {
         case Left(x)  => Applicative[G].point(Left(x))

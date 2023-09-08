@@ -32,8 +32,8 @@ object MonadIO {
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
   implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]): MonadIO[RegionT[S, M, *]] =
     new MonadIO[RegionT[S, M, *]] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
-      implicit def M = M0
-      implicit def L = M0
+      implicit def M: Monad[M] = M0
+      implicit def L: LiftIO[M] = M0
     }
 
   private[scalaz] trait FromLiftIO[F[_]] extends MonadIO[F] {

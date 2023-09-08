@@ -84,7 +84,7 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 
   implicit val idTCohoist: Cohoist[IdT] =
     new Cohoist[IdT] {
-      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N): IdT[M, *] ~> IdT[N, *] =
         new (IdT[M, *] ~> IdT[N, *]){
           def apply[A](x: IdT[M, A]) = IdT(f(x.run))
         }
@@ -157,7 +157,7 @@ private object IdTHoist extends Hoist[IdT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): IdT[G, A] =
     new IdT[G, A](a)
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+  def hoist[M[_]: Monad, N[_]](f: M ~> N): IdT[M, *] ~> IdT[N, *] =
     new (IdT[M, *] ~> IdT[N, *]) {
       def apply[A](fa: IdT[M, A]): IdT[N, A] =
         new IdT[N, A](f(fa.run))

@@ -65,7 +65,7 @@ sealed abstract class EndomorphicInstances2 extends EndomorphicInstances3 {
 sealed abstract class EndomorphicInstances3 extends EndomorphicInstances4 {
   implicit def endomorphicMonoid0[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
     new Monoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
-      val F = G
+      val F: Compose[=>:] = G
       def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
     }
 }

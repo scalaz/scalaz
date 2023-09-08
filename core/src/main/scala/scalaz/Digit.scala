@@ -140,9 +140,9 @@ sealed abstract class DigitInstances {
     override def predn(n: Int, a: Digit) =
       super.predn(n % 10, a)
 
-    override def min = Some(Digit._0)
+    override def min: Option[Digit] = Some(Digit._0)
 
-    override def max = Some(Digit._9)
+    override def max: Option[Digit] = Some(Digit._9)
 
     override def shows(f: Digit) = f.toChar.toString
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)
