@@ -199,7 +199,7 @@ object ImmutableArray extends ImmutableArrayInstances {
       }
     }
 
-    def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
+    def slice(from: Int, until: Int): ImmutableArray[Char] = new StringArray(str.slice(from, until))
 
     def ++[B >: Char: ClassTag](other: ImmutableArray[B]) =
       other match {

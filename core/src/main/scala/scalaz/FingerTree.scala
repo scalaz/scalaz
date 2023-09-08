@@ -804,21 +804,21 @@ object FingerTree extends FingerTreeInstances {
 
     def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1)
 
-    def +:(a: A) = Two(r.cons(a, v), a, a1)
+    def +:(a: A): Finger[V, A] = Two(r.cons(a, v), a, a1)
 
-    def :+(a: A) = Two(r.snoc(v, a), a1, a)
+    def :+(a: A): Finger[V, A] = Two(r.snoc(v, a), a1, a)
 
-    def |-:(a: A) = one(a)
+    def |-:(a: A): Finger[V, A] = one(a)
 
-    def :-|(a: A) = one(a)
+    def :-|(a: A): Finger[V, A] = one(a)
 
     def lhead = a1
 
-    def ltail = sys.error("Tail on the digit One")
+    def ltail: Finger[V, A] = sys.error("Tail on the digit One")
 
     def rhead = a1
 
-    def rtail = sys.error("Tail on the digit One")
+    def rtail: Finger[V, A] = sys.error("Tail on the digit One")
 
     def toTree = single(a1)
 
@@ -832,9 +832,10 @@ object FingerTree extends FingerTreeInstances {
 
     def reverseIterator = Iterator.single(a1)
 
-    val measure = v
+    val measure: V = v
 
-    private[scalaz] def split1(pred: V => Boolean, accV: Maybe[V]) = (None, a1, None)
+    private[scalaz] def split1(pred: V => Boolean, accV: Maybe[V]): (Option[Finger[V, A]], A, Option[Finger[V, A]]) =
+      (None, a1, None)
   }
 
 
@@ -843,9 +844,9 @@ object FingerTree extends FingerTreeInstances {
 
     def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(f(a1), f(a2))
 
-    def +:(a: A) = Three(r.cons(a, v), a, a1, a2)
+    def +:(a: A): Finger[V, A] = Three(r.cons(a, v), a, a1, a2)
 
-    def :+(a: A) = Three(r.snoc(v, a), a1, a2, a)
+    def :+(a: A): Finger[V, A] = Three(r.snoc(v, a), a1, a2, a)
 
     def |-:(a: A) = two(a, a2)
 
@@ -874,7 +875,7 @@ object FingerTree extends FingerTreeInstances {
 
     def reverseIterator = Iterator(a2, a1)
 
-    val measure = v
+    val measure: V = v
 
     private[scalaz] def split1(pred: V => Boolean, accV: Maybe[V]) = {
       val va1 = r.unit(a1)
@@ -890,9 +891,9 @@ object FingerTree extends FingerTreeInstances {
 
     def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(m.append(f(a1), f(a2)), f(a3))
 
-    def +:(a: A) = Four(r.cons(a, v), a, a1, a2, a3)
+    def +:(a: A): Finger[V, A] = Four(r.cons(a, v), a, a1, a2, a3)
 
-    def :+(a: A) = Four(r.snoc(v, a), a1, a2, a3, a)
+    def :+(a: A): Finger[V, A] = Four(r.snoc(v, a), a1, a2, a3, a)
 
     def |-:(a: A) = three(a, a2, a3)
 
@@ -922,7 +923,7 @@ object FingerTree extends FingerTreeInstances {
 
     def reverseIterator = Iterator(a3, a2, a1)
 
-    val measure = v
+    val measure: V = v
 
     private[scalaz] def split1(pred: V => Boolean, accV: Maybe[V]) = {
       val va1 = r.unit(a1)
@@ -943,9 +944,9 @@ object FingerTree extends FingerTreeInstances {
 
     def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(m.append(f(a1), f(a2)), m.append(f(a3), f(a4)))
 
-    def +:(a: A) = sys.error("Digit overflow")
+    def +:(a: A): Finger[V, A] = sys.error("Digit overflow")
 
-    def :+(a: A) = sys.error("Digit overflow")
+    def :+(a: A): Finger[V, A] = sys.error("Digit overflow")
 
     def |-:(a: A) = four(a, a2, a3, a4)
 
@@ -976,7 +977,7 @@ object FingerTree extends FingerTreeInstances {
 
     def reverseIterator = Iterator(a4, a3, a2, a1)
 
-    val measure = v
+    val measure: V = v
 
     private[scalaz] def split1(pred: V => Boolean, accV: Maybe[V]) = {
       val va1 = r.unit(a1)
@@ -1107,7 +1108,7 @@ sealed abstract class IndSeqInstances {
   implicit val indSeqInstance: MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
     new MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, *]]{
       def G = implicitly
-      override val naturalTrans = new (IndSeq ~> FingerTree[Int, *]) {
+      override val naturalTrans: IndSeq ~> FingerTree[Int, *] = new (IndSeq ~> FingerTree[Int, *]) {
         def apply[A](a: IndSeq[A]) =
           a.self
       }

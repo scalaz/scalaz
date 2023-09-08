@@ -263,7 +263,7 @@ private trait MaybeTMonadError[F[_], E] extends MonadError[MaybeT[F, *], E] with
 private trait MaybeTMonadTell[F[_], W] extends MonadTell[MaybeT[F, *], W] with MaybeTMonad[F] with MaybeTHoist {
   def MT: MonadTell[F, W]
 
-  implicit def F = MT
+  implicit def F: Monad[F] = MT
 
   def writer[A](w: W, v: A): MaybeT[F, A] =
     liftM[F, A](MT.writer(w, v))

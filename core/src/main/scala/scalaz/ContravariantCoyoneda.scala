@@ -57,7 +57,7 @@ sealed abstract class ContravariantCoyonedaInstances {
     */
   implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyoneda[F, *]] =
     new Contravariant[ContravariantCoyoneda[F, *]] {
-      def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
+      def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A): ContravariantCoyoneda[F, B] =
         fa contramap f
     }
 }
