@@ -132,7 +132,7 @@ sealed abstract class Free[S[_], A] {
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T): Free[T, A] =
     flatMapSuspension(new (S ~> Free[T, *]) {
-      def apply[X](s: S[X]) = Suspend(f(s))
+      def apply[X](s: S[X]): Free[T, X] = Suspend(f(s))
     })
 
   /** Modifies the first suspension with the given natural transformation. */

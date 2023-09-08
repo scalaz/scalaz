@@ -20,7 +20,7 @@ trait VectorInstances extends VectorInstances0 {
     override def bind[A, B](fa: Vector[A])(f: A => Vector[B]): Vector[B] =
       fa flatMap f
 
-    override def createNewBuilder[A]() =
+    override def createNewBuilder[A](): scala.collection.mutable.Builder[A, Vector[A]] =
       Vector.newBuilder[A]
 
     override def isEmpty[A](fa: Vector[A]): Boolean =

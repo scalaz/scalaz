@@ -362,7 +362,7 @@ private trait IterateeTHoist[E] extends Hoist[({type l[β[_], α] = IterateeT[E,
     type λ[α] = IterateeT[E, F, α]
   }
 
-  override def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
+  override def hoist[F[_]: Monad, G[_]](f: F ~> G): IterateeTF[F]#λ ~> IterateeTF[G]#λ = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
     def apply[A](fa: IterateeT[E, F, A]): IterateeT[E, G, A] = fa mapI f
   }
 

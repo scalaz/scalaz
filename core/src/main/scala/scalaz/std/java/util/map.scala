@@ -7,7 +7,7 @@ trait MapInstances {
   import java.util.AbstractMap.SimpleImmutableEntry
 
   implicit val mapEntryBitraverse: Bitraverse[Entry] = new Bitraverse[Entry] {
-    override def bimap[A, B, C, D](fab: Entry[A, B])(f: A => C, g: B => D) =
+    override def bimap[A, B, C, D](fab: Entry[A, B])(f: A => C, g: B => D): Entry[C, D] =
       new SimpleImmutableEntry(f(fab.getKey), g(fab.getValue))
 
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: Entry[A, B])

@@ -16,8 +16,8 @@ trait BigIntegerInstances {
     def pred(b: BigInteger): BigInteger = b subtract BigInteger.ONE
     override def succn(a: Int, b: BigInteger): BigInteger = b add BigInteger.valueOf(a.toLong)
     override def predn(a: Int, b: BigInteger): BigInteger = b subtract BigInteger.valueOf(a.toLong)
-    override def min = None
-    override def max = None
+    override def min: Option[BigInteger] = None
+    override def max: Option[BigInteger] = None
 
     def order(x: BigInteger, y: BigInteger): Ordering = x.compareTo(y) match {
       case x if x < 0   => Ordering.LT

@@ -96,7 +96,7 @@ object Lan extends LanInstances {
     new Applicative[Lan[G, H, *]] with LanApply[G, H] {
       def G = implicitly
       def H = implicitly
-      def point[A](a: => A) = new Lan[G,H,A] {
+      def point[A](a: => A): Lan[G, H, A] = new Lan[G,H,A] {
         type I = Unit
         val v = Applicative[H].point(())
         def f(gi: G[I]) = a
@@ -156,7 +156,7 @@ private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, *]] with LanFunctor[G
   def G: Functor[G]
   def H: Apply[H]
 
-  def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
+  def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]): Lan[G, H, B] = new Lan[G, H, B] {
     val xfp = Need(xf)
     val xp = Need(x)
     override type I = (xfp.value.I, xp.value.I)
