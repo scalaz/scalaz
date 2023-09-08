@@ -36,8 +36,8 @@ sealed abstract class LiskovInstances {
   
   /** Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
-    def substCo[F[+ _]](p: F[A]) = p
-    def substCt[F[- _]](p: F[B]) = p
+    def substCo[F[+ _]](p: F[A]): F[B] = p
+    def substCt[F[- _]](p: F[B]): F[A] = p
   }
 }
 

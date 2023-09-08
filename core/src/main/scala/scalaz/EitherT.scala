@@ -488,10 +488,11 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[*, F, *]] with 
 }
 
 private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new ~>[EitherT[A, M, *], EitherT[A, N, *]] {
-    def apply[B](mb: EitherT[A, M, B]): EitherT[A, N, B] =
-      mb.mapT(f.apply)
-  }
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): EitherT[A, M, *] ~> EitherT[A, N, *] =
+    new ~>[EitherT[A, M, *], EitherT[A, N, *]] {
+      def apply[B](mb: EitherT[A, M, B]): EitherT[A, N, B] =
+        mb.mapT(f.apply)
+    }
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[A, M, B] = EitherT(M.map(mb)(\/.right))
 
@@ -501,7 +502,7 @@ private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[A, α,
 private[scalaz] trait EitherTMonadTell[F[_], W, A] extends MonadTell[EitherT[A, F, *], W] with EitherTMonad[F, A] with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
-  implicit def F = MT
+  implicit def F: MonadTell[F, W] = MT
 
   def writer[B](w: W, v: B): EitherT[A, F, B] =
     liftM[F, B](MT.writer(w, v))

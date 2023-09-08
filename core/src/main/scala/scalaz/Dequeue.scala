@@ -201,8 +201,8 @@ object Dequeue extends DequeueInstances {
   */
 private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[A] {
   override def isEmpty = false
-  override def frontMaybe = Maybe.Just(single)
-  override def backMaybe = Maybe.Just(single)
+  override def frontMaybe: Maybe[A] = Maybe.Just(single)
+  override def backMaybe: Maybe[A] = Maybe.Just(single)
 }
 
 /**

@@ -69,8 +69,8 @@ object PlusEmpty {
   ////
   implicit def liftPlusEmpty[M[_], N[_]](implicit M: Applicative[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
     new Plus.LiftedPlus[M, N] with PlusEmpty[λ[α => M[N[α]]]] {
-      def G = M
-      def F = P
+      def G: Applicative[M] = M
+      def F: PlusEmpty[N] = P
       def empty[A] = M.point(P.empty[A])
     }
   ////

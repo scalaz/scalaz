@@ -76,7 +76,7 @@ sealed abstract class Unapply_4 {
       type M[X] = A0
       type A = A0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: A0 === M[A] = refl
     }
 }
 
@@ -90,7 +90,7 @@ sealed abstract class Unapply_3 extends Unapply_4 {
       type M[X] = M0[F, X, X, B0]
       type A = A0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[F, A0, A0, B0] === M[A] = refl
     }
 }
 
@@ -104,7 +104,7 @@ sealed abstract class Unapply_2 extends Unapply_3 {
       type M[X] = M0[F, X, B0]
       type A = A0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[F, A0, B0] === M[A] = refl
     }
 }
 
@@ -118,7 +118,7 @@ sealed abstract class Unapply_0 extends Unapply_2 {
       type M[X] = M0[X, B0]
       type A = A0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[A0, B0] === M[A] = refl
     }
 }
 
@@ -142,7 +142,7 @@ object Unapply extends Unapply_0 {
       type M[X] = M0[X]
       type A = A0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[A0] === M[A] = refl
     }
 
   // TODO More!
@@ -188,7 +188,7 @@ object Unapply2 {
       type A = A0
       type B = B0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[A0, B0] === M[A, B] = refl
     }
 
   /**Unpack a value of type `M0[A0, F0, B0]` into types `M0`, `A`, `F0`, and 'B', given an instance of `TC` */
@@ -202,7 +202,7 @@ object Unapply2 {
       type A = A0
       type B = B0
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[A0, F0, B0] === M[A, B] = refl
     }
 }
 
@@ -235,6 +235,6 @@ object Unapply21 {
       type B = B0
 
       def TC = TC0
-      def leibniz = refl
+      def leibniz: M0[F[A0, *], C, B0] === M[A, B] = refl
     }
 }

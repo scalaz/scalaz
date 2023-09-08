@@ -372,7 +372,7 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
       def bind[A, B](fa: L \&/ A)(f: A => L \&/ B) =
         fa flatMap f
 
-      def point[A](a: => A) =
+      def point[A](a: => A): L \&/ A =
         \&/.That(a)
     }
 

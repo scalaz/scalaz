@@ -16,7 +16,7 @@ trait AnyValInstances {
 
     def zero = ()
 
-    def order(x: Unit, y: Unit) = Ordering.EQ
+    def order(x: Unit, y: Unit): Ordering = Ordering.EQ
 
     def succ(u: Unit) = ()
 
@@ -26,9 +26,9 @@ trait AnyValInstances {
 
     override def predn(a: Int, b: Unit) = ()
 
-    override def min = Some(())
+    override def min: Option[Unit] = Some(())
 
-    override def max = Some(())
+    override def max: Option[Unit] = Some(())
 
     override def equalIsNatural: Boolean = true
   }
@@ -159,8 +159,8 @@ trait AnyValInstances {
     def pred(b: Byte) = (b - 1).toByte
     override def succn(a: Int, b: Byte) = (b + a).toByte
     override def predn(a: Int, b: Byte) = (b - a).toByte
-    override def min = Some(Byte.MinValue)
-    override def max = Some(Byte.MaxValue)
+    override def min: Option[Byte] = Some(Byte.MinValue)
+    override def max: Option[Byte] = Some(Byte.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }
@@ -204,8 +204,8 @@ trait AnyValInstances {
     def pred(b: Char) = (b - 1).toChar
     override def succn(a: Int, b: Char) = (b + a).toChar
     override def predn(a: Int, b: Char) = (b - a).toChar
-    override def min = Some(Char.MinValue)
-    override def max = Some(Char.MaxValue)
+    override def min: Option[Char] = Some(Char.MinValue)
+    override def max: Option[Char] = Some(Char.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }
@@ -246,8 +246,8 @@ trait AnyValInstances {
     def pred(b: Short) = (b - 1).toShort
     override def succn(a: Int, b: Short) = (b + a).toShort
     override def predn(a: Int, b: Short) = (b - a).toShort
-    override def min = Some(Short.MinValue)
-    override def max = Some(Short.MaxValue)
+    override def min: Option[Short] = Some(Short.MinValue)
+    override def max: Option[Short] = Some(Short.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }
@@ -286,8 +286,8 @@ trait AnyValInstances {
     def pred(b: Int) = b - 1
     override def succn(a: Int, b: Int) = b + a
     override def predn(a: Int, b: Int) = b - a
-    override def min = Some(Int.MinValue)
-    override def max = Some(Int.MaxValue)
+    override def min: Option[Int] = Some(Int.MinValue)
+    override def max: Option[Int] = Some(Int.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }
@@ -342,8 +342,8 @@ trait AnyValInstances {
     def pred(b: Long) = b - 1
     override def succn(a: Int, b: Long) = b + a
     override def predn(a: Int, b: Long) = b - a
-    override def min = Some(Long.MinValue)
-    override def max = Some(Long.MaxValue)
+    override def min: Option[Long] = Some(Long.MinValue)
+    override def max: Option[Long] = Some(Long.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }

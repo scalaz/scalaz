@@ -233,7 +233,7 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): MaybeT[G, A] =
     MaybeT[G, A](G.map[A, Maybe[A]](a)((a: A) => Maybe.just(a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+  def hoist[M[_]: Monad, N[_]](f: M ~> N): MaybeT[M, *] ~> MaybeT[N, *] =
     new (MaybeT[M, *] ~> MaybeT[N, *]) {
       def apply[A](fa: MaybeT[M, A]): MaybeT[N, A] =
         fa.mapT(f.apply)
