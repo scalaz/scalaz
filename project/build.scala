@@ -109,7 +109,7 @@ object build {
     Seq("-Ywarn-unused:imports")
   }
 
-  private def Scala213 = "2.13.11"
+  private def Scala213 = "2.13.12"
   private def Scala3 = "3.3.1"
 
   private[this] val buildInfoPackageName = "scalaz"
@@ -155,6 +155,14 @@ object build {
       "-feature",
       "-unchecked"
     ),
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "2.13" =>
+          Seq("-Wconf:msg=constructor modifiers are assumed by synthetic:info")
+        case _ =>
+          Nil
+      }
+    },
     Compile / scalacOptions ++= {
       scalaBinaryVersion.value match {
         case "2.13" =>
