@@ -92,7 +92,7 @@ private sealed trait OneAndPlus[F[_]] extends Plus[OneAnd[F, *]] {
 
 private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, *]] with OneAndBind[F] with OneAndApplicative[F] {
   def F: MonadPlus[F]
-  def G = F
+  def G: MonadPlus[F] = F
 }
 
 private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, *]] {
@@ -296,8 +296,8 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 
   implicit def oneAndOrder[F[_], A](implicit A: Order[A], FA: Order[F[A]]): Order[OneAnd[F, A]] =
     new Order[OneAnd[F, A]] with OneAndEqual[F, A] {
-      def OA = A
-      def OFA = FA
+      def OA: Order[A] = A
+      def OFA: Order[F[A]] = FA
       def order(a1: OneAnd[F, A], a2: OneAnd[F, A]) =
         Monoid[Ordering].append(A.order(a1.head, a2.head),
                                 FA.order(a1.tail, a2.tail))

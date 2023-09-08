@@ -431,7 +431,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
     new Monoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2
-      def zero =
+      def zero: Validation[E, A] =
         Success(Monoid[A].zero)
     }
 
@@ -529,7 +529,7 @@ sealed abstract class ValidationInstances3 {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
 
-      def point[A](a: => A) =
+      def point[A](a: => A): Validation[L, A] =
         Success(a)
 
       def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
