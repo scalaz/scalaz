@@ -63,7 +63,7 @@ trait MapInstances0 {
 
   implicit def mapBand[K, V](implicit S: Band[V]): Band[Map[K, V]] =
     new MapMonoid[K, V] with Band[Map[K, V]] {
-      implicit override def V = S
+      implicit override def V: Band[V] = S
     }
 }
 

@@ -17,8 +17,8 @@ trait BigInts {
     def pred(b: BigInt) = b - 1
     override def succn(a: Int, b: BigInt) = b + a
     override def predn(a: Int, b: BigInt) = b - a
-    override def min = None
-    override def max = None
+    override def min: Option[BigInt] = None
+    override def max: Option[BigInt] = None
   }
 
   import Tags.Multiplication

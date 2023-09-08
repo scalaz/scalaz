@@ -284,7 +284,7 @@ private trait OptionTHoist extends Hoist[OptionT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): OptionT[G, A] =
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+  def hoist[M[_]: Monad, N[_]](f: M ~> N): OptionT[M, *] ~> OptionT[N, *] =
     new (OptionT[M, *] ~> OptionT[N, *]) {
       def apply[A](fa: OptionT[M, A]): OptionT[N, A] =
         fa.mapT(f.apply)

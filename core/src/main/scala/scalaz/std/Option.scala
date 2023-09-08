@@ -24,7 +24,7 @@ sealed trait OptionInstances1 {
 trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
-      def point[A](a: => A) = Some(a)
+      def point[A](a: => A): Option[A] = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
       override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
@@ -79,7 +79,7 @@ trait OptionInstances extends OptionInstances0 {
       def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
         fa map (a => f(Some(a)))
 
-      override def cojoin[A](a: Option[A]) =
+      override def cojoin[A](a: Option[A]): Option[Option[A]] =
         a map (Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
@@ -141,7 +141,7 @@ trait OptionInstances extends OptionInstances0 {
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
     new OptionSemigroup[A] with Monoid[Option[A]] {
       override def B = implicitly
-      override def zero = None
+      override def zero: Option[A] = None
     }
 
   /** Add `None` as an element less than all `A`s. */

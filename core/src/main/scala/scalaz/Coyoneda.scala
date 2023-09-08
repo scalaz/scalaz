@@ -266,7 +266,7 @@ sealed abstract class CoyonedaInstances12 {
 }
 
 private trait CoyonedaFunctor[F[_]] extends Functor[Coyoneda[F, *]] {
-  override def map[A, B](ya: Coyoneda[F, A])(f: A => B) = ya map f
+  override def map[A, B](ya: Coyoneda[F, A])(f: A => B): Coyoneda[F, B] = ya map f
 }
 
 private trait CoyonedaFoldable[F[_]] extends Foldable[Coyoneda[F, *]] {
