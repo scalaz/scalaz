@@ -303,7 +303,7 @@ private trait OptionTMonadPlus[F[_]] extends MonadPlus[OptionT[F, *]] with Optio
 private trait OptionTMonadTell[F[_], W] extends MonadTell[OptionT[F, *], W] with OptionTMonad[F] with OptionTHoist {
   def MT: MonadTell[F, W]
 
-  implicit def F = MT
+  implicit def F: Monad[F] = MT
 
   def writer[A](w: W, v: A): OptionT[F, A] =
     liftM[F, A](MT.writer(w, v))

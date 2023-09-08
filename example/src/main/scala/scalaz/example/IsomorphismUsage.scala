@@ -16,7 +16,7 @@ object IsomorphismUsage {
   def equivalentIsoSet[A] = IsoSet[Seq[A], List[A]](_.toList, _.toSeq)
 
 
-  def isoFunctor = new IsoFunctorTemplate[Seq, List] {
+  def isoFunctor: Seq <~> List = new IsoFunctorTemplate[Seq, List] {
     def to_[A](sa: Seq[A]): List[A] = sa.toList
     def from_[A](la: List[A]): Seq[A] = la.toSeq
   }
@@ -24,15 +24,15 @@ object IsomorphismUsage {
   def main(args: Array[String]): Unit = {
     implicit def isoMonoid[A]: IsomorphismMonoid[Seq[A], List[A]] = new IsomorphismMonoid[Seq[A], List[A]] {
       def G = Monoid[List[A]]
-      def iso = isoSet
+      def iso: Seq[A] <=> List[A] = isoSet
     }
     implicit val isoMonad: IsomorphismMonad[Seq, List] = new IsomorphismMonad[Seq, List] {
       def G = Monad[List]
-      def iso = isoFunctor
+      def iso: Seq <~> List = isoFunctor
     }
     implicit val isoTraverse: IsomorphismTraverse[Seq, List] = new IsomorphismTraverse[Seq, List] {
       def G = Traverse[List]
-      def iso = isoFunctor
+      def iso: Seq <~> List  = isoFunctor
     }
 
     assert((Seq(1, 2) |+| Seq(3, 4)).toList === List(1, 2, 3, 4))

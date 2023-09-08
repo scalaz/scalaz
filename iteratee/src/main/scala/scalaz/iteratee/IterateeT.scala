@@ -391,7 +391,7 @@ private trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[({type l[α
 private trait IterateeTHoistT[E, H[_[_], _]] extends Hoist[({type l[α[_], β] = IterateeT[E, H[α, *], β]})#l] with IterateeTMonadTransT[E, H] {
   implicit def T: Hoist[H]
 
-  override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+  override def hoist[M[_]: Monad, N[_]](f: M ~> N): IterateeT[E, H[M, *], *] ~> IterateeT[E, H[N, *], *] =
     new (IterateeT[E, H[M, *], *] ~> IterateeT[E, H[N, *], *]) {
       def apply[A](fa: IterateeT[E, H[M, *], A]): IterateeT[E, H[N, *], A] =
         fa.mapI[H[N, *]](T.hoist[M, N](f))(T[M])

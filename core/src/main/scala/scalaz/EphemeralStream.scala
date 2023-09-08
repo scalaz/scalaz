@@ -344,7 +344,7 @@ object EphemeralStream extends EphemeralStreamInstances {
   }
 
   def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new scala.collection.AbstractIterable[A] {
-    def iterator = new scala.collection.AbstractIterator[A] {
+    def iterator: Iterator[A] = new scala.collection.AbstractIterator[A] {
       private[this] var cur = e
 
       def next() = {

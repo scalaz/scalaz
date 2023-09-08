@@ -236,7 +236,7 @@ object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
 private trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[EnumeratorT[E, F]] {
   implicit def F: Bind[F]
 
-  def append(f1: EnumeratorT[E, F], f2: => EnumeratorT[E, F]) =
+  def append(f1: EnumeratorT[E, F], f2: => EnumeratorT[E, F]): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = (s: StepT[E, F, A]) => f1[A](s) >>== f2[A]
     }
@@ -245,7 +245,7 @@ private trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[EnumeratorT[E, F]]
 private trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F]] with EnumeratorTSemigroup[E, F] {
   implicit def F: Monad[F]
 
-  def zero = new EnumeratorT[E, F] {
+  def zero: EnumeratorT[E, F] = new EnumeratorT[E, F] {
     def apply[A] = (s: StepT[E, F, A]) => s.pointI
   }
 }
