@@ -109,22 +109,22 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 sealed abstract class OptionTInstances3 {
   implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[OptionT[F, *]] =
     new OptionTFunctor[F] {
-      implicit def F: Functor[F] = F0
+      override def F: Functor[F] = F0
     }
 }
 
 sealed abstract class OptionTInstances2 extends OptionTInstances3 {
   implicit def optionTBindRec[F[_]](implicit F0: Monad[F], B0: BindRec[F]): BindRec[OptionT[F, *]] =
     new OptionTBindRec[F] {
-      implicit def F = F0
-      implicit def B = B0
+      override def F = F0
+      override def B = B0
     }
 }
 
 sealed abstract class OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[OptionT[F, *]] =
     new OptionTFoldable[F] {
-      implicit def F: Foldable[F] = F0
+      override def F: Foldable[F] = F0
     }
 
   implicit def optionTMonadError[F[_], E](implicit F0: MonadError[F, E]): MonadError[OptionT[F, *], E] =
@@ -136,7 +136,7 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
 sealed abstract class OptionTInstances0 extends OptionTInstances1 {
   implicit def optionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[OptionT[F, *]] =
     new OptionTMonadPlus[F] {
-      implicit def F: Monad[F] = F0
+      override def F: Monad[F] = F0
     }
 }
 
@@ -145,7 +145,7 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
 
   implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[OptionT[F, *]] =
     new OptionTTraverse[F] {
-      implicit def F: Traverse[F] = F0
+      override def F: Traverse[F] = F0
     }
 
   implicit def optionTEqual[F[_], A](implicit F0: Equal[F[Option[A]]]): Equal[OptionT[F, A]] =

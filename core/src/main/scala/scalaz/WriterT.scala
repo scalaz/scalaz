@@ -106,26 +106,26 @@ object WriterT extends WriterTInstances with WriterTFunctions
 sealed abstract class WriterTInstances18 {
   implicit def writerTFunctor0[F[_], W](implicit F0: Functor[F]): Functor[WriterT[F, W, *]] =
     new WriterTFunctor[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class WriterTInstances17 extends WriterTInstances18 {
   implicit def writerTFoldable0[F[_], W](implicit F0: Foldable[F]): Foldable[WriterT[F, W, *]] =
     new WriterTFoldable[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
   implicit def writerTApply0[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[WriterT[F, W, *]] =
     new WriterTApply[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
 sealed abstract class WriterTInstances16 extends WriterTInstances17 {
   implicit def writerTTraverse0[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, *]] =
     new WriterTTraverse[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -145,7 +145,7 @@ sealed abstract class WriterTInstances15 extends WriterTInstances16 {
 sealed abstract class WriterTInstances14 extends WriterTInstances15 {
   implicit def writerFunctor[W]: Functor[Writer[W, *]] =
     new WriterTFunctor[Id, W] {
-      implicit def F = idInstance
+      override def F = idInstance
     }
 
   implicit def writerTPlusEmpty[F[_], W](implicit F0: PlusEmpty[F]): PlusEmpty[WriterT[F, W, *]] =
@@ -157,13 +157,13 @@ sealed abstract class WriterTInstances13 extends WriterTInstances14 {
   // for binary compatibility
   def writerTFunctor[F[_], W](implicit F0: Functor[F]): Functor[WriterT[F, W, *]] =
     new WriterTFunctor[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
   implicit def writerTBindRec0[F[_], W](implicit W0: Semigroup[W], F0: BindRec[F], F1: Applicative[F]): BindRec[WriterT[F, W, *]] =
     new WriterTBindRec[F, W] {
-      implicit def F = F0
-      implicit def A = F1
-      implicit def W = W0
+      override def F = F0
+      override def A = F1
+      override def W = W0
     }
 }
 
@@ -171,22 +171,22 @@ sealed abstract class WriterTInstances12 extends WriterTInstances13 {
   // for binary compatibility
   def writerBind[W](implicit W0: Semigroup[W]): Bind[Writer[W, *]] =
     new WriterTBind[Id, W] {
-      implicit def F = idInstance
-      implicit def W = W0
+      override def F = idInstance
+      override def W = W0
     }
   implicit def writerTBind0[F[_], W](implicit W0: Semigroup[W], F0: Bind[F]): Bind[WriterT[F, W, *]] =
     new WriterTBind[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
 sealed abstract class WriterTInstances11 extends WriterTInstances12 {
   implicit def writerBindRec[W](implicit W0: Semigroup[W]): BindRec[Writer[W, *]] =
     new WriterTBindRec[Id, W] {
-      implicit def F = idInstance
-      implicit def A = idInstance
-      implicit def W = W0
+      override def F = idInstance
+      override def A = idInstance
+      override def W = W0
     }
 }
 
@@ -194,8 +194,8 @@ sealed abstract class WriterTInstances10 extends WriterTInstances11 {
   // for binary compatibility
   def writerTApply[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[WriterT[F, W, *]] =
     new WriterTApply[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
@@ -203,16 +203,16 @@ sealed abstract class WriterTInstances9 extends WriterTInstances10 {
   // for binary compatibility
   def writerTBind[F[_], W](implicit W0: Semigroup[W], F0: Bind[F]): Bind[WriterT[F, W, *]] =
     new WriterTBind[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
 sealed abstract class WriterTInstances8 extends WriterTInstances9 {
   implicit def writerTApplicative[F[_], W](implicit W0: Monoid[W], F0: Applicative[F]): Applicative[WriterT[F, W, *]] =
     new WriterTApplicative[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
@@ -220,25 +220,25 @@ sealed abstract class WriterTInstances7 extends WriterTInstances8 {
   // for binary compatibility
   def writerTBindRec[F[_], W](implicit W0: Semigroup[W], F0: BindRec[F], F1: Applicative[F]): BindRec[WriterT[F, W, *]] =
     new WriterTBindRec[F, W] {
-      implicit def F = F0
-      implicit def A = F1
-      implicit def W = W0
+      override def F = F0
+      override def A = F1
+      override def W = W0
     }
 }
 
 sealed abstract class WriterTInstances6 extends WriterTInstances7 {
   implicit def writerMonad[W](implicit W0: Monoid[W]): Monad[Writer[W, *]] =
     new WriterTMonad[Id, W] {
-      implicit def F = idInstance
-      implicit def W = W0
+      override def F = idInstance
+      override def W = W0
     }
 }
 
 sealed abstract class WriterTInstance5 extends WriterTInstances6 {
   implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]): Monad[WriterT[F, W, *]] =
     new WriterTMonad[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 
   implicit def writerTEqual0[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] =
@@ -248,7 +248,7 @@ sealed abstract class WriterTInstance5 extends WriterTInstances6 {
 sealed abstract class WriterTInstances4 extends WriterTInstance5 {
   implicit def writerFoldable[W]: Foldable[Writer[W, *]] =
     new WriterTFoldable[Id, W] {
-      implicit def F = idInstance
+      override def F = idInstance
     }
   implicit def writerEqual[W, A](implicit E: Equal[(W, A)]): Equal[Writer[W, A]] = E.contramap((_: Writer[W, A]).run)
 
@@ -262,12 +262,12 @@ sealed abstract class WriterTInstances4 extends WriterTInstance5 {
 sealed abstract class WriterTInstances3 extends WriterTInstances4 {
   implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[WriterT[F, *, *]] =
     new WriterTBifunctor[F] {
-      implicit def F = F0
+      override def F = F0
     }
   // for binary compatibility
   def writerTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[WriterT[F, W, *]] =
     new WriterTFoldable[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
   // for binary compatibility
   def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
@@ -289,36 +289,36 @@ sealed abstract class WriterTInstances2 extends WriterTInstances3 {
 sealed abstract class WriterTInstances1 extends WriterTInstances2 {
   implicit val writerBitraverse: Bitraverse[Writer] =
     new WriterTBitraverse[Id] {
-      implicit def F = idInstance
+      override def F = idInstance
     }
   implicit def writerTraverse[W]: Traverse[Writer[W, *]] =
     new WriterTTraverse[Id, W] {
-      implicit def F = idInstance
+      override def F = idInstance
     }
 }
 
 sealed abstract class WriterTInstances0 extends WriterTInstances1 {
   implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[WriterT[F, *, *]] =
     new WriterTBitraverse[F] {
-      implicit def F = F0
+      override def F = F0
     }
   // for binary compatibility
   def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, *]] =
     new WriterTTraverse[F, W] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class WriterTInstances extends WriterTInstances0 {
   implicit def writerTMonadListen[F[_], W](implicit F0: Monad[F], W0: Monoid[W]): MonadListen[WriterT[F, W, *], W] =
     new WriterTMonadListen[F, W] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 
   implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type l[α[_], β] = WriterT[α, W, β]})#l] =
     new WriterTHoist[W] {
-      implicit def W = W0
+      override def W = W0
     }
 
   implicit def writerTShow[F[_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[F, W, A]] =
