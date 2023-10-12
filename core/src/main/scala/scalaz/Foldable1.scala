@@ -12,8 +12,8 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product[G[_]](implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] =
     new ProductFoldable1[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The composition of Foldable1 `F` and `G`, `[x]F[G[x]]`, is a Foldable1 */

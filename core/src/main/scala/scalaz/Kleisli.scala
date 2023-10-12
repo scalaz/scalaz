@@ -156,7 +156,7 @@ sealed abstract class KleisliInstances8 extends KleisliInstances9 {
 
   implicit def kleisliPlus[F[_], A](implicit F0: Plus[F]): Plus[Kleisli[F, A, *]] =
     new KleisliPlus[F, A] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -168,7 +168,7 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
 
   implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, *]] =
     new KleisliPlusEmpty[F, A] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -180,19 +180,19 @@ sealed abstract class KleisliInstances6 extends KleisliInstances7 {
 
   implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]): Semigroup[Kleisli[F, A, B]] =
     new KleisliSemigroup[F, A, B] {
-      implicit def FB = FB0
+      override def FB = FB0
     }
 }
 
 sealed abstract class KleisliInstances5 extends KleisliInstances6 {
   implicit def kleisliMonadError[F[_], E, R](implicit F0: MonadError[F, E]): MonadError[Kleisli[F, R, *], E] =
     new KleisliMonadError[F, E, R] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def kleisliAlt[F[_]: Alt: Applicative, A]: Alt[Kleisli[F, A, *]] =
     new KleisliApplicative[F, A] with Alt[Kleisli[F, A, *]] {
-      implicit def F = Applicative[F]
+      override def F = Applicative[F]
 
       def alt[B](f1: => Kleisli[F, A, B], f2: => Kleisli[F, A, B]) =
         Kleisli(a => Alt[F].alt(f1.run(a), f2.run(a)))
@@ -202,7 +202,7 @@ sealed abstract class KleisliInstances5 extends KleisliInstances6 {
 sealed abstract class KleisliInstances4 extends KleisliInstances5 {
   implicit def kleisliMonadPlus[F[_], A](implicit F0: MonadPlus[F]): MonadPlus[Kleisli[F, A, *]] =
     new KleisliMonadPlus[F, A] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -233,12 +233,12 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
 
   implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[Kleisli[F, *, *]] =
     new KleisliProChoice[F] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def kleisliCompose[F[_]](implicit F0: Bind[F]): Compose[Kleisli[F, *, *]] =
     new KleisliCompose[F] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -256,7 +256,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
 
   implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]): Monoid[Kleisli[F, A, B]] =
     new KleisliMonoid[F, A, B] {
-      implicit def FB = FB0
+      override def FB = FB0
     }
 
   implicit def kleisliMonadTrans[R]: Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] =
@@ -264,7 +264,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
 
   implicit def kleisliCatchable[F[_], A](implicit F0: Catchable[F]): Catchable[Kleisli[F, A, *]] =
     new KleisliCatchable[F, A] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 

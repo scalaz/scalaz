@@ -154,7 +154,7 @@ sealed abstract class WriterTInstances12 extends WriterTInstances13 {
   implicit def writerBind[W](implicit W0: Semigroup[W]): Bind[Writer[W, *]] =
     new WriterTBind[Id, W] {
       override def F: Bind[Id] = Id.id
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -162,8 +162,8 @@ sealed abstract class WriterTInstances11 extends WriterTInstances12 {
   implicit def writerTBindRec[W, F[_]](implicit W0: Semigroup[W], F0: BindRec[F], F1: Applicative[F]): BindRec[WriterT[W, F, *]] =
     new WriterTBindRec[F, W] {
       override def F = F0
-      implicit def A = F1
-      implicit def W = W0
+      override def A = F1
+      override def W = W0
     }
 }
 
@@ -171,7 +171,7 @@ sealed abstract class WriterTInstances10 extends WriterTInstances11 {
   implicit def writerTApply[W, F[_]](implicit W0: Semigroup[W], F0: Apply[F]): Apply[WriterT[W, F, *]] =
     new WriterTApply[F, W] {
       override def F = F0
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -179,7 +179,7 @@ sealed abstract class WriterTInstances9 extends WriterTInstances10 {
   implicit def writerTBind[W, F[_]](implicit W0: Semigroup[W], F0: Bind[F]): Bind[WriterT[W, F, *]] =
     new WriterTBind[F, W] {
       override def F = F0
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -187,7 +187,7 @@ sealed abstract class WriterTInstances8 extends WriterTInstances9 {
   implicit def writerTApplicative[W, F[_]](implicit W0: Monoid[W], F0: Applicative[F]): Applicative[WriterT[W, F, *]] =
     new WriterTApplicative[F, W] {
       override def F = F0
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -196,7 +196,7 @@ sealed abstract class WriterTInstances7 extends WriterTInstances8 {
     new WriterTBindRec[Id, W] {
       override def F: BindRec[Id] = Id.id
       override def A: Applicative[Id] = Id.id
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -204,7 +204,7 @@ sealed abstract class WriterTInstances6 extends WriterTInstances7 {
   implicit def writerMonad[W](implicit W0: Monoid[W]): Monad[Writer[W, *]] =
     new WriterTMonad[Id, W] {
       override def F: Monad[Id] = Id.id
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -212,7 +212,7 @@ sealed abstract class WriterTInstance5 extends WriterTInstances6 {
   implicit def writerTMonad[W, F[_]](implicit W0: Monoid[W], F0: Monad[F]): Monad[WriterT[W, F, *]] =
     new WriterTMonad[F, W] {
       override def F = F0
-      implicit def W = W0
+      override def W = W0
     }
 }
 
@@ -251,7 +251,7 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
 sealed abstract class WriterTInstances2 extends WriterTInstances3 {
   implicit def writerComonad[W]: Comonad[Writer[W, *]] =
     new WriterComonad[W] {
-      override def F = Id.id
+      override def F: Functor[Id] = Id.id
     }
 }
 
@@ -281,12 +281,12 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
   implicit def writerTMonadListen[W, F[_]](implicit F0: Monad[F], W0: Monoid[W]): MonadListen[WriterT[W, F, *], W] =
     new WriterTMonadListen[F, W] {
       override def F = F0
-      implicit def W = W0
+      override def W = W0
     }
 
   implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type l[α[_], β] = WriterT[W, α, β]})#l] =
     new WriterTHoist[W] {
-      implicit def W = W0
+      override def W = W0
     }
 
   implicit def writerTShow[F[_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[W, F, A]] =

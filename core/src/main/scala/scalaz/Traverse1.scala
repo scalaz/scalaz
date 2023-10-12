@@ -14,8 +14,8 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   /**The product of Traverse1 `F` and `G`, `[x](F[x], G[x]])`, is a Traverse1 */
   def product[G[_]](implicit G0: Traverse1[G]): Traverse1[λ[α => (F[α], G[α])]] =
     new ProductTraverse1[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Traverse1 `F` and Traverse `G`, `[x](F[x], G[x]])`, is a Traverse1 */

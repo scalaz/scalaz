@@ -6,22 +6,22 @@ import scalaz.Liskov.<~<
 sealed trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]): Semigroup[A => R] =
     new Function1Semigroup[A, R] {
-      implicit def R = R0
+      override def R = R0
     }
   implicit def function1Cobind[A, R](implicit A0: Semigroup[A]): Cobind[A => *] =
     new Function1Cobind[A, R] {
-      implicit def M = A0
+      override def M = A0
     }
 }
 
 sealed trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]): Monoid[A => R] =
     new Function1Monoid[A, R] {
-      implicit def R = R0
+      override def R = R0
     }
   implicit def function1Comonad[A, R](implicit A0: Monoid[A]): Comonad[A => *] =
     new Function1Comonad[A, R] {
-      implicit def M = A0
+      override def M = A0
     }
   // See SI-7899. Scala 2.11 will no longer infer by-name types for type parameter `T` (which was unsound.)
   // Scala doesn't support abstraction over by-name-ness.

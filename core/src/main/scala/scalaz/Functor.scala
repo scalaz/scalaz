@@ -62,8 +62,8 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
   def compose[G[_]](implicit G0: Functor[G]): Functor[λ[α => F[G[α]]]] =
     new CompositionFunctor[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** The composition of Functor F and Contravariant G, `[x]F[G[x]]`,
@@ -85,8 +85,8 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   /**The product of Functors `F` and `G`, `[x](F[x], G[x]])`, is a Functor */
   def product[G[_]](implicit G0: Functor[G]): Functor[λ[α => (F[α], G[α])]] =
     new ProductFunctor[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**
