@@ -69,7 +69,7 @@ trait ReaderWriterStateTFunctions {
 sealed abstract class IndexedReaderWriterStateTInstances1 {
   implicit def irwstFunctor[R, W, S1, S2, F[_]](implicit F0: Functor[F]): Functor[IndexedReaderWriterStateT[R, W, S1, S2, F, *]] =
     new IndexedReaderWriterStateTFunctor[F, R, W, S1, S2] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
@@ -112,8 +112,8 @@ sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterSt
   MonadState[ReaderWriterStateT[R, W, S, F, *], S] with
   MonadListen[ReaderWriterStateT[R, W, S, F, *], W] =
     new ReaderWriterStateTMonad[F, R, W, S] {
-      implicit def F = F0
-      implicit def W = W0
+      override def F = F0
+      override def W = W0
     }
 }
 
@@ -126,7 +126,7 @@ abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 
 
   implicit def rwstHoist[R, W, S](implicit W0: Monoid[W]): Hoist[({type l[α[_], β] = ReaderWriterStateT[R, W, S, α, β]})#l] =
     new ReaderWriterStateTHoist[R, W, S] {
-      implicit def W = W0
+      override def W = W0
     }
 
   implicit def rwstContravariantR[W, S1, S2, F[_], A]: IsContravariant[IRWST[*, W, S1, S2, F, A]] =

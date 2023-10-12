@@ -17,16 +17,16 @@ trait Unzip[F[_]]  { self =>
   /**The composition of Unzips `F` and `G`, `[x]F[G[x]]`, is an Unzip */
   def compose[G[_]](implicit T0: Functor[F], G0: Unzip[G]): Unzip[λ[α => F[G[α]]]] =
     new CompositionUnzip[F, G] {
-      implicit def F = self
-      implicit def T = T0
-      implicit def G = G0
+      override def F = self
+      override def T = T0
+      override def G = G0
     }
 
   /**The product of Unzips `F` and `G`, `[x](F[x], G[x]])`, is an Unzip */
   def product[G[_]](implicit G0: Unzip[G]): Unzip[λ[α => (F[α], G[α])]] =
     new ProductUnzip[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   def unzip3[A, B, C](x: F[(A, (B, C))]): (F[A], F[B], F[C]) = {

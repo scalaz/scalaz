@@ -168,7 +168,7 @@ sealed abstract class IndexedStateTInstances3 {
 sealed abstract class IndexedStateTInstances2 extends IndexedStateTInstances3 {
   implicit def indexedStateTContravariant[S2, A0, F[_]](implicit F0: Applicative[F]): Contravariant[IndexedStateT[*, S2, F, A0]] =
     new IndexedStateTContravariant[S2, A0, F] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
