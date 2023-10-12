@@ -109,7 +109,7 @@ object ImmutableArray extends ImmutableArrayInstances {
    * Provides better type inference than `make[A]`
    */
   def fromArray[A](x: Array[A]): ImmutableArray[A] = {
-    val y = x.asInstanceOf[AnyRef] match {
+    val y = x match {
       case null              => null
       case x: Array[Byte]    => new ofByte(x)
       case x: Array[Short]   => new ofShort(x)
@@ -120,7 +120,7 @@ object ImmutableArray extends ImmutableArrayInstances {
       case x: Array[Double]  => new ofDouble(x)
       case x: Array[Boolean] => new ofBoolean(x)
       case x: Array[Unit]    => new ofUnit(x)
-      case _: Array[AnyRef]  => new ofRef(x.asInstanceOf[Array[AnyRef]])
+      case x: Array[AnyRef]  => new ofRef(x)
     }
     y.asInstanceOf[ImmutableArray[A]]
   }
