@@ -90,8 +90,8 @@ sealed abstract class LazyTuple2Instances0 {
 
   implicit def lazyTuple2Semigroup[A1, A2](implicit A1: Semigroup[A1], A2: Semigroup[A2]): Semigroup[LazyTuple2[A1, A2]] =
     new LazyTuple2Semigroup[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
+      override def _1 = A1
+      override def _2 = A2
     }
 
   implicit def lazyTuple2Functor[A1]: Functor[LazyTuple2[A1, *]] =
@@ -109,34 +109,34 @@ sealed abstract class LazyTuple2Instances extends LazyTuple2Instances0 {
 
   implicit def lazyTuple2Show[A1, A2](implicit A1: Show[A1], A2: Show[A2]): Show[LazyTuple2[A1, A2]] =
     new LazyTuple2Show[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
+      override def _1 = A1
+      override def _2 = A2
     }
 
   implicit def lazyTuple2Order[A1, A2](implicit A1: Order[A1], A2: Order[A2]): Order[LazyTuple2[A1, A2]] =
     new LazyTuple2Order[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
+      override def _1 = A1
+      override def _2 = A2
     }
 
   implicit def lazyTuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[LazyTuple2[A1, A2]] =
     new LazyTuple2Monoid[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
+      override def _1 = A1
+      override def _2 = A2
     }
 
   implicit def lazyTuple2Monad[A1](implicit A1: Monoid[A1]): Monad[LazyTuple2[A1, *]] =
     new LazyTuple2Monad[A1] {
-      implicit def _1 = A1
+      override def _1 = A1
     }
 }
 
 sealed abstract class LazyTuple3Instances0 {
   implicit def lazyTuple3Semigroup[A1, A2, A3](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3]): Semigroup[LazyTuple3[A1, A2, A3]] =
     new LazyTuple3Semigroup[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 
   implicit def lazyTuple3Functor[A1, A2]: Functor[LazyTuple3[A1, A2, *]] =
@@ -144,9 +144,9 @@ sealed abstract class LazyTuple3Instances0 {
 
   implicit def lazyTuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[LazyTuple3[A1, A2, A3]] =
     new LazyTuple3Equal[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 }
 
@@ -154,39 +154,39 @@ sealed abstract class LazyTuple3Instances extends LazyTuple3Instances0 {
 
   implicit def lazyTuple3Show[A1, A2, A3](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]): Show[LazyTuple3[A1, A2, A3]] =
     new LazyTuple3Show[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 
   implicit def lazyTuple3Order[A1, A2, A3](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3]): Order[LazyTuple3[A1, A2, A3]] =
     new LazyTuple3Order[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 
   implicit def lazyTuple3Monoid[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monoid[LazyTuple3[A1, A2, A3]] =
     new LazyTuple3Monoid[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 
   implicit def lazyTuple3Monad[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monad[LazyTuple3[A1, A2, *]] =
     new LazyTuple3Monad[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
+      override def _1 = A1
+      override def _2 = A2
     }
 }
 
 sealed abstract class LazyTuple4Instances0 {
   implicit def lazyTuple4Semigroup[A1, A2, A3, A4](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3], A4: Semigroup[A4]): Semigroup[LazyTuple4[A1, A2, A3, A4]] =
     new LazyTuple4Semigroup[A1, A2, A3, A4] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
-      implicit def _4 = A4
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
+      override def _4 = A4
     }
 
   implicit def lazyTuple4Functor[A1, A2, A3]: Functor[LazyTuple4[A1, A2, A3, *]] =
@@ -194,43 +194,43 @@ sealed abstract class LazyTuple4Instances0 {
 
   implicit def lazyTuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[LazyTuple4[A1, A2, A3, A4]] =
     new LazyTuple4Equal[A1, A2, A3, A4] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
-      implicit def _4 = A4
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
+      override def _4 = A4
     }
 }
 sealed abstract class LazyTuple4Instances extends LazyTuple4Instances0 {
 
   implicit def lazyTuple4Show[A1, A2, A3, A4](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4]): Show[LazyTuple4[A1, A2, A3, A4]] =
     new LazyTuple4Show[A1, A2, A3, A4] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
-      implicit def _4 = A4
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
+      override def _4 = A4
     }
 
   implicit def lazyTuple4Order[A1, A2, A3, A4](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4]): Order[LazyTuple4[A1, A2, A3, A4]] =
     new LazyTuple4Order[A1, A2, A3, A4] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
-      implicit def _4 = A4
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
+      override def _4 = A4
     }
 
   implicit def lazyTuple4Monoid[A1, A2, A3, A4](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4]): Monoid[LazyTuple4[A1, A2, A3, A4]] =
     new LazyTuple4Monoid[A1, A2, A3, A4] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
-      implicit def _4 = A4
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
+      override def _4 = A4
     }
 
   implicit def lazyTuple4Monad[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monad[LazyTuple4[A1, A2, A3, *]] =
     new LazyTuple4Monad[A1, A2, A3] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-      implicit def _3 = A3
+      override def _1 = A1
+      override def _2 = A2
+      override def _3 = A3
     }
 }
 

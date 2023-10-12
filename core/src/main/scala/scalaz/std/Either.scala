@@ -7,8 +7,8 @@ import scalaz.Tags.{First, Last}
 
 sealed trait EitherInstances0 {
   implicit def eitherEqual[A, B](implicit A0: Equal[A], B0: Equal[B]): Equal[Either[A, B]] = new EitherEqual[A, B] {
-    implicit def A = A0
-    implicit def B = B0
+    override def A = A0
+    override def B = B0
   }
 
   implicit def eitherLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X]] = new EitherLeftEqual[A, X] {
@@ -240,8 +240,8 @@ trait EitherInstances extends EitherInstances0 {
 
   implicit def eitherOrder[A, B](implicit OrderA: Order[A], OrderB: Order[B]): Order[Either[A, B]] =
     new EitherOrder[A, B] {
-      implicit def A = OrderA
-      implicit def B = OrderB
+      override def A = OrderA
+      override def B = OrderB
     }
 
   implicit def eitherLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X]] =

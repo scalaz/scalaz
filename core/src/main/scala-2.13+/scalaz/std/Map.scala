@@ -107,7 +107,7 @@ trait MapInstances extends MapInstances0 with MapFunctions {
   /** Map union monoid, unifying values with `V`'s `append`. */
   implicit def mapMonoid[K, V](implicit S: Semigroup[V]): Monoid[Map[K, V]] =
     new MapMonoid[K, V] { self =>
-      implicit override def V = S
+      override def V = S
     }
 
   implicit def mapShow[K, V](implicit K: Show[K], V: Show[V]): Show[Map[K, V]] =

@@ -14,16 +14,16 @@ trait Zip[F[_]]  { self =>
   /**The composition of Zip `F` and `G`, `[x]F[G[x]]`, is a Zip (if F is a Functor) */
   def compose[G[_]](implicit T0: Functor[F], G0: Zip[G]): Zip[λ[α => F[G[α]]]] =
     new CompositionZip[F, G] {
-      implicit def T = T0
-      implicit def F = self
-      implicit def G = G0
+      override def T = T0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Zips `F` and `G`, `[x](F[x], G[x]])`, is a Zip */
   def product[G[_]](implicit G0: Zip[G]): Zip[λ[α => (F[α], G[α])]] =
     new ProductZip[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   def zipWith[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C)(implicit F: Functor[F]): F[C] =

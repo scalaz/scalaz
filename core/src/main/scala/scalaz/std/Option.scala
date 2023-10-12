@@ -3,7 +3,7 @@ package std
 
 sealed trait OptionInstances0 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
-    implicit def A = A0
+    override def A = A0
   }
 }
 
@@ -94,7 +94,7 @@ trait OptionInstances extends OptionInstances0 {
 
   /** Add `None` as an element less than all `A`s. */
   implicit def optionOrder[A](implicit A0: Order[A]): Order[Option[A]] = new OptionOrder[A] {
-    implicit def A = A0
+    override def A = A0
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {

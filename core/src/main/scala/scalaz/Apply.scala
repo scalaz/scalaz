@@ -31,15 +31,15 @@ trait Apply[F[_]] extends Functor[F] with ApplyParent[F] { self =>
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
     new CompositionApply[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
   def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] =
     new ProductApply[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** Flipped variant of `ap`. */

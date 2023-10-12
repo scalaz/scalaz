@@ -27,15 +27,15 @@ trait Bifoldable[F[_, _]]  { self =>
   /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
   def compose[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[λ[(α, β) => F[G[α, β], G[α, β]]]] =
     new CompositionBifoldable[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Bifoldables `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifoldable */
   def product[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[λ[(α, β) => (F[α, β], G[α, β])]] =
     new ProductBifoldable[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   // derived functions
