@@ -7,7 +7,7 @@ import Maybe.just
 
 sealed trait VectorInstances0 {
   implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new VectorEqual[A] {
-    implicit def A = A0
+    override def A = A0
   }
 }
 
@@ -92,7 +92,7 @@ trait VectorInstances extends VectorInstances0 {
   }
 
   implicit def vectorOrder[A](implicit A0: Order[A]): Order[Vector[A]] = new VectorOrder[A] {
-    implicit def A = A0
+    override def A = A0
   }
 }
 

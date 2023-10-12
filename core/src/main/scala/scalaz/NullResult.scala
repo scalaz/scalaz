@@ -158,7 +158,7 @@ sealed abstract class NullResultInstances0 {
 
   implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
-      implicit val M = M0
+      override val M = M0
     }
 
   implicit val nullResultProfunctor: Profunctor[NullResult] =
@@ -177,7 +177,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
 
   implicit def nullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
     new NullResultMonoid[A, B] {
-      implicit val M = M0
+      override val M = M0
     }
 
   implicit val nullResultArrow: Arrow[NullResult] with Choice[NullResult] with ProChoice[NullResult] =
