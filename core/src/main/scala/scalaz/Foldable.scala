@@ -24,8 +24,8 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
   /**The composition of Foldables `F` and `G`, `[x]F[G[x]]`, is a Foldable */
   def compose[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => F[G[α]]]] =
     new CompositionFoldable[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** The composition of Foldable `F` and Bifoldable `G`, `[x, y]F[G[x, y]]`, is a Bifoldable */
@@ -38,8 +38,8 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
   /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
   def product[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => (F[α], G[α])]] =
     new ProductFoldable[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */

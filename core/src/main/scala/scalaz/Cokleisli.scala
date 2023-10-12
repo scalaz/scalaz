@@ -39,7 +39,7 @@ object Cokleisli extends CokleisliInstances {
 sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[Cokleisli[F, *, *]] =
     new CokleisliCompose[F] {
-      override implicit def F = F0
+      override def F = F0
     }
   implicit def cokleisliProfunctor[F[_]: Functor]: Profunctor[Cokleisli[F, *, *]] =
     new CokleisliProfunctor[F] {
@@ -53,7 +53,7 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, *, *]] with ProChoice[Cokleisli[F, *, *]] =
     new CokleisliArrow[F] {
-      override implicit def F = F0
+      override def F = F0
     }
 }
 

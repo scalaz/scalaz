@@ -69,15 +69,15 @@ trait Applicative[F[_]] extends Apply[F] with ApplicativeParent[F] { self =>
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](implicit G0: Applicative[G]): Applicative[λ[α => F[G[α]]]] =
     new CompositionApplicative[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Applicatives `F` and `G`, `[x](F[x], G[x]])`, is an Applicative */
   def product[G[_]](implicit G0: Applicative[G]): Applicative[λ[α => (F[α], G[α])]] =
     new ProductApplicative[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** An `Applicative` for `F` in which effects happen in the opposite order. */

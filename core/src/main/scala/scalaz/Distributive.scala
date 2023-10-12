@@ -16,15 +16,15 @@ trait Distributive[F[_]] extends Functor[F] with DistributiveParent[F] { self =>
   /**The composition of Distributives `F` and `G`, `[x]F[G[x]]`, is a Distributive */
   def compose[G[_]](implicit G0: Distributive[G]): Distributive[λ[α => F[G[α]]]] =
     new CompositionDistributive[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Distributives `F` and `G`, `[x](F[x], G[x]])`, is a Distributive */
   def product[G[_]](implicit G0: Distributive[G]): Distributive[λ[α => (F[α], G[α])]] =
     new ProductDistributive[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   class Distribution[G[_]](implicit G: Functor[G]) {

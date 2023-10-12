@@ -118,16 +118,16 @@ object BijectionT extends BijectionTInstances {
 sealed abstract class BijectionTInstances0 {
   implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[BijectionT[F, G, *, *]] =
     new BijectionTSplit[F, G] {
-      implicit def F = F0
-      implicit def G = G0
+      override def F = F0
+      override def G = G0
     }
 }
 
 sealed abstract class BijectionTInstances extends BijectionTInstances0 {
   implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[BijectionT[F, G, *, *]] =
     new BijectionTCategory[F, G] {
-      implicit def F = F0
-      implicit def G = G0
+      override def F = F0
+      override def G = G0
     }
 }
 

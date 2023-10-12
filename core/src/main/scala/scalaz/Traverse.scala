@@ -21,8 +21,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] with TraverseParent[F] 
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
   def compose[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => F[G[α]]]] =
     new CompositionTraverse[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** The composition of Traverse `F` and Bitraverse `G`, `[x, y]F[G[x, y]]`, is a Bitraverse */
@@ -35,8 +35,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] with TraverseParent[F] 
   /**The product of Traverses `F` and `G`, `[x](F[x], G[x]])`, is a Traverse */
   def product[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => (F[α], G[α])]] =
     new ProductTraverse[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Traverse `F` and Traverse1 `G`, `[x](F[x], G[x]])`, is a Traverse1 */

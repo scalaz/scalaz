@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 
 trait ListInstances0 {
   implicit def listEqual[A](implicit A0: Equal[A]): Equal[List[A]] = new ListEqual[A] {
-    implicit def A = A0
+    override def A = A0
   }
 }
 
@@ -152,7 +152,7 @@ trait ListInstances extends ListInstances0 {
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
-    implicit def A = A0
+    override def A = A0
   }
 }
 
