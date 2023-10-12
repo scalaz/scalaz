@@ -18,7 +18,7 @@ jobs:
           - java: 11
             scala: 2
             project: rootJVM
-          - java: 17
+          - java: 21
             scala: 2
             project: rootJVM
     steps:
