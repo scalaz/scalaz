@@ -181,14 +181,14 @@ object IterateeT extends IterateeTInstances with IterateeTFunctions {
 sealed abstract class IterateeTInstances0 {
   implicit def IterateeTMonad[E, F[_]](implicit F0: Monad[F]): Monad[IterateeT[E, F, *]] =
     new IterateeTMonad[E, F] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def IterateeMonad[E]: Monad[Iteratee[E, *]] = IterateeTMonad[E, Id]
 
   implicit def IterateeTMonadTransT[E, H[_[_], _]](implicit T0: MonadTrans[H]): MonadTrans[({type l[α[_], β] = IterateeT[E, H[α, *], β]})#l] =
     new IterateeTMonadTransT[E, H] {
-      implicit def T = T0
+      override def T = T0
     }
 }
 
@@ -198,12 +198,12 @@ sealed abstract class IterateeTInstances extends IterateeTInstances0 {
 
   implicit def IterateeTHoistT[E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[({type l[α[_], β] = IterateeT[E, H[α, *], β]})#l] =
     new IterateeTHoistT[E, H] {
-      implicit def T = T0
+      override def T = T0
     }
 
   implicit def IterateeTMonadIO[E, F[_]](implicit M0: MonadIO[F]): MonadIO[IterateeT[E, F, *]] =
     new IterateeTMonadIO[E, F] {
-      implicit def F = M0
+      override def F = M0
     }
 
   implicit def IterateeTContravariant[F[_]: Monad, A]: Contravariant[IterateeT[*, F, A]] =

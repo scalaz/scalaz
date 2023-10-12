@@ -106,7 +106,7 @@ object STArray {
   def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] = new STArray[S, A] {
     val size = s
     val z = a
-    implicit val tag = t
+    override val tag = t
   }
 }
 
