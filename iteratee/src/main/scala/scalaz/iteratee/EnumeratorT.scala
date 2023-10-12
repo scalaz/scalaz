@@ -69,19 +69,19 @@ trait EnumeratorT[E, F[_]] { self =>
 trait EnumeratorTInstances0 {
   implicit def enumeratorTSemigroup[E, F[_]](implicit F0: Bind[F]): Semigroup[EnumeratorT[E, F]] =
     new EnumeratorTSemigroup[E, F] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 trait EnumeratorTInstances extends EnumeratorTInstances0 {
   implicit def enumeratorTMonoid[E, F[_]](implicit F0: Monad[F]): Monoid[EnumeratorT[E, F]] =
     new EnumeratorTMonoid[E, F] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def enumeratorTMonad[F[_]](implicit M0: Monad[F]): Monad[EnumeratorT[*, F]] =
     new EnumeratorTMonad[F] {
-      implicit def M = M0
+      override def M = M0
     }
 
   implicit val enumeratorTMonadTrans: MonadTrans[({type l[β[_], α] = EnumeratorT[α, β]})#l] =
@@ -91,7 +91,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
           def apply[A] = (s: StepT[E, G, A]) => iterateeT(Monad[G].bind(ga) { e => s.mapCont(k => k(elInput(e))).value })
         }
 
-      implicit def apply[G[_]: Monad]: Monad[EnumeratorT[*, G]] = enumeratorTMonad[G]
+      override def apply[G[_]: Monad]: Monad[EnumeratorT[*, G]] = enumeratorTMonad[G]
     }
 }
 

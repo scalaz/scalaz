@@ -34,11 +34,11 @@ object RegionT extends RegionTInstances {
 
 sealed abstract class RegionTInstances1 {
   implicit def RegionTLiftIO[S, M[_]](implicit M: LiftIO[M]): LiftIO[RegionT[S, M, *]] = new RegionTLiftIO[S, M] {
-    implicit def L = M
+    override def L = M
   }
 
   implicit def RegionTMonad[S, M[_]](implicit M0: Monad[M]): Monad[RegionT[S, M, *]] = new RegionTMonad[S, M] {
-    implicit def M = M0
+    override def M = M0
   }
 
   implicit def RegionTHoist[S]: Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] = new Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] {
