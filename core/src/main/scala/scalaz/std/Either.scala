@@ -12,11 +12,11 @@ sealed trait EitherInstances0 {
   }
 
   implicit def eitherLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X]] = new EitherLeftEqual[A, X] {
-    implicit def A = A0
+    override def A = A0
   }
 
   implicit def eitherRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A]] = new EitherRightEqual[X, A] {
-    implicit def A = A0
+    override def A = A0
   }
 
   implicit def eitherFirstRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ First] = First.subst(Equal[RightProjection[X, A]])
@@ -36,13 +36,13 @@ sealed trait EitherInstances0 {
   implicit def eitherLastRightSemigroup[X, A: Semigroup]: Semigroup[RightProjection[X, A] @@ Last] = new EitherLastRightSemigroup[X, A] {}
 
   implicit def eitherLeftSemigroup[A, X](implicit SemigroupA: Semigroup[A], MonoidX: Monoid[X]): Semigroup[LeftProjection[A, X]] = new EitherLeftSemigroup[A, X] {
-    implicit def A = SemigroupA
-    implicit def X = MonoidX
+    override def A = SemigroupA
+    override def X = MonoidX
   }
 
   implicit def eitherRightSemigroup[X, A](implicit MonoidX: Monoid[X], SemigroupA: Semigroup[A]): Semigroup[RightProjection[X, A]] = new EitherRightSemigroup[X, A] {
-    implicit def X = MonoidX
-    implicit def A = SemigroupA
+    override def X = MonoidX
+    override def A = SemigroupA
   }
 
 }
@@ -193,19 +193,19 @@ trait EitherInstances extends EitherInstances0 {
   val eitherLeftInstance =
     new IsomorphismBifunctor[LeftProjection, Either] {
       def iso = LeftProjectionIso2
-      implicit def G: Bifunctor[Either] = eitherInstance
+      override def G: Bifunctor[Either] = eitherInstance
     }
 
   val eitherFirstLeftInstance =
     new IsomorphismBifunctor[λ[(α, β) => LeftProjection[α, β] @@ First], Either] {
       def iso = FirstLeftProjectionIso2
-      implicit def G: Bifunctor[Either] = eitherInstance
+      override def G: Bifunctor[Either] = eitherInstance
     }
 
   val eitherRightInstance =
     new IsomorphismBifunctor[RightProjection, Either] {
       def iso = RightProjectionIso2
-      implicit def G: Bifunctor[Either] = eitherInstance
+      override def G: Bifunctor[Either] = eitherInstance
     }
 
   implicit def eitherRightLInstance[L]: Monad[RightProjection[L, *]] =
@@ -246,12 +246,12 @@ trait EitherInstances extends EitherInstances0 {
 
   implicit def eitherLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X]] =
     new EitherLeftOrder[A, X] {
-      implicit def A = OrderA
+      override def A = OrderA
     }
 
   implicit def eitherRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A]] =
     new EitherRightOrder[X, A] {
-      implicit def A = OrderA
+      override def A = OrderA
     }
 
   implicit def eitherFirstLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ First] = First.subst(Order[LeftProjection[A, X]])
@@ -264,34 +264,34 @@ trait EitherInstances extends EitherInstances0 {
 
   implicit def eitherFirstLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ First] =
     new EitherFirstLeftMonoid[A, X] {
-      implicit def X = MonoidX
+      override def X = MonoidX
     }
 
   implicit def eitherFirstRightMonoid[X, A](implicit MonoidX: Monoid[X]): Monoid[RightProjection[X, A] @@ First] =
     new EitherFirstRightMonoid[X, A] {
-      implicit def X = MonoidX
+      override def X = MonoidX
     }
 
   implicit def eitherLastLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ Last] =
     new EitherLastLeftMonoid[A, X] {
-      implicit def X = MonoidX
+      override def X = MonoidX
     }
 
   implicit def eitherLastRightMonoid[X, A](implicit MonoidX: Monoid[X]): Monoid[RightProjection[X, A] @@ Last] =
     new EitherLastRightMonoid[X, A] {
-      implicit def X = MonoidX
+      override def X = MonoidX
     }
 
   implicit def eitherLeftMonoid[A, X](implicit MonoidA: Monoid[A], MonoidX: Monoid[X]): Monoid[LeftProjection[A, X]] =
     new EitherLeftMonoid[A, X] {
-      implicit def A = MonoidA
-      implicit def X = MonoidX
+      override def A = MonoidA
+      override def X = MonoidX
     }
 
   implicit def eitherRightMonoid[X, A](implicit MonoidX: Monoid[X], MonoidA: Monoid[A]): Monoid[RightProjection[X, A]] =
     new EitherRightMonoid[X, A] {
-      implicit def X = MonoidX
-      implicit def A = MonoidA
+      override def X = MonoidX
+      override def A = MonoidA
     }
 
   implicit def eitherAssociative: Associative[Either] = new Associative[Either] {
