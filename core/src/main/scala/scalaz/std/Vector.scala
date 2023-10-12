@@ -73,7 +73,7 @@ trait VectorInstances extends VectorInstances0 {
           case Nil =>
         }
       go(List(f(a)))
-      bs.result
+      bs.result()
     }
 
     def alignWith[A, B, C](f: A \&/ B => C): (Vector[A], Vector[B]) => Vector[C] = { (as, bs) =>

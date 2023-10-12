@@ -128,7 +128,7 @@ trait ListInstances extends ListInstances0 {
             case Nil =>
           }
         go(List(f(a)))
-        bs.result
+        bs.result()
       }
     }
 

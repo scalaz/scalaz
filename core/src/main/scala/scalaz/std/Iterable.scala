@@ -34,8 +34,8 @@ trait IterableInstances {
       var b = false
 
       while (i1.hasNext && i2.hasNext && !b) {
-        val x1 = i1.next
-        val x2 = i2.next
+        val x1 = i1.next()
+        val x2 = i2.next()
 
         if (!Equal[A].equal(x1, x2)) {
           b = true
@@ -58,7 +58,7 @@ trait IterableInstances {
       val i = a.iterator
       while (i.hasNext) {
         n = n + 1
-        i.next
+        i.next()
       }
       n
     }

@@ -154,13 +154,13 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
     index(fa, i) getOrElse default
 
   def toList[A](fa: F[A]): List[A] = {
-    foldLeft(fa, List.newBuilder[A]){ (buf, a) => buf += a }.result
+    foldLeft(fa, List.newBuilder[A]){ (buf, a) => buf += a }.result()
   }
   def toVector[A](fa: F[A]): Vector[A] = {
-    foldLeft(fa, Vector.newBuilder[A]){ (buf, a) => buf += a }.result
+    foldLeft(fa, Vector.newBuilder[A]){ (buf, a) => buf += a }.result()
   }
   def toSet[A](fa: F[A]): Set[A] = {
-    foldLeft(fa, Set.newBuilder[A]){ (buf, a) => buf += a }.result
+    foldLeft(fa, Set.newBuilder[A]){ (buf, a) => buf += a }.result()
   }
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
   /**
