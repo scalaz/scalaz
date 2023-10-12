@@ -306,59 +306,59 @@ object EitherT extends EitherTInstances {
 sealed abstract class EitherTInstances5 {
   implicit def eitherTNondeterminism[F[_], E](implicit F0: Nondeterminism[F]): Nondeterminism[EitherT[E, F, *]] =
     new EitherTNondeterminism[F, E] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class EitherTInstances4 extends EitherTInstances5{
   implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[E, F, *]] =
     new EitherTBindRec[F, E] {
-      implicit def F = F0
-      implicit def B = B0
+      override def F = F0
+      override def B = B0
     }
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[EitherT[L, F, *]] =
     new EitherTFunctor[F, L] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class EitherTInstances2 extends EitherTInstances3 {
   implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[E, F, *], E] =
     new EitherTMonadError[F, E] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class EitherTInstances1 extends EitherTInstances2 {
   implicit def eitherTPlus[F[_], L](implicit F0: Monad[F], L0: Semigroup[L]): Plus[EitherT[L, F, *]] =
     new EitherTPlus[F, L] {
-      implicit def F = F0
-      implicit def G = L0
+      override def F = F0
+      override def G = L0
     }
   
   implicit def eitherTMonadReader[E, F[_], R](implicit F0: MonadReader[F, R]): MonadReader[EitherT[E, F, *], R] =
     new EitherTMonadReader[E, F, R] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class EitherTInstances0 extends EitherTInstances1 {
   implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[EitherT[*, F, *]] =
     new EitherTBifunctor[F] {
-      implicit def F = F0
+      override def F = F0
     }
   implicit def eitherTBifoldable[F[_]](implicit F0: Foldable[F]): Bifoldable[EitherT[*, F, *]] =
     new EitherTBifoldable[F] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def eitherTMonadPlusAlt[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, *]] with Alt[EitherT[L, F, *]] =
     new EitherTMonadPlus[F, L] with Alt[EitherT[L, F, *]] {
-      implicit def F = F0
-      implicit def G = L0
+      override def F = F0
+      override def G = L0
 
       def alt[A](a1: => EitherT[L, F, A], a2: => EitherT[L, F, A]): EitherT[L, F, A] =
         EitherT(
@@ -376,19 +376,19 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
 
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[EitherT[L, F, *]] =
     new EitherTFoldable[F, L] {
-      implicit def F = F0
+      override def F = F0
     }
 }
 
 sealed abstract class EitherTInstances extends EitherTInstances0 {
   implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[EitherT[*, F, *]] =
     new EitherTBitraverse[F] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def eitherTTraverse[F[_], L](implicit F0: Traverse[F]): Traverse[EitherT[L, F, *]] =
     new EitherTTraverse[F, L] {
-      implicit def F = F0
+      override def F = F0
     }
 
   implicit def eitherTHoist[A]: Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] =

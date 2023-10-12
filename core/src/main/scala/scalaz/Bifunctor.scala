@@ -14,15 +14,15 @@ trait Bifunctor[F[_, _]]  { self =>
   /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
   def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => F[G[α, β], G[α, β]]]] =
     new CompositionBifunctor[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /**The product of Bifunctors `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifunctor */
   def product[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => (F[α, β], G[α, β])]] =
     new ProductBifunctor[F, G] {
-      implicit def F = self
-      implicit def G = G0
+      override def F = self
+      override def G = G0
     }
 
   /** Extract the Functor on the first param. */

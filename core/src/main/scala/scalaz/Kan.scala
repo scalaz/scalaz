@@ -96,7 +96,7 @@ object Lan extends LanInstances {
     new Applicative[Lan[G, H, *]] with LanApply[G, H] {
       def G = implicitly
       def H = implicitly
-      def point[A](a: => A) = new Lan[G,H,A] {
+      def point[A](a: => A): Lan[G, H, A] = new Lan[G, H, A] {
         type I = Unit
         val v = Applicative[H].point(())
         def f(gi: G[I]) = a
