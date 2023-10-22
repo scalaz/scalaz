@@ -1,5 +1,4 @@
 import build._
-import com.typesafe.sbt.osgi.OsgiKeys
 
 val minSuccessfulTests = settingKey[Int]("")
 
@@ -146,7 +145,6 @@ lazy val scalacheckBinding =
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.17.0",
-      osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
