@@ -11,9 +11,6 @@ import sbtrelease.Utilities._
 
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
 
-import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi
-
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
@@ -341,9 +338,7 @@ object build {
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
-  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
-    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  )
+  }
 
   private[this] val jvm_js_settings = Seq(
     (Compile / unmanagedSourceDirectories) += {
@@ -375,8 +370,7 @@ object build {
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := buildInfoPackageName,
       buildInfoObject := "ScalazBuildInfo",
-      osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    )
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
       jvm_js_settings,
@@ -393,7 +387,7 @@ object build {
     .settings(
       unmanagedSourcePathSettings,
       name := "scalaz-effect",
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+    )
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
     .jvmSettings(
@@ -405,7 +399,7 @@ object build {
     .settings(
       unmanagedSourcePathSettings,
       name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee"))
+    )
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
 
@@ -443,7 +437,6 @@ object build {
 
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
-  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
 
 // vim: expandtab:ts=2:sw=2
