@@ -94,9 +94,9 @@ object InjectTest extends SpecLite {
         I1: Test2Algebra :<: F,
         I2: Test3Algebra :<: F): Option[Free[F, A]] =
           for {
-            Test1(x, h) <- match_[F, Test1Algebra, A](t)
-            Test2(y, k) <- match_[F, Test2Algebra, A](h(x.length))
-            Test3(z, l) <- match_[F, Test3Algebra, A](k((x ++ y).length))
+            case Test1(x, h) <- match_[F, Test1Algebra, A](t)
+            case Test2(y, k) <- match_[F, Test2Algebra, A](h(x.length))
+            case Test3(z, l) <- match_[F, Test3Algebra, A](k((x ++ y).length))
           } yield l((x ++ y ++ z).length)
 
     val res =
