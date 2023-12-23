@@ -57,7 +57,7 @@ object FoldableUsage {
     // we can accumulate into any type for which we have an
     // ApplicativePlus instance, so here we can collapse our List of
     // Options into a Vector
-    assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(listOfOptions.flatten: _*))
+    assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(listOfOptions.flatten *))
 
     // we can go deeeeep:
     val deepFolder = Foldable[List] compose Foldable[Vector] compose Foldable[LazyList] compose Foldable[Option]

@@ -24,14 +24,14 @@ object SortedMapTest extends SpecLite {
 
   implicit def sortedMapArb[A: Arbitrary: Order, B: Arbitrary]: Arbitrary[SortedMap[A, B]] = {
     implicit val o: scala.Ordering[A] = Order[A].toScalaOrdering
-    Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq:_*)))
+    Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq *)))
   }
 
   "SortedMap ordering" ! forAll {
     val O = implicitly[Order[SortedMap[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {
-      val (m1, m2) = (SortedMap(kvs:_*), SortedMap(kvs2:_*))
+      val (m1, m2) = (SortedMap(kvs*), SortedMap(kvs2*))
       ((m1.size == kvs.size) && (m2.size == kvs2.size)) ==> {
         val l: Boolean = O.lessThan(m1, m2)
         val r: Boolean = (if (m1.size < m2.size) true

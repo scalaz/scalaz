@@ -45,7 +45,7 @@ object EphemeralStreamTest extends SpecLite {
   }
 
   "foldLeft" ! forAll{ (xs: List[List[Int]]) =>
-    Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
+    Foldable[EphemeralStream].foldLeft(EphemeralStream(xs *), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
 
   // https://github.com/scalaz/scalaz/pull/1151

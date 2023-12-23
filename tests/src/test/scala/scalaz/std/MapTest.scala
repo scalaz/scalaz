@@ -24,7 +24,7 @@ object MapTest extends SpecLite {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {
-      val (m1, m2) = (Map(kvs:_*), Map(kvs2:_*))
+      val (m1, m2) = (Map(kvs*), Map(kvs2*))
       ((m1.size == kvs.size) && (m2.size == kvs2.size)) ==> {
         val l: Boolean = O.lessThan(m1, m2)
         val r: Boolean = (if (m1.size < m2.size) true

@@ -566,7 +566,7 @@ object ScalazArbitrary {
   implicit def constArbitrary[A: Arbitrary, B]: Arbitrary[Const[A, B]] =
     Functor[Arbitrary].map(arb[A])(Const(_))
 
-  implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[DList[A]] = Functor[Arbitrary].map(A)(as => DList(as : _*))
+  implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[DList[A]] = Functor[Arbitrary].map(A)(as => DList(as *))
 
   implicit def ilistArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[IList[A]] = Functor[Arbitrary].map(A)(IList.fromList)
 
