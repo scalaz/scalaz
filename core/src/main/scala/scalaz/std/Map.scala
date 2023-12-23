@@ -73,7 +73,7 @@ trait MapInstances extends MapInstances0 with MapFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K]: Traverse[Map[K, *]] with IsEmpty[Map[K, *]] with Bind[Map[K, *]] with Align[Map[K, *]] =
+  implicit def mapInstance[K]: Traverse[Map[K, *]] & IsEmpty[Map[K, *]] & Bind[Map[K, *]] & Align[Map[K, *]] =
     new Traverse[Map[K, *]] with IsEmpty[Map[K, *]] with Bind[Map[K, *]] with MapFoldable[K] with Align[Map[K, *]] {
       def empty[V] = Map.empty[K, V]
       def plus[V](a: Map[K, V], b: => Map[K, V]) = a ++ b

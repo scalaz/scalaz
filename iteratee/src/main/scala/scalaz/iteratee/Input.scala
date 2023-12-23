@@ -82,7 +82,7 @@ object Input extends InputInstances with InputFunctions {
 sealed abstract class InputInstances {
   import Input._
 
-  implicit val input: Traverse[Input] with Monad[Input] with Plus[Input] =
+  implicit val input: Traverse[Input] & Monad[Input] & Plus[Input] =
     new Traverse[Input] with Monad[Input] with Plus[Input] {
       override def length[A](fa: Input[A]): Int = fa.fold(
         empty = 0

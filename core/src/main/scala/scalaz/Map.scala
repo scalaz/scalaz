@@ -1023,7 +1023,7 @@ sealed abstract class MapInstances1 extends MapInstances2 {
 
 sealed abstract class MapInstances0 extends MapInstances1 {
 
-  implicit def scalazMapInstance[S: Order]: Bind[==>>[S, *]] with Align[==>>[S, *]] with Zip[==>>[S, *]] =
+  implicit def scalazMapInstance[S: Order]: Bind[==>>[S, *]] & Align[==>>[S, *]] & Zip[==>>[S, *]] =
     new Bind[==>>[S, *]] with Align[==>>[S, *]] with Zip[==>>[S, *]] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f

@@ -176,7 +176,7 @@ sealed abstract class StrictTreeInstances {
   implicit val strictTreeIsCovariant: IsCovariant[StrictTree] =
     IsCovariant.force[StrictTree]
 
-  implicit val strictTreeInstance: Traverse1[StrictTree] with Monad[StrictTree] with Comonad[StrictTree] with Align[StrictTree] with Zip[StrictTree] = new Traverse1[StrictTree] with Monad[StrictTree] with Comonad[StrictTree] with Align[StrictTree] with Zip[StrictTree] {
+  implicit val strictTreeInstance: Traverse1[StrictTree] & Monad[StrictTree] & Comonad[StrictTree] & Align[StrictTree] & Zip[StrictTree] = new Traverse1[StrictTree] with Monad[StrictTree] with Comonad[StrictTree] with Align[StrictTree] with Zip[StrictTree] {
     def point[A](a: => A): StrictTree[A] = StrictTree.Leaf(a)
     def cobind[A, B](fa: StrictTree[A])(f: StrictTree[A] => B): StrictTree[B] = fa cobind f
     def copoint[A](p: StrictTree[A]): A = p.rootLabel

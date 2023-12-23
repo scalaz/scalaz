@@ -74,7 +74,7 @@ sealed abstract class EndoInstances {
     def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
     def zero = Endo.idEndo
   }
-  implicit val endoInstances: Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] = new Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] {
+  implicit val endoInstances: Zip[Endo] & Unzip[Endo] & InvariantFunctor[Endo] = new Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] {
     def xmap[A, B](fa: Endo[A], f: A => B, g: B => A) =
       Endo.endo(g andThen fa.run andThen f)
 
@@ -98,7 +98,7 @@ sealed abstract class EndoByNameInstances {
     def append(f1: EndoByName[A], f2: => EndoByName[A]) = f1 compose f2
     def zero = Endo.idEndoByName
   }
-  implicit val endoInstances: Zip[EndoByName] with Unzip[EndoByName] with InvariantFunctor[EndoByName] = new Zip[EndoByName] with Unzip[EndoByName] with InvariantFunctor[EndoByName] {
+  implicit val endoInstances: Zip[EndoByName] & Unzip[EndoByName] & InvariantFunctor[EndoByName] = new Zip[EndoByName] with Unzip[EndoByName] with InvariantFunctor[EndoByName] {
     def xmap[A, B](fa: EndoByName[A], f: A => B, g: B => A) =
       Endo.endoByName(a => f(fa(g(a))))
 

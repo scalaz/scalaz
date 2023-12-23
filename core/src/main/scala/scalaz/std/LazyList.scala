@@ -4,7 +4,7 @@ package std
 import Maybe.just
 
 trait LazyListInstances {
-  implicit val lazylistInstance: Traverse[LazyList] with MonadPlus[LazyList] with Alt[LazyList] with BindRec[LazyList] with Zip[LazyList] with Unzip[LazyList] with Align[LazyList] with IsEmpty[LazyList] with Cobind[LazyList] = new Traverse[LazyList] with MonadPlus[LazyList] with Alt[LazyList] with BindRec[LazyList] with Zip[LazyList] with Unzip[LazyList] with Align[LazyList] with IsEmpty[LazyList] with Cobind[LazyList] with IterableSubtypeFoldable[LazyList] with Functor.OverrideWiden[LazyList] {
+  implicit val lazylistInstance: Traverse[LazyList] & MonadPlus[LazyList] & Alt[LazyList] & BindRec[LazyList] & Zip[LazyList] & Unzip[LazyList] & Align[LazyList] & IsEmpty[LazyList] & Cobind[LazyList] = new Traverse[LazyList] with MonadPlus[LazyList] with Alt[LazyList] with BindRec[LazyList] with Zip[LazyList] with Unzip[LazyList] with Align[LazyList] with IsEmpty[LazyList] with Cobind[LazyList] with IterableSubtypeFoldable[LazyList] with Functor.OverrideWiden[LazyList] {
 
     override def point[A](a: => A): LazyList[A] =
       LazyList(a)

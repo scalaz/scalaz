@@ -332,7 +332,7 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
       override def F = F0
     }
 
-  implicit def eitherTMonadPlusAlt[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, *]] with Alt[EitherT[L, F, *]] =
+  implicit def eitherTMonadPlusAlt[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, *]] & Alt[EitherT[L, F, *]] =
     new EitherTMonadPlus[F, L] with Alt[EitherT[L, F, *]] {
       override def F = F0
       override def G = L0

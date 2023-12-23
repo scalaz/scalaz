@@ -431,7 +431,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 }
 
 sealed abstract class FreeInstances extends FreeInstances0 {
-  implicit def freeMonad[S[_]]: Monad[Free[S, *]] with BindRec[Free[S, *]] =
+  implicit def freeMonad[S[_]]: Monad[Free[S, *]] & BindRec[Free[S, *]] =
     new Monad[Free[S, *]] with BindRec[Free[S, *]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f

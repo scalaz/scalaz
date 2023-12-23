@@ -7,7 +7,7 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 trait StringInstances {
-  implicit val stringInstance: Monoid[String] with Show[String] with Order[String] with IsEmpty[λ[α => String]] =
+  implicit val stringInstance: Monoid[String] & Show[String] & Order[String] & IsEmpty[λ[α => String]] =
     new Monoid[String] with Show[String] with Order[String] with IsEmpty[λ[α => String]] {
       type SA[α] = String
       def append(f1: String, f2: => String) = f1 + f2

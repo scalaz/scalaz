@@ -356,7 +356,7 @@ object Zipper extends ZipperInstances {
 sealed abstract class ZipperInstances {
   import Zipper._
 
-  implicit val zipperInstance: Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] = new Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
+  implicit val zipperInstance: Traverse1[Zipper] & Applicative[Zipper] & Comonad[Zipper] = new Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
     import std.lazylist._
     override def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
