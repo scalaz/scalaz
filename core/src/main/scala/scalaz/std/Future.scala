@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 trait FutureInstances1 {
-  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with BindRec[Future] =
+  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] & Cobind[Future] & MonadError[Future, Throwable] & BindRec[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =

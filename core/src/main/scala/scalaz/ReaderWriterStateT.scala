@@ -108,8 +108,8 @@ sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterSt
     }
 
   implicit def rwstMonad[R, W, S, F[_]](implicit W0: Monoid[W], F0: Monad[F]):
-  MonadReader[ReaderWriterStateT[R, W, S, F, *], R] with
-  MonadState[ReaderWriterStateT[R, W, S, F, *], S] with
+  MonadReader[ReaderWriterStateT[R, W, S, F, *], R] &
+  MonadState[ReaderWriterStateT[R, W, S, F, *], S] &
   MonadListen[ReaderWriterStateT[R, W, S, F, *], W] =
     new ReaderWriterStateTMonad[F, R, W, S] {
       override def F = F0

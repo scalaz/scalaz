@@ -23,7 +23,7 @@ object FreeList extends FreeListInstances {
       FreeList(Z.zip(a.f, b.f))
   }
 
-  implicit def freeListMonad: Monad[FreeList] with BindRec[FreeList] = new Monad[FreeList] with BindRec[FreeList] {
+  implicit def freeListMonad: Monad[FreeList] & BindRec[FreeList] = new Monad[FreeList] with BindRec[FreeList] {
     def point[A](a: => A): FreeList[A] =
       FreeList(Monad[Free[List, *]].point(a))
 

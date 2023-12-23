@@ -33,7 +33,7 @@ sealed abstract class ImmutableArrayInstances {
       (a.length == b.length) && (0 until a.length).forall(i => A.equal(a(i), b(i)))
     }
 
-  implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[ImmutableArray] =
+  implicit val immutableArrayInstance: Foldable[ImmutableArray] & Zip[ImmutableArray] =
     new Foldable[ImmutableArray] with Zip[ImmutableArray] {
       override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)

@@ -25,7 +25,7 @@ object Name {
   }
   def unapply[A](v: Name[A]): Some[A] = Some(v.value)
 
-  implicit val name: Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] =
+  implicit val name: Monad[Name] & BindRec[Name] & Comonad[Name] & Distributive[Name] & Traverse1[Name] & Zip[Name] & Unzip[Name] & Align[Name] & Cozip[Name] =
     new Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] {
       override def foldMap1[A, B: Semigroup](fa: Name[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Name[A], z: B)(f: (B, A) => B) = f(z, fa.value)
@@ -63,7 +63,7 @@ object Need {
 
   def unapply[A](x: Need[A]): Some[A] = Some(x.value)
 
-  implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
+  implicit val need: Monad[Need] & BindRec[Need] & Comonad[Need] & Distributive[Need] & Traverse1[Need] & Zip[Need] & Unzip[Need] & Align[Need] & Cozip[Need] =
     new Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] {
       override def foldMap1[A, B: Semigroup](fa: Need[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Need[A], z: B)(f: (B, A) => B) = f(z, fa.value)
@@ -97,7 +97,7 @@ object Need {
 }
 
 object Value {
-  implicit val value: Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] =
+  implicit val value: Monad[Value] & BindRec[Value] & Comonad[Value] & Distributive[Value] & Traverse1[Value] & Zip[Value] & Unzip[Value] & Align[Value] & Cozip[Value] =
     new Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] {
       override def foldMap1[A, B: Semigroup](fa: Value[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Value[A], z: B)(f: (B, A) => B) = f(z, fa.value)

@@ -25,14 +25,14 @@ trait TimeInstances {
 
   implicit val instantInstance: Order[Instant] = orderFromInt[Instant](_ compareTo _)
 
-  implicit val durationInstance: Monoid[Duration] with Order[Duration] =
+  implicit val durationInstance: Monoid[Duration] & Order[Duration] =
     new Monoid[Duration] with Order[Duration] {
       override def zero = Duration.ZERO
       override def append(f1: Duration, f2: => Duration) = f1 plus f2
       override def order(a1: Duration, a2: Duration) = Ordering.fromInt(a1 compareTo a2)
     }
 
-  implicit val periodInstance: Monoid[Period] with Equal[Period] =
+  implicit val periodInstance: Monoid[Period] & Equal[Period] =
     new Monoid[Period] with Equal[Period] {
       override def zero = Period.ZERO
       override def append(f1: Period, f2: => Period) = f1 plus f2

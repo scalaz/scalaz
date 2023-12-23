@@ -22,7 +22,7 @@ sealed trait OptionInstances1 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+  implicit val optionInstance: Traverse[Option] & MonadPlus[Option] & Alt[Option] & BindRec[Option] & Cozip[Option] & Zip[Option] & Unzip[Option] & Align[Option] & IsEmpty[Option] & Cobind[Option] & Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A): Option[A] = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -157,7 +157,7 @@ trait OptionInstances extends OptionInstances0 {
     }
   }
 
-  implicit def optionFirst[A]: Monoid[FirstOption[A]] with Band[FirstOption[A]] = new Monoid[FirstOption[A]] with Band[FirstOption[A]] {
+  implicit def optionFirst[A]: Monoid[FirstOption[A]] & Band[FirstOption[A]] = new Monoid[FirstOption[A]] with Band[FirstOption[A]] {
     def zero: FirstOption[A] = Tag(None)
 
     def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
@@ -169,7 +169,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstMonad: Monad[FirstOption] = Tags.First.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionLast[A]: Monoid[LastOption[A]] with Band[LastOption[A]] = new Monoid[LastOption[A]] with Band[LastOption[A]] {
+  implicit def optionLast[A]: Monoid[LastOption[A]] & Band[LastOption[A]] = new Monoid[LastOption[A]] with Band[LastOption[A]] {
     def zero: LastOption[A] = Tag(None)
 
     def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
@@ -181,7 +181,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastMonad: Monad[LastOption] = Tags.Last.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMin[A](implicit o: Order[A]): Monoid[MinOption[A]] with Band[MinOption[A]] = new Monoid[MinOption[A]] with Band[MinOption[A]] {
+  implicit def optionMin[A](implicit o: Order[A]): Monoid[MinOption[A]] & Band[MinOption[A]] = new Monoid[MinOption[A]] with Band[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -198,7 +198,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMinMonad: Monad[MinOption] = Tags.Min.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMax[A](implicit o: Order[A]): Monoid[MaxOption[A]] with Band[MaxOption[A]] = new Monoid[MaxOption[A]] with Band[MaxOption[A]] {
+  implicit def optionMax[A](implicit o: Order[A]): Monoid[MaxOption[A]] & Band[MaxOption[A]] = new Monoid[MaxOption[A]] with Band[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {

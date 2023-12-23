@@ -15,7 +15,7 @@ object jsPromise extends JSPromiseInstances {
   implicit def jsPromiseMonoid[A](implicit A: Monoid[A]): Monoid[js.Promise[A]] =
     Monoid.liftMonoid[js.Promise, A]
 
-  implicit val JSPromiseInstance: Nondeterminism[js.Promise] with MonadError[js.Promise, Any] with Cobind[js.Promise] =
+  implicit val JSPromiseInstance: Nondeterminism[js.Promise] & MonadError[js.Promise, Any] & Cobind[js.Promise] =
     new Nondeterminism[js.Promise] with MonadError[js.Promise, Any] with Cobind[js.Promise] {
 
       def cobind[A, B](fa: js.Promise[A])(f: js.Promise[A] => B): js.Promise[B] =

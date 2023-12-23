@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait SetInstances {
-  implicit val setInstance: Foldable[Set] with IsEmpty[Set] = new Foldable[Set] with IsEmpty[Set] with Foldable.FromFoldr[Set] with IterableSubtypeFoldable[Set] {
+  implicit val setInstance: Foldable[Set] & IsEmpty[Set] = new Foldable[Set] with IsEmpty[Set] with Foldable.FromFoldr[Set] with IterableSubtypeFoldable[Set] {
     override def length[A](fa: Set[A]) = fa.size
     def empty[A] = Set()
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
@@ -55,7 +55,7 @@ trait SetInstances {
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
 
-  implicit def setMonoid[A]: Monoid[Set[A]] with SemiLattice[Set[A]] =
+  implicit def setMonoid[A]: Monoid[Set[A]] & SemiLattice[Set[A]] =
     new Monoid[Set[A]] with SemiLattice[Set[A]] {
       def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
       def zero: Set[A] = Set[A]()

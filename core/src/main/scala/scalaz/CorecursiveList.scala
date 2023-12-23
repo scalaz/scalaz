@@ -124,9 +124,8 @@ object CorecursiveList extends CorecursiveListInstances {
     }
 
   implicit val covariantInstance:
-      MonadPlus[CorecursiveList] with Alt[CorecursiveList] with Foldable[CorecursiveList]
-      with IsEmpty[CorecursiveList] with Align[CorecursiveList]
-      with Zip[CorecursiveList] =
+      MonadPlus[CorecursiveList] & Alt[CorecursiveList] & Foldable[CorecursiveList]
+      & IsEmpty[CorecursiveList] & Align[CorecursiveList] & Zip[CorecursiveList] =
     new MonadPlus[CorecursiveList] with Alt[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
         with IsEmpty[CorecursiveList] with Align[CorecursiveList]
         with Zip[CorecursiveList] {

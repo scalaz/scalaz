@@ -100,7 +100,7 @@ object IStream {
   private[this] final val __empty = Value(_empty)
   private[this] final def nil[A]  = __empty.asInstanceOf[Name[IStream[A]]]
 
-  implicit val instances: MonadPlus[IStream] with IsEmpty[IStream] with Traverse[IStream] =
+  implicit val instances: MonadPlus[IStream] & IsEmpty[IStream] & Traverse[IStream] =
     new MonadPlus[IStream] with IsEmpty[IStream] with Traverse[IStream] {
 
       override def map[A, B](fa: IStream[A])(f: A => B): IStream[B] =

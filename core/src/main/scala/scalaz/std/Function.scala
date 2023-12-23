@@ -29,7 +29,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   // `function1Covariant[=> Any]`. In 2.11.0-M6 and above, they would infer this value.
   // Those places have been change to explicitly use this instance so that we don't see different
   // behaviour based on Scala version.
-  implicit def function1CovariantByName[T]: Monad[(=> T) => *] with BindRec[(=> T) => *] with Zip[(=> T) => *] with Unzip[(=> T) => *] with Distributive[(=> T) => *] =
+  implicit def function1CovariantByName[T]: Monad[(=> T) => *] & BindRec[(=> T) => *] & Zip[(=> T) => *] & Unzip[(=> T) => *] & Distributive[(=> T) => *] =
     new Monad[(=> T) => *] with BindRec[(=> T) => *] with Zip[(=> T) => *] with Unzip[(=> T) => *] with Distributive[(=> T) => *] {
       def point[A](a: => A): (=> T) => A = _ => a
 
@@ -58,7 +58,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit val function0Instance: Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] =
+  implicit val function0Instance: Traverse[Function0] & Monad[Function0] & BindRec[Function0] & Comonad[Function0] & Distributive[Function0] =
     new Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] {
       def point[A](a: => A) =
         () => a
@@ -102,7 +102,7 @@ trait FunctionInstances extends FunctionInstances0 {
   implicit def function0Equal[R: Equal]: Equal[() => R] =
     (a1: () => R, a2: () => R) => Equal[R].equal(a1(), a2())
 
-  implicit val function1Instance: Arrow[Function1] with Choice[Function1] with ProChoice[Function1] =
+  implicit val function1Instance: Arrow[Function1] & Choice[Function1] & ProChoice[Function1] =
     new Arrow[Function1] with Choice[Function1] with ProChoice[Function1] {
       def left[A, B, C](fa: A => B) = _.leftMap(fa)
 
@@ -126,7 +126,7 @@ trait FunctionInstances extends FunctionInstances0 {
       }
     }
 
-  implicit def function1Covariant[T]: Monad[T => *] with BindRec[T => *] with Zip[T => *] with Unzip[T => *] with Distributive[T => *] =
+  implicit def function1Covariant[T]: Monad[T => *] & BindRec[T => *] & Zip[T => *] & Unzip[T => *] & Distributive[T => *] =
     new Monad[T => *] with BindRec[T => *] with Zip[T => *] with Unzip[T => *] with Distributive[T => *] {
       def point[A](a: => A) =
         _ => a
@@ -162,7 +162,7 @@ trait FunctionInstances extends FunctionInstances0 {
         Liskov.contra[({type l[-a] = Function1[a, R]})#l, B, A](ev)(f)
     }
 
-  implicit def function2Instance[T1, T2]: Monad[(T1, T2) => *] with BindRec[(T1, T2) => *] =
+  implicit def function2Instance[T1, T2]: Monad[(T1, T2) => *] & BindRec[(T1, T2) => *] =
     new Monad[(T1, T2) => *] with BindRec[(T1, T2) => *] {
       def point[A](a: => A) =
         (_, _) => a
@@ -182,7 +182,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function3Instance[T1, T2, T3]: Monad[(T1, T2, T3) => *] with BindRec[(T1, T2, T3) => *] =
+  implicit def function3Instance[T1, T2, T3]: Monad[(T1, T2, T3) => *] & BindRec[(T1, T2, T3) => *] =
     new Monad[(T1, T2, T3) => *] with BindRec[(T1, T2, T3) => *] {
       def point[A](a: => A) =
         (_, _, _) => a
@@ -202,7 +202,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function4Instance[T1, T2, T3, T4]: Monad[(T1, T2, T3, T4) => *] with BindRec[(T1, T2, T3, T4) => *] =
+  implicit def function4Instance[T1, T2, T3, T4]: Monad[(T1, T2, T3, T4) => *] & BindRec[(T1, T2, T3, T4) => *] =
     new Monad[(T1, T2, T3, T4) => *] with BindRec[(T1, T2, T3, T4) => *] {
       def point[A](a: => A) =
         (_, _, _, _) => a
@@ -222,7 +222,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function5Instance[T1, T2, T3, T4, T5]: Monad[(T1, T2, T3, T4, T5) => *] with BindRec[(T1, T2, T3, T4, T5) => *] =
+  implicit def function5Instance[T1, T2, T3, T4, T5]: Monad[(T1, T2, T3, T4, T5) => *] & BindRec[(T1, T2, T3, T4, T5) => *] =
     new Monad[(T1, T2, T3, T4, T5) => *] with BindRec[(T1, T2, T3, T4, T5) => *] {
       def point[A](a: => A) =
         (_, _, _, _, _) => a
@@ -242,7 +242,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function6Instance[T1, T2, T3, T4, T5, T6]: Monad[(T1, T2, T3, T4, T5, T6) => *] with BindRec[(T1, T2, T3, T4, T5, T6) => *] =
+  implicit def function6Instance[T1, T2, T3, T4, T5, T6]: Monad[(T1, T2, T3, T4, T5, T6) => *] & BindRec[(T1, T2, T3, T4, T5, T6) => *] =
     new Monad[(T1, T2, T3, T4, T5, T6) => *] with BindRec[(T1, T2, T3, T4, T5, T6) => *] {
       def point[A](a: => A) =
         (_, _, _, _, _, _) => a
@@ -262,7 +262,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function7Instance[T1, T2, T3, T4, T5, T6, T7]: Monad[(T1, T2, T3, T4, T5, T6, T7) => *] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => *] =
+  implicit def function7Instance[T1, T2, T3, T4, T5, T6, T7]: Monad[(T1, T2, T3, T4, T5, T6, T7) => *] & BindRec[(T1, T2, T3, T4, T5, T6, T7) => *] =
     new Monad[(T1, T2, T3, T4, T5, T6, T7) => *] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => *] {
       def point[A](a: => A) =
         (_, _, _, _, _, _, _) => a
@@ -282,7 +282,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function8Instance[T1, T2, T3, T4, T5, T6, T7, T8]: Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => *] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => *] =
+  implicit def function8Instance[T1, T2, T3, T4, T5, T6, T7, T8]: Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => *] & BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => *] =
     new Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => *] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => *] {
       def point[A](a: => A) =
         (_, _, _, _, _, _, _, _) => a

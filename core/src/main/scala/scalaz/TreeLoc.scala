@@ -184,7 +184,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 }
 
 sealed abstract class TreeLocInstances {
-  implicit val treeLocInstance: Comonad[TreeLoc] with Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
+  implicit val treeLocInstance: Comonad[TreeLoc] & Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
 
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 

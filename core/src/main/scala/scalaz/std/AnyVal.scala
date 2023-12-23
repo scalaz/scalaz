@@ -8,7 +8,7 @@ import Id._
 
 trait AnyValInstances {
 
-  implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
+  implicit val unitInstance: Monoid[Unit] & Enum[Unit] & Show[Unit] & SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
     override def show(f: Unit): Cord = Cord()
     override def shows(f: Unit): String = ().toString
 
@@ -63,7 +63,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] {
+  implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] & Enum[Boolean @@ Disjunction] & Band[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(Tag.unwrap(f1) || Tag.unwrap(f2))
 
     def zero: Boolean @@ Disjunction = Disjunction(false)
@@ -104,7 +104,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] with Band[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] with Band[Boolean @@ Conjunction] {
+  implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] & Enum[Boolean @@ Conjunction] & Band[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] with Band[Boolean @@ Conjunction] {
     def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Conjunction(Tag.unwrap(f1) && Tag.unwrap(f2))
 
     def zero: Boolean @@ Conjunction = Conjunction(true)
@@ -145,7 +145,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
+  implicit val byteInstance: Monoid[Byte] & Enum[Byte] & Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
     override def show(f: Byte): Cord = Cord(shows(f))
     override def shows(f: Byte) = f.toString
 
@@ -167,7 +167,7 @@ trait AnyValInstances {
 
   import Tags.Multiplication
 
-  implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
+  implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] & Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toByte)
 
     def zero: Byte @@ Multiplication = Multiplication(1)
@@ -190,7 +190,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
+  implicit val char: Monoid[Char] & Enum[Char] & Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
     override def show(f: Char): Cord = Cord(shows(f))
     override def shows(f: Char) = f.toString
 
@@ -210,7 +210,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
+  implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] & Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) = Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toChar)
 
     def zero: Char @@ Multiplication = Multiplication(1)
@@ -232,7 +232,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortInstance: Monoid[Short] with Enum[Short] with Show[Short] = new Monoid[Short] with Enum[Short] with Show[Short] {
+  implicit val shortInstance: Monoid[Short] & Enum[Short] & Show[Short] = new Monoid[Short] with Enum[Short] with Show[Short] {
     override def show(f: Short): Cord = Cord(shows(f))
     override def shows(f: Short) = f.toString
 
@@ -252,7 +252,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
+  implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] & Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) = Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toShort)
 
     def zero: Short @@ Multiplication = Multiplication(1)
@@ -272,7 +272,7 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(Tag.unwrap(a1), Tag.unwrap(a2))
   }
 
-  implicit val intInstance: Monoid[Int] with Enum[Int] with Show[Int] = new Monoid[Int] with Enum[Int] with Show[Int] {
+  implicit val intInstance: Monoid[Int] & Enum[Int] & Show[Int] = new Monoid[Int] with Enum[Int] with Show[Int] {
     override def show(f: Int): Cord = Cord(shows(f))
     override def shows(f: Int) = f.toString
 
@@ -292,7 +292,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
+  implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] & Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) = Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
 
     def zero: Int @@ Multiplication = Multiplication(1)
@@ -328,7 +328,7 @@ trait AnyValInstances {
       unfoldlSumOpt[S](s)(f(_) map (_.swap))
   }
 
-  implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
+  implicit val longInstance: Monoid[Long] & Enum[Long] & Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
     override def show(f: Long): Cord = Cord(shows(f))
     override def shows(f: Long) = f.toString
 
@@ -348,7 +348,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
+  implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] & Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) = Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
 
     def zero: Long @@ Multiplication = Multiplication(1)
@@ -368,7 +368,7 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(Tag.unwrap(a1), Tag.unwrap(a2))
   }
 
-  implicit val floatInstance: Order[Float] with Show[Float] = new Order[Float] with Show[Float] {
+  implicit val floatInstance: Order[Float] & Show[Float] = new Order[Float] with Show[Float] {
     override def show(f: Float): Cord = Cord(shows(f))
     override def shows(f: Float) = f.toString
 
@@ -377,7 +377,7 @@ trait AnyValInstances {
     def order(x: Float, y: Float) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit val doubleInstance: Order[Double] with Show[Double] = new Order[Double] with Show[Double] {
+  implicit val doubleInstance: Order[Double] & Show[Double] = new Order[Double] with Show[Double] {
     override def show(f: Double): Cord = Cord(shows(f))
     override def shows(f: Double) = f.toString
 

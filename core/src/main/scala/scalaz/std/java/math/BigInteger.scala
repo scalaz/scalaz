@@ -4,7 +4,7 @@ package std.java.math
 import java.math.BigInteger
 
 trait BigIntegerInstances {
-  implicit val bigIntegerInstance: Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
+  implicit val bigIntegerInstance: Monoid[BigInteger] & Enum[BigInteger] & Show[BigInteger] = new Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
     override def show(f: BigInteger): Cord = Cord(shows(f))
     override def shows(f: BigInteger): String = f.toString
 
@@ -28,7 +28,7 @@ trait BigIntegerInstances {
 
   import Tags.Multiplication
 
-  implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
+  implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] & Order[BigInteger @@ Multiplication] & Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
     override def show(f: BigInteger @@ Multiplication): Cord = Cord(shows(f))
     override def shows(f: BigInteger @@ Multiplication): String = f.toString
 

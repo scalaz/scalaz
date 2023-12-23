@@ -515,7 +515,7 @@ abstract class StreamT[M[_], A] { self =>
 sealed abstract class StreamTInstances0 {
   implicit def StreamTInstance1[F[_]](implicit
       F0: Functor[F]
-  ): Bind[StreamT[F, *]] with Plus[StreamT[F, *]] =
+  ): Bind[StreamT[F, *]] & Plus[StreamT[F, *]] =
     new StreamTInstance1[F] {
       implicit def F: Functor[F] = F0
     }

@@ -257,7 +257,7 @@ sealed abstract class FreeTInstances1 extends FreeTInstances2 {
 }
 
 sealed abstract class FreeTInstances0 extends FreeTInstances1 {
-  implicit def freeTMonad[S[_], M[_]](implicit M0: Applicative[M]): Monad[FreeT[S, M, *]] with BindRec[FreeT[S, M, *]] =
+  implicit def freeTMonad[S[_], M[_]](implicit M0: Applicative[M]): Monad[FreeT[S, M, *]] & BindRec[FreeT[S, M, *]] =
     new FreeTMonad[S, M] {
       def M = M0
     }
@@ -271,7 +271,7 @@ sealed abstract class FreeTInstances0 extends FreeTInstances1 {
 }
 
 sealed abstract class FreeTInstances extends FreeTInstances0 {
-  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, *]] with Alt[FreeT[S, M, *]] =
+  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, *]] & Alt[FreeT[S, M, *]] =
     new MonadPlus[FreeT[S, M, *]] with Alt[FreeT[S, M, *]] with FreeTPlus[S, M] with FreeTMonad[S, M] {
       override def M = implicitly
       override def M1 = implicitly

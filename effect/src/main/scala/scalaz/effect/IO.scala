@@ -137,7 +137,7 @@ sealed abstract class IOInstances1 {
 
   implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
 
-  implicit val ioMonad: Monad[IO] with BindRec[IO] = new IOMonad {}
+  implicit val ioMonad: Monad[IO] & BindRec[IO] = new IOMonad {}
 }
 
 sealed abstract class IOInstances0 extends IOInstances1 {

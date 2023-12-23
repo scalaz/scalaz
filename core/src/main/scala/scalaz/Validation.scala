@@ -513,7 +513,7 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Optional[Validation[L, *]] =
+  implicit def ValidationInstances1[L]: Traverse[Validation[L, *]] & Cozip[Validation[L, *]] & Optional[Validation[L, *]] =
     new Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Optional[Validation[L, *]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
@@ -561,7 +561,7 @@ sealed abstract class ValidationInstances3 {
         fab.bitraverse(f, g)
     }
 
-  implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, *], L] with Alt[Validation[L, *]] =
+  implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, *], L] & Alt[Validation[L, *]] =
     new ApplicativeError[Validation[L, *], L] with Alt[Validation[L, *]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f

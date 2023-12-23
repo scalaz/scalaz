@@ -12,7 +12,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance: Traverse[List] with MonadPlus[List] with Alt[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
+  implicit val listInstance: Traverse[List] & MonadPlus[List] & Alt[List] & BindRec[List] & Zip[List] & Unzip[List] & Align[List] & IsEmpty[List] & Cobind[List] =
     new Traverse[List] with MonadPlus[List] with Alt[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] with Functor.OverrideWiden[List] {
 
       override def point[A](a: => A): List[A] =
