@@ -35,7 +35,7 @@ object GenerateTupleW {
         n => n.alpha2
       }
       val mapallParams = mapMkString {
-        n => s"${n.element}: (${n.alpha} => ${n.alpha2}) = identity[${n.alpha}] _"
+        n => s"${n.element}: (${n.alpha} => ${n.alpha2}) = identity[${n.alpha}]"
       }
       val mapallApply = mapMkString {
         n => s"${n.element}(value.${n.element})"
