@@ -74,7 +74,7 @@ object Show {
       * @note the name of this method is meant to pun on `s` being Scala's
       *       basic string interpolator, whereas this is Scalaz's.
       */
-    def z(args: Shows*): String = sc.s(args: _*)
+    def z(args: Shows*): String = sc.s(args *)
 
   }
   ////

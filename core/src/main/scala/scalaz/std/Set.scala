@@ -47,8 +47,8 @@ trait SetInstances {
       else {
         implicit val x: scala.Ordering[A] = Order[A].toScalaOrdering
         import scala.collection.immutable.TreeSet
-        val s1 = TreeSet[A](a1.toSeq: _*)
-        val s2 = TreeSet[A](a2.toSeq: _*)
+        val s1 = TreeSet[A](a1.toSeq *)
+        val s2 = TreeSet[A](a2.toSeq *)
         s1.iterator.corresponds(s2.iterator)(Order[A].equal)
       }
     }

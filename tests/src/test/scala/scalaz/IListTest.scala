@@ -376,7 +376,7 @@ object IListTest extends SpecLite {
   }
 
   "toEphemeralStream" ! forAll { (ns: List[Int]) =>
-    IList.fromSeq(ns).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
+    IList.fromSeq(ns).toEphemeralStream.toList must_=== EphemeralStream(ns *).toList
   }
 
   "toList" ! forAll { (ns: List[Int]) =>
@@ -384,7 +384,7 @@ object IListTest extends SpecLite {
   }
 
   "toMap" ! forAll { (ps: List[(String, Int)]) =>
-    IList.fromSeq(ps).toMap must_=== ==>>(ps: _*)
+    IList.fromSeq(ps).toMap must_=== ==>>(ps *)
   }
 
   "toNel" ! forAll { (ns: List[Int]) =>
