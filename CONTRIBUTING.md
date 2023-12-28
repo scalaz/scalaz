@@ -57,39 +57,41 @@ autocompletion, and avoids unneeded indirection in cases when abstraction is not
 
 Define type class instances in the same files as the data structure. Type class instance is described in more detail separately.
 
-    sealed abstract class MyDataStructure[A] {
-       final def map[B](f: A => B): F[B] = ...
-       final def flatMap[B](f: A => F[B]): F[B] = ...
-    }
+```scala
+sealed abstract class MyDataStructure[A] {
+  final def map[B](f: A => B): F[B] = ...
+  final def flatMap[B](f: A => F[B]): F[B] = ...
+}
 
-    object MyDataStructure extends MyDataStructureInstances with MyDataStructureFunctions {
-       // Define type aliases in the companion directly; avoids fights with the compiler later.
-       type MDS[A] = MyDataStructure[A]
+object MyDataStructure extends MyDataStructureInstances with MyDataStructureFunctions {
+  // Define type aliases in the companion directly; avoids fights with the compiler later.
+  type MDS[A] = MyDataStructure[A]
 
-       // apply method not suitable for mixing, define directly in the companion.
-       def apply[A](a: A): MyDataStructure[A] = ...
-    }
+  // apply method not suitable for mixing, define directly in the companion.
+  def apply[A](a: A): MyDataStructure[A] = ...
+}
 
-    // described separately.
-    sealed abstract class MyDataStructureInstances {
-       import MyDataStructure._
-       type MDS[X] = MyDataStructure
+// described separately.
+sealed abstract class MyDataStructureInstances {
+  import MyDataStructure._
+  type MDS[X] = MyDataStructure
 
-       implicit object mdsMonad extends Monad[MDS] {
-          def point[A](a: => A) = MDS(a)
+  implicit val mdsMonad: Monad[MDS] = new Monad[MDS] {
+    def point[A](a: => A) = MDS(a)
 
-          def bind[A, B](fa: MDS[A])(f: A => MDS[B]) = fa flatMap f // delegate
+    def bind[A, B](fa: MDS[A])(f: A => MDS[B]) = fa flatMap f // delegate
 
-          // override to use directly call map
-          override def map[A, B](fa: MDS[A])(f: A => B) = fa map f // delegate
-       }
-    }
+    // override to use directly call map
+    override def map[A, B](fa: MDS[A])(f: A => B) = fa map f // delegate
+  }
+}
 
-    // Design to allow the user to mix these functions into an object
-    trait MyDataStructureFunctions {
-        final def emptyMds[A]: MyDataStructure[A] = ...
-    }
-    
+// Design to allow the user to mix these functions into an object
+trait MyDataStructureFunctions {
+  final def emptyMds[A]: MyDataStructure[A] = ...
+}
+```
+
 ### Variance
 
 Avoid using variant type parameters in defining data structures, even if they
