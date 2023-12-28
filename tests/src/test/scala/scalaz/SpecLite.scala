@@ -31,13 +31,13 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
   private var context: String = ""
 
   implicit protected[this] class StringOps(s: String) {
-    def should[A](a: => Any): Unit = {
+    infix def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 
-    def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = Prop { prms =>
+    infix def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = Prop { prms =>
       ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
     }
   }
@@ -69,7 +69,7 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
         fail(koMessage)
     }
 
-    def and[B](b: => B): B = {
+    infix def and[B](b: => B): B = {
       actual
       b
     }
