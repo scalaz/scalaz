@@ -125,7 +125,6 @@ object build {
         }
       }
     },
-    scala213_pre_cross_setting
   )
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
@@ -345,19 +344,6 @@ object build {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
-
-  private[this] val scala213_pre_cross_setting = {
-    // sbt wants `scala-2.13.0-M1`, `scala-2.13.0-M2`, ... (sbt/sbt#2819)
-    // @fommil tells me we could use sbt-sensible for this
-    (Compile / unmanagedSourceDirectories) ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2L, minor)) =>
-          Some((Compile / baseDirectory).value.getParentFile / s"src/main/scala-2.$minor")
-        case _               =>
-          None
-      }
-    }
-  }
 
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
