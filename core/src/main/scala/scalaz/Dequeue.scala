@@ -7,7 +7,7 @@ package scalaz
   * A queue that allows items to be put onto either the front (cons)
   * or the back (snoc) of the queue in constant time, and constant
   * time access to the element at the very front or the very back of
-  * the queue.  Dequeueing an element from either end is constant time
+  * the queue.  Dequeuing an element from either end is constant time
   * when amortized over a number of dequeues.
   *
   * This queue maintains an invariant that whenever there are at least

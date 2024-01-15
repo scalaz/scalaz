@@ -28,7 +28,7 @@ case object B extends Token
 
 object Token {
 
-  implicit val euqalsRef: Equal[Token] = Equal.equalRef
+  implicit val equalsRef: Equal[Token] = Equal.equalRef
   implicit val showTok: Show[Token] = {
     case A => Cord("A")
     case B => Cord("B")

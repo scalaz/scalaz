@@ -49,14 +49,14 @@ trait Apply[F[_]] extends Functor[F] { self =>
     f(seed) map { case (fa, s) => go(map(fa)(R.unit), s) }
   }
 
-  /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
+  /**The composition of `Apply`s `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
     new CompositionApply[F, G] {
       override def F = self
       override def G = G0
     }
 
-  /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
+  /**The product of `Apply`s `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
   def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] =
     new ProductApply[F, G] {
       override def F = self
