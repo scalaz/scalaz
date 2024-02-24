@@ -336,7 +336,7 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    kindProjectorVersion := "0.13.2",
+    kindProjectorVersion := "0.13.3",
     libraryDependencies ++= {
       if (scalaBinaryVersion.value == "3") {
         Nil
