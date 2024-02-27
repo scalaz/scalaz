@@ -143,7 +143,7 @@ object build {
 
   private def Scala212 = "2.12.18"
   private def Scala213 = "2.13.13"
-  private def Scala3 = "3.1.0"
+  private def Scala3 = "3.1.3"
 
   private[this] val buildInfoPackageName = "scalaz"
 
