@@ -29,6 +29,7 @@ jobs:
         distribution: adopt
     - uses: coursier/cache-action@v6
     - run: ./sbt -v
+           -Dcheck_build_file_imports
            checkGenTypeClasses
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
            "project ${{ matrix.project }}"

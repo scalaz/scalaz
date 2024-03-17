@@ -26,6 +26,12 @@ if (sys.env.isDefinedAt("GITHUB_ACTION")) {
 semanticdbEnabled := true
 
 Global / onLoad := { state1 =>
-  val state2 = Project.extract(state1).runInputTask(Compile / scalafix, " OrganizeImports --check", state1)._1
+  val state2 = {
+    if (sys.props.isDefinedAt("check_build_file_imports")) {
+      Project.extract(state1).runInputTask(Compile / scalafix, " OrganizeImports --check", state1)._1
+    } else {
+      state1
+    }
+  }
   (Global / onLoad).value.apply(state2)
 }
