@@ -1,25 +1,18 @@
-import sbt._
-import Keys._
-
-import GenTypeClass._
-
+import GenTypeClass.*
+import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishLocalSigned
+import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishSigned
 import java.awt.Desktop
-
-import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations._
-import sbtrelease.Utilities._
-
-import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
-
-import sbtbuildinfo.BuildInfoPlugin.autoImport._
-
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
-import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
-import sbtcrossproject.CrossPlugin.autoImport._
-
-import xerial.sbt.Sonatype.autoImport._
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport.*
+import sbt.*
+import sbt.Keys.*
+import sbtbuildinfo.BuildInfoPlugin.autoImport.*
+import sbtcrossproject.CrossPlugin.autoImport.*
+import sbtrelease.ReleasePlugin.autoImport.*
+import sbtrelease.ReleaseStateTransformations.*
+import sbtrelease.Utilities.*
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport.*
+import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport.*
+import xerial.sbt.Sonatype.autoImport.*
 
 object build {
   type Sett = Def.Setting[_]

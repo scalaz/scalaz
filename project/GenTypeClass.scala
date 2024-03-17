@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 case class TypeClass(
   name: String,
