@@ -1,7 +1,7 @@
 scalacOptions += "-deprecation"
 
 addSbtPlugin("com.47deg" % "sbt-microsites" % "1.4.4")
-addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.12.0")
 addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.5.0")
 addSbtPlugin("com.github.sbt" % "sbt-release" % "1.4.0")
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.2.1")
