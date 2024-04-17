@@ -151,7 +151,7 @@ lazy val scalacheckBinding =
     .settings(
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.0",
       osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
@@ -175,7 +175,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       )
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
+  )
   .nativeSettings(
     nativeSettings,
   )
