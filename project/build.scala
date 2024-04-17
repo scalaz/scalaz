@@ -62,8 +62,6 @@ object build {
     reapply(Seq(ThisBuild / scalazMimaBasis := releaseV), st)
   }
 
-  val scalaCheckVersion_1_15 = SettingKey[String]("scalaCheckVersion_1_15")
-  val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -189,15 +187,6 @@ object build {
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_15 := {
-      scalaBinaryVersion.value match {
-        case "3" =>
-          "1.16.0"
-        case _ =>
-          "1.15.2"
-      }
-    },
-    scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",

@@ -163,7 +163,7 @@ lazy val exampleNative = example.native
 def scalacheckBindingProject(
   id: String,
   base: String,
-  scalacheckVersion: SettingKey[String],
+  scalacheckVersion: String,
   versionSuffix: String,
   platforms: Seq[Platform]
 ) = {
@@ -186,7 +186,7 @@ def scalacheckBindingProject(
       (Compile / unmanagedSourceDirectories) += {
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/src/main/scala"
       },
-      libraryDependencies += scalaCheckGroupId.value %%% "scalacheck" % scalacheckVersion.value,
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion,
       osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
@@ -231,7 +231,7 @@ def scalacheckBindingProject(
 lazy val scalacheckBinding_1_15 = scalacheckBindingProject(
   id = "scalacheck-binding_1_15",
   base = "scalacheck-binding_1_15",
-  scalacheckVersion = scalaCheckVersion_1_15,
+  scalacheckVersion = "1.18.0",
   versionSuffix = "1.15",
   platforms = Seq(JVMPlatform, JSPlatform, NativePlatform)
 )
