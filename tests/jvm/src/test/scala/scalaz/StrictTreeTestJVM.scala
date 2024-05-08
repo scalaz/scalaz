@@ -44,7 +44,7 @@ object StrictTreeTestJVM extends SpecLite {
 
   "deep scanr should not cause a stack overflow" ! {
     def f(a: Int, b: Seq[StrictTree[Int]]): Int = a + b.size
-    deepTree.scanr[Int](f _)
+    deepTree.scanr[Int](f)
     true
   }
 

@@ -61,6 +61,6 @@ trait IsomorphismCozip[F[_], G[_]] extends Cozip[F] {
   def iso: F <~> G
 
   def cozip[A, B](x: F[A \/ B]): (F[A] \/ F[B]) =
-    G.cozip(iso.to(x)).bimap(iso.from.apply _, iso.from.apply _)
+    G.cozip(iso.to(x)).bimap(iso.from.apply, iso.from.apply)
   ////
 }

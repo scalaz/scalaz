@@ -489,7 +489,7 @@ object ScalazArbitrary {
         )(deep[V, A](_, _, _))
       }
     }
-    Gen.sized(fingerTree[A] _)
+    Gen.sized(fingerTree[A])
   }
 
   implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)

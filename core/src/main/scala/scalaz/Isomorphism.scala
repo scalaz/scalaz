@@ -60,8 +60,8 @@ sealed abstract class Isomorphisms {
       GF: Arr[G, F] <~< (G ~~> F)
     ): F[A, B] <=> G[A, B] =
       new (F[A, B] <=> G[A, B]){
-        def from = GF(self.from).apply _
-        def to   = FG(self.to).apply _
+        def from = GF(self.from).apply
+        def to   = FG(self.to).apply
       }
 
     def unlift1[A](implicit
@@ -191,8 +191,8 @@ trait IsomorphismAssociative[F[_, _], G[_, _]] extends Associative[F] {
   def iso: F <~~> G
 
   override def reassociateLeft[A, B, C](f: F[A, F[B, C]]): F[F[A, B], C] =
-    iso.from(G.leftMap(G.reassociateLeft(G.rightMap(iso.to(f))(iso.to.apply _)))(iso.from.apply _))
+    iso.from(G.leftMap(G.reassociateLeft(G.rightMap(iso.to(f))(iso.to.apply)))(iso.from.apply))
 
   override def reassociateRight[A, B, C](f: F[F[A, B], C]): F[A, F[B, C]] =
-    iso.from(G.rightMap(G.reassociateRight(G.leftMap(iso.to(f))(iso.to.apply _)))(iso.from.apply _))
+    iso.from(G.rightMap(G.reassociateRight(G.leftMap(iso.to(f))(iso.to.apply)))(iso.from.apply))
 }

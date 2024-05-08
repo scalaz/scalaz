@@ -7,7 +7,7 @@ object SemigroupTest extends SpecLite {
     import InvariantFunctorTest._
     import syntax.invariantFunctor._
 
-    val sg: Semigroup[Num] = Semigroup[Int].xmap[Num](Num.apply _, _.x)
+    val sg: Semigroup[Num] = Semigroup[Int].xmap[Num](Num.apply, _.x)
     sg.append(Num(1), Num(2)) must_===(Num(3))
   }
 }

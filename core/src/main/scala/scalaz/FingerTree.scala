@@ -485,7 +485,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
          (v, pr, m, sf) => {
            //F.ap(traverseFinger(sf)(f))(F.ap(m.traverseTree(n => traverseNode(n)(f)))(F.map(traverseFinger(pr)(f))(pr => mkDeep(pr)_)))
            //the implementation below seems most efficient. The straightforward implementation using F.map3 leads to an explosion of traverseTree calls
-           val fmap2 = F.apply2(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b)_)
+           val fmap2 = F.apply2(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b))
            F.ap(traverseFinger(sf)(f))(fmap2)
         })
   }
@@ -494,7 +494,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     def mkNode(x: B)(y: B)(z: B): Node[V2, B] = node3(x, y, z)
     node.fold((v, a, b) => F.apply2(f(a), f(b))((x, y) => node2(x, y)),
         (v, a, b, c) =>  {
-          F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkNode(x)_)))
+          F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkNode(x))))
         }
     )
   }
@@ -505,9 +505,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     def mkFour(w: B)(x: B)(y: B)(z: B): Finger[V2, B] = four(w, x, y, z)
     digit match {
       case One(v, a) => F.map(f(a))(x => one(x))
-      case Two(v, a, b) => F.ap(f(b))(F.map(f(a))(x => mkTwo(x)_))
-      case Three(v, a, b, c) => F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkThree(x)_)))
-      case Four(v, a, b, c, d) => F.ap(f(d))(F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkFour(x)_))))
+      case Two(v, a, b) => F.ap(f(b))(F.map(f(a))(x => mkTwo(x)))
+      case Three(v, a, b, c) => F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkThree(x))))
+      case Four(v, a, b, c, d) => F.ap(f(d))(F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkFour(x)))))
     }
   }
 
