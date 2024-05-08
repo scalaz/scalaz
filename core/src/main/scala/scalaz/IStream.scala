@@ -197,7 +197,7 @@ object IStream {
       }
     }
 
-    loop _
+    loop
   }
 
 }

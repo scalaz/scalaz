@@ -138,9 +138,9 @@ object ContravariantCoyonedaUsage {
     // type of that list of sort key functions and indexes is:
 
     val untypedSortKeys: List[(String => java.io.Serializable, Int)] =
-      List((caseInsensitively _, 0),
-           (parseDate _, 1),
-           (parseCommaNum _, 2))
+      List((caseInsensitively, 0),
+           (parseDate, 1),
+           (parseCommaNum, 2))
 
     // The problem is that the return type for each sort key is different,
     // and is an absolutely essential part of the sort process.  Check

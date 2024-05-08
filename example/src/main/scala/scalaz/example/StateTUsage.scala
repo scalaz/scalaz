@@ -82,7 +82,7 @@ object LaunchburyInterpreter {
   // Substitute new variable names in
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
   private def sub(m: IMap[String, String])(e: Expr): Expr = {
-    val subExpr = sub(m) _
+    val subExpr = sub(m)
     def subName(n: String) : String = m lookup n getOrElse n
     e match {
       case Lambda(z, e2) => Lambda(subName(z), subExpr(e2))
@@ -113,7 +113,7 @@ object LaunchburyInterpreter {
                                   // IList[((originalVar, Expr), freshVar)]
                                   newBindings = bs.toIList.zip(fs)
                                   // sub(Map(originalVar -> freshVar))
-                                  subs = sub( newBindings.map(tpl => tpl.copy(_1 = tpl._1._1)).toMap ) _
+                                  subs = sub( newBindings.map(tpl => tpl.copy(_1 = tpl._1._1)).toMap )
                                   // List[freshVar, Expr] - change to map when dolio's done
                                   bs2 = newBindings.map(tpl => tpl.copy(_1 = tpl._2, _2 = tpl._1._2)).toIList
                                   e3 <- freshen( subs(e2) )

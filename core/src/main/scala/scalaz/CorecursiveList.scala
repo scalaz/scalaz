@@ -144,7 +144,7 @@ object CorecursiveList extends CorecursiveListInstances {
               orElse ff.step(sf).flatMap(st => bstep(fa.init, just(st))))
         }
         CorecursiveList((fa.init, Empty(): Maybe[(ff.S, A => B)])
-                      )((bstep _).tupled)
+                      )(bstep.tupled)
       }
 
       override def bind[A, B](fa: CorecursiveList[A])(f: A => CorecursiveList[B]) = {

@@ -75,7 +75,7 @@ object ApplyUsage {
 
     def add8(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int) = a+b+c+d+e+f+g+h
     val someOf8Options = (1.some |@| 2.some |@| 3.some |@| 4.some |@|
-                          5.some |@| 6.some |@| 7.some |@| 8.some)(add8 _)
+                          5.some |@| 6.some |@| 7.some |@| 8.some)(add8)
     assert(someOf8Options === 36.some)
 
     // the applicative builder created by |@| also has a "tupled" method
