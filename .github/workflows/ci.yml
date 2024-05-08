@@ -22,6 +22,10 @@ jobs:
             scala: 2
             project: rootJVM
     steps:
+    - uses: catchpoint/workflow-telemetry-action@94c3c3d9567a0205de6da68a76c428ce4e769af1 # v2.0.0
+      with:
+        comment_on_pr: false
+        theme: 'dark'
     - uses: actions/checkout@v4
     - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
       with:
