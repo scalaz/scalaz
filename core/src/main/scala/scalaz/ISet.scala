@@ -427,7 +427,7 @@ sealed abstract class ISet[A] {
     * When `Order` instances are viewed as "mere" equivalences (as opposed
     * to equalities), we can loosely say that `ISet` is an (endo-)functor
     * in the category _Equiv_ of sets with an equivalence relation (where
-    * the morphishms are equivalence-preserving functions, i.e. exactly the
+    * the morphisms are equivalence-preserving functions, i.e. exactly the
     * functions satisfying the above requirement). By contrast, [[Functor]]
     * instances are functors in the _Scala_ category, whose morphisms are
     * arbitrary functions, including the ones that don't preserve equivalence.

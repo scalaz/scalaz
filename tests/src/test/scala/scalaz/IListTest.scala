@@ -446,7 +446,7 @@ object IListTest extends SpecLite {
     def order[A: Order] = Order[IList[A]]
     def monoid[A] = Monoid[IList[A]]
     def monadPlus = MonadPlus[IList]
-    def bindrec = BindRec[IList]
+    def bindRec = BindRec[IList]
     def traverse = Traverse[IList]
     def zip = Zip[IList]
     def align = Align[IList]

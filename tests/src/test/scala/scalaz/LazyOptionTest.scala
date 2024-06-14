@@ -35,7 +35,7 @@ object LazyOptionTest extends SpecLite {
     def equal[A: Equal] = Equal[LazyOption[A]]
     def monadPlus = MonadPlus[LazyOption]
     def alt = Alt[LazyOption]
-    def bindrec = BindRec[LazyOption]
+    def bindRec = BindRec[LazyOption]
     def cobind = Cobind[LazyOption]
     def traverse = Traverse[LazyOption]
     def zip = Zip[LazyOption]

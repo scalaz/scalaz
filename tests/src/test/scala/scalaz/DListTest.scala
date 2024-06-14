@@ -38,7 +38,7 @@ object DListTest extends SpecLite {
     def monoid[A] = Monoid[DList[A]]
     def monadPlus = MonadPlus[DList]
     def alt = Alt[DList]
-    def bindrec = BindRec[DList]
+    def bindRec = BindRec[DList]
     def traverse = Traverse[DList]
     def zip = Zip[DList]
     def isEmpty = IsEmpty[DList]
