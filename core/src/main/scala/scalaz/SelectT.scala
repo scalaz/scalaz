@@ -63,7 +63,7 @@ sealed abstract class SelectTInstances3 extends SelectTInstances4 {
 
 sealed abstract class SelectTInstances2 extends SelectTInstances3 {
   implicit def selectMonad[R]: Monad[Select[R, *]] =
-    SelectT.selectTMonad[R, Id](Id.id)
+    SelectT.selectTMonad[R, Id](using Id.id)
 }
 
 sealed abstract class SelectTInstances1 extends SelectTInstances2 {

@@ -269,12 +269,12 @@ object EitherT extends EitherTInstances {
 
   private[scalaz] final class EitherTLeft[B](private val dummy: Boolean) extends AnyVal {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.A, F.M, B] =
-      leftT[F.A, F.M, B](F(fa))(F.TC)
+      leftT[F.A, F.M, B](F(fa))(using F.TC)
   }
 
   private[scalaz] final class EitherTRight[A](private val dummy: Boolean) extends AnyVal {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[A, F.M, F.A] =
-      rightT[A, F.M, F.A](F(fb))(F.TC)
+      rightT[A, F.M, F.A](F(fb))(using F.TC)
   }
 
   /** Construct a disjunction value from a standard `scala.Either`. */

@@ -7,7 +7,7 @@ trait MonadTrans[F[_[_], _]] {
 
   /** A version of `liftM` that infers the type constructor `G`. */
   final def liftMU[GA](a: GA)(implicit G: Unapply[Monad, GA]): F[G.M, G.A] =
-    liftM[G.M, G.A](G(a))(G.TC)
+    liftM[G.M, G.A](G(a))(using G.TC)
 
   def wrapEffect[G[_]: Monad, A](a: G[F[G, A]]): F[G, A] =
     apply[G].join(liftM(a))

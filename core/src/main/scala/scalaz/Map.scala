@@ -966,7 +966,7 @@ sealed abstract class ==>>[A, B] {
   override final def equals(other: Any): Boolean =
     other match {
       case that: ==>>[A, B] =>
-        ==>>.mapEqual[A, B](Equal.equalA, Equal.equalA).equal(this, that)
+        ==>>.mapEqual[A, B](using Equal.equalA, Equal.equalA).equal(this, that)
       case _ =>
         false
     }

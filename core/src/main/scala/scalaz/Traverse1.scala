@@ -60,7 +60,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
     G.map(sequence1(fgfa))(F.join)
 
   final def sequence1U[GA](fga: F[GA])(implicit G: Unapply[Apply, GA]): G.M[F[G.A]] =
-    sequence1(G.leibniz.subst(fga))(G.TC)
+    sequence1(G.leibniz.subst(fga))(using G.TC)
 
   trait Traverse1Law extends TraverseLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to

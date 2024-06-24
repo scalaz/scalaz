@@ -227,7 +227,8 @@ object Diev extends DievInstances {
 sealed abstract class DievInstances extends DievImplementation {
   import std.tuple._, std.vector._
 
-  implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
+  implicit def dievEqual[A: Equal]: Equal[Diev[A]] =
+    Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(using std.vector.vectorEqual[(A, A)])
 
   implicit def dievMonoid[A: Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
     def append(f1: Diev[A], f2: => Diev[A]) = f1 ++ f2

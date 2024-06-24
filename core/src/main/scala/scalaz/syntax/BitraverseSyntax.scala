@@ -8,7 +8,7 @@ final class BitraverseOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
       F.bitraverseImpl(self)(f, g)
 
   final def bitraverseU[GC, GD](f: A => GC, g: B => GD)(implicit G1: UnapplyProduct[Applicative, GC, GD]): G1.M[F[G1.A, G1.B]] =
-      F.bitraverseImpl(self)(a => G1._1(f(a)), b => G1._2(g(b)))(G1.TC)
+      F.bitraverseImpl(self)(a => G1._1(f(a)), b => G1._2(g(b)))(using G1.TC)
 
 
   final def bisequence[G[_], A1, B1](implicit G: Applicative[G], eva: A === G[A1], evb: B === G[B1]): G[F[A1, B1]] =

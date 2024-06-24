@@ -34,7 +34,7 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
   // impls of sequence, traverse, etc
 
   def traverse[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse[G]): F[G[B]] =
-    G.traverse(value)(f)(this)
+    G.traverse(value)(f)(using this)
 
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
     traverse(as)(a => a)
@@ -64,7 +64,7 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
 
   /** Performs the action `n` times, returning the list of results. */
   def replicateM[A](n: Int, fa: F[A]): F[IList[A]] =
-    Traverse[IList].sequence(IList.fill(n)(fa))(this)
+    Traverse[IList].sequence(IList.fill(n)(fa))(using this)
 
   /** Performs the action `n` times, returning nothing. */
   def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
