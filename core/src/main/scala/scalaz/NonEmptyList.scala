@@ -165,7 +165,8 @@ object NonEmptyList extends NonEmptyListInstances {
 }
 
 sealed abstract class NonEmptyListInstances0 {
-  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], IList[A]](_.list)(IList.equal[A])
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] =
+    Equal.equalBy[NonEmptyList[A], IList[A]](_.list)(using IList.equal[A])
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
@@ -264,5 +265,5 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
     Contravariant[Show].contramap(IList.show[A])(_.list)
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
-    Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
+    Order.orderBy[NonEmptyList[A], IList[A]](_.list)(using IList.order[A])
 }

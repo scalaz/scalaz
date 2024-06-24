@@ -115,7 +115,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     G.map(sequence(fgfa))(F.join)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
-    traversal[Id](Id.id).run(fa)(f)
+    traversal[Id](using Id.id).run(fa)(f)
 
   def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (B, F[Unit]) =
     runTraverseS(fa, z)(a => State.modify(f(_, a)))
@@ -170,7 +170,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
                                                (implicit N: Applicative[N], M: Applicative[M], MN: Equal[M[N[F[C]]]]): Boolean = {
       type MN[A] = M[N[A]]
       val t1: MN[F[C]] = M.map(traverse[M, A, B](fa)(amb))(fb => traverse[N, B, C](fb)(bnc))
-      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
+      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(using M compose N)
       MN.equal(t1, t2)
     }
 
@@ -196,7 +196,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
                                         (implicit N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {
       type MN[A] = (M[A], N[A])
       val t1: MN[F[B]] = (traverse[M, A, B](fa)(amb), traverse[N, A, B](fa)(anb))
-      val t2: MN[F[B]] = traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
+      val t2: MN[F[B]] = traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(using M product N)
       MN.equal(t1, t2)
     }
   }

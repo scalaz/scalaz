@@ -658,7 +658,7 @@ sealed abstract class ISet[A] {
   override final def equals(other: Any): Boolean =
     other match {
       case that: ISet[A] =>
-        ISet.setEqual[A](Equal.equalA).equal(this, that)
+        ISet.setEqual[A](using Equal.equalA).equal(this, that)
       case _ =>
         false
     }
