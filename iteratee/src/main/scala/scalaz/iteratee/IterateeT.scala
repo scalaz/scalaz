@@ -382,7 +382,7 @@ private trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[({type l[α
   implicit def T: MonadTrans[H]
 
   def liftM[G[_]: Monad, A](ga: G[A]): IterateeT[E, H[G, *], A] =
-    IterateeT.IterateeTMonadTrans[E].liftM[H[G, *], A](T.liftM(ga))(T[G])
+    IterateeT.IterateeTMonadTrans[E].liftM[H[G, *], A](T.liftM(ga))(using T[G])
 
   def apply[G[_]: Monad]: Monad[IterateeT[E, H[G, *], *]] =
     IterateeT.IterateeTMonad[E, H[G, *]](T[G])

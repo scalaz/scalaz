@@ -203,7 +203,7 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, *]] with O
            tl => G.map(f(fa.head))(OneAnd(_, tl)))
 
   override def traverseImpl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Applicative[G]) =
-    G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
+    G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(using G))(OneAnd.apply)
 
   override def traverseS[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
     State{(s: S) =>
@@ -217,7 +217,7 @@ private sealed trait OneAndTraverse1[F[_]] extends OneAndTraverse[F] with OneAnd
   def F: Traverse1[F]
 
   override def traverse1Impl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Apply[G]) =
-    G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(G))(OneAnd.apply)
+    G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(using G))(OneAnd.apply)
 }
 
 sealed abstract class OneAndInstances5 {
