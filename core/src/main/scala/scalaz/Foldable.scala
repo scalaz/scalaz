@@ -304,7 +304,7 @@ trait Foldable[F[_]]  { self =>
    * elements than is needed to determine the result.
    */
   def psum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
-    fold(fa)(G.monoid)
+    fold(fa)(using G.monoid)
 
   /** Alias for [[psum]]. `asum` is the name used in Haskell. */
   final def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
