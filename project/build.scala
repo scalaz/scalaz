@@ -173,7 +173,7 @@ object build {
           )
         case _ =>
           Seq(
-            "-Xsource:3",
+            "-Xsource:3-cross",
             "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
             "-Ywarn-dead-code",
             "-Ywarn-numeric-widen",
