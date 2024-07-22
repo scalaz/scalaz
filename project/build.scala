@@ -144,17 +144,6 @@ object build {
       "-feature",
       "-unchecked"
     ),
-    scalacOptions ++= {
-      scalaBinaryVersion.value match {
-        case "2.13" =>
-          Seq(
-            "-Wconf:msg=constructor modifiers are assumed by synthetic:silent",
-            "-Wconf:msg=method are copied from the case class constructor:silent",
-          )
-        case _ =>
-          Nil
-      }
-    },
     Compile / scalacOptions ++= {
       scalaBinaryVersion.value match {
         case "2.13" =>
