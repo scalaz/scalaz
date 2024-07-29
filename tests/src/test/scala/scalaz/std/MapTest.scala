@@ -72,4 +72,16 @@ object MapTest extends SpecLite {
     getOrAdd[Id.Id, Int, Long](mWithOld, k)({evaluated = true; vNew}) must_=== (mWithOld -> vOld)
     evaluated must_=== false
   }
+
+  "unionWith" ! forAll { (m1: Map[Byte, Byte], m2: Map[Byte, Byte], f1: (Byte, Byte) => Byte, f2: ((Byte, Byte)) => Boolean) =>
+    (m1.keySet ++ m2.keySet) must_=== std.map.unionWith(m1, m2)(f1).keySet
+
+    val (x1, x2) = m1.partition(f2)
+    std.map.unionWith(x1, x2)(f1) must_=== m1
+
+    std.map.unionWith(m1, Map.empty)(f1) must_=== m1
+    std.map.unionWith(Map.empty, m1)(f1) must_=== m1
+
+    std.map.unionWith(m1, m2)(f1) must_=== std.map.unionWith(m2, m1)((a1, a2) => f1(a2, a1))
+  }
 }
