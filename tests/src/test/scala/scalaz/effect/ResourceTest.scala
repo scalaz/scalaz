@@ -1,7 +1,8 @@
 package scalaz
 package effect
 
-import java.io._
+import java.io.StringReader
+import java.io.IOException
 import std.effect.autoCloseable._
 
 object ResourceTest extends SpecLite {
