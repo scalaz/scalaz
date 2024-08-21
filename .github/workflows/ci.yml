@@ -76,3 +76,18 @@ jobs:
       with:
         paths: '**/target/test-reports/*.xml'
     - run: rm -rf "$HOME/.ivy2/local" || true
+  latest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
+      with:
+        java-version: 21
+        distribution: adopt
+    - uses: coursier/cache-action@v6
+    - run: ./sbt -v
+           "++ 3.5.1-RC2!"
+           Test/compile
