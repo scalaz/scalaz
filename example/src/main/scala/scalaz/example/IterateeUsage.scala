@@ -36,7 +36,7 @@ object IterateeUsage {
 
     (collect[List[Int], List] %= group(3) &= enumStream((1 to 9).toStream)).run assert_=== List(List(1, 2, 3), List(4, 5, 6), List(7, 8, 9))
 
-    import java.io._
+    import java.io.StringReader
 
     def r = enumReader[IO](new StringReader("file contents"))
 
