@@ -86,7 +86,7 @@ sealed abstract class ImmutableArrayInstances {
 object ImmutableArray extends ImmutableArrayInstances {
 
   def make[A](x: AnyRef): ImmutableArray[A] = {
-    val y = x match {
+    val y: ImmutableArray[?] = x match {
       case null              => null
       case x: Array[Byte]    => new ofByte(x)
       case x: Array[Short]   => new ofShort(x)
@@ -109,7 +109,7 @@ object ImmutableArray extends ImmutableArrayInstances {
    * Provides better type inference than `make[A]`
    */
   def fromArray[A](x: Array[A]): ImmutableArray[A] = {
-    val y = x match {
+    val y: ImmutableArray[?] = x match {
       case null              => null
       case x: Array[Byte]    => new ofByte(x)
       case x: Array[Short]   => new ofShort(x)
