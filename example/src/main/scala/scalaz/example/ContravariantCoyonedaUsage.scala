@@ -235,7 +235,7 @@ object ContravariantCoyonedaUsage {
     // representation.  For example, a set of data rules about how
     // records are to be sorted.
 
-    sealed abstract class SortType
+    sealed abstract class SortType extends Product with Serializable
     object SortType {
       case object CI extends SortType
       case object Dateish extends SortType
