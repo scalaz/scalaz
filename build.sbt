@@ -144,7 +144,7 @@ lazy val scalacheckBinding =
       unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.0",
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.1",
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
