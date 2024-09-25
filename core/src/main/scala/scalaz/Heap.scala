@@ -400,7 +400,7 @@ object Heap extends HeapInstances {
     }
 
     def skewMeld[A](f: (A, A) => Boolean, ts: Forest[A], tsp: Forest[A]) =
-      unionUniq(f)(uniqify(f)(ts), uniqify(f)(tsp))
+      unionUniq(f)(uniquify(f)(ts), uniquify(f)(tsp))
 
     def ins[A](f: (A, A) => Boolean, t: Tree[Ranked[A]]): Forest[A] => Forest[A] = {
       case s if s.isEmpty    => EphemeralStream(t)
@@ -409,10 +409,13 @@ object Heap extends HeapInstances {
         ins(f, link(f)(t, tp))(ts)
     }
 
-    def uniqify[A](f: (A, A) => Boolean): Forest[A] => Forest[A] = {
+    def uniquify[A](f: (A, A) => Boolean): Forest[A] => Forest[A] = {
       case s if s.isEmpty   => emptyEphemeralStream
       case (t ##:: ts) => ins(f, t)(ts)
     }
+
+    @deprecated("Use uniquify", "")
+    def uniqify[A](f: (A, A) => Boolean): Forest[A] => Forest[A] = uniquify(f)
 
     def unionUniq[A](f: (A, A) => Boolean): (Forest[A], Forest[A]) => Forest[A] = {
       case (s, ts) if s.isEmpty                         => ts
