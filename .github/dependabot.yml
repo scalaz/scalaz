@@ -4,3 +4,17 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "series/7.3.x"
+    commit-message:
+      prefix: "[7.3.x] "
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "series/7.2.x"
+    commit-message:
+      prefix: "[7.2.x] "
