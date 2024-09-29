@@ -165,7 +165,7 @@ object KleisliTest extends SpecLite {
 
     "throw exceptions captured via fail()" in {
       try {
-        bad.run(1).unsafePerformIO
+        bad.run(1).unsafePerformIO()
         fail("should have thrown")
       } catch {
         case t: Throwable => t must_== err

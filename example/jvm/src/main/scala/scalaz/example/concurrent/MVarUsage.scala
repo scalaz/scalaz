@@ -11,7 +11,7 @@ import std.anyVal._
 import syntax.equal._
 
 object MVarUsage {
-  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f.unsafePerformIO); () }
+  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f.unsafePerformIO()); () }
 
   def out(): Unit = {
     def calc(mvar: MVar[Int]): IO[Unit] = mvar.put(42)
@@ -62,7 +62,7 @@ object MVarUsage {
         _ <- c.put("ping")
         _ <- p.take flatMap (s => putStrLn("p: " + s))
       } yield ()
-    io.unsafePerformIO
+    io.unsafePerformIO()
   }
 
   def main(args: Array[String]): Unit = {

@@ -42,7 +42,7 @@ class FutureTest extends SpecLite {
     override def toString = s"SomeFailure($n)"
   }
 
-  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
+  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure.apply))
 
   implicit val cogenThrowable: Cogen[Throwable] =
     Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
