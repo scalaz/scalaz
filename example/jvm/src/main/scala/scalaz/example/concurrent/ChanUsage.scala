@@ -9,7 +9,7 @@ import Chan._
 import std.anyVal._
 import syntax.equal._
 
-object ChanUsage extends App {
+object ChanUsage {
   def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f.unsafePerformIO); () }
 
   def calc(chan: Chan[Int], a: Int) =
@@ -23,5 +23,8 @@ object ChanUsage extends App {
       a <- chan.read
       b <- chan.read
     } yield a + b
-  assert(io.unsafePerformIO() === 25150)
+
+  def main(args: Array[String]): Unit = {
+    assert(io.unsafePerformIO() === 25150)
+  }
 }

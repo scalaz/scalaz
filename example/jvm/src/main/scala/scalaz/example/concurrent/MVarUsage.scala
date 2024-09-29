@@ -10,7 +10,7 @@ import MVar._
 import std.anyVal._
 import syntax.equal._
 
-object MVarUsage extends App {
+object MVarUsage {
   def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f.unsafePerformIO); () }
 
   def out(): Unit = {
@@ -65,7 +65,9 @@ object MVarUsage extends App {
     io.unsafePerformIO
   }
 
-  //out()
-  //inout()
-  pingpong()
+  def main(args: Array[String]): Unit = {
+    out()
+    inout()
+    pingpong()
+  }
 }
