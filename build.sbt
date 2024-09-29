@@ -35,15 +35,6 @@ lazy val scalaz = Project(
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
   packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
-  ScalaUnidoc / unidoc / unidocAllSources := {
-    scalaBinaryVersion.value match {
-      case "3" =>
-        // TODO OutOfMemoryError
-        Nil
-      case _ =>
-        (ScalaUnidoc / unidoc / unidocAllSources).value
-    }
-  },
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
