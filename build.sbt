@@ -110,6 +110,7 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     },
   )
   .jsSettings(
+    scalajsProjectSettings,
     scalaJSUseMainModuleInitializer := true,
     commands += Command.command("runAllMain") { state1 =>
       val extracted = Project.extract(state1)

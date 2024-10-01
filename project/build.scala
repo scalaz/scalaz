@@ -3,6 +3,7 @@ import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishLocalSigned
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishSigned
 import java.awt.Desktop
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport.*
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
 import sbtbuildinfo.BuildInfoPlugin.autoImport.*
@@ -45,7 +46,31 @@ object build {
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
+  private val wasmSetting: Def.SettingsDefinition = (
+    if (sys.props.isDefinedAt("scala_js_wasm")) {
+      println("enable wasm")
+      Def.settings(
+        scalaJSLinkerConfig ~= (
+          _.withExperimentalUseWebAssembly(true).withModuleKind(ModuleKind.ESModule)
+        ),
+        jsEnv := {
+          import org.scalajs.jsenv.nodejs.NodeJSEnv
+          val config = NodeJSEnv.Config()
+            .withArgs(List(
+              "--experimental-wasm-exnref",
+              "--experimental-wasm-imported-strings",
+              "--turboshaft-wasm",
+            ))
+          new NodeJSEnv(config)
+        },
+      )
+    } else {
+      Def.settings()
+    }
+  )
+
   val scalajsProjectSettings = Def.settings(
+    wasmSetting,
     scalacOptions += {
       val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
