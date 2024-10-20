@@ -89,7 +89,7 @@ jobs:
         distribution: adopt
     - uses: coursier/cache-action@v6
     - run: ./sbt -v
-           "++ 3.5.2-RC2!"
+           "++ 3.6.1!"
            Test/compile
   wasm:
     runs-on: ubuntu-latest
