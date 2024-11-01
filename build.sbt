@@ -42,7 +42,7 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   ScalaUnidoc / unidoc / unidocProjectFilter := {
-    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
@@ -190,45 +190,3 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
 lazy val testsNative = tests.native
-
-lazy val site = Project(
-  id = "site",
-  base = file("site")
-).settings(
-  standardSettings,
-  name := "scalaz-site",
-  notPublish,
-  Compile / compile / scalacOptions -= "-Xlint:adapted-args",
-).dependsOn(
-  coreJVM
-).enablePlugins(
-  MicrositesPlugin
-).settings(
-  scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
-  scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
-  micrositeFooterText := Some("""
-                                |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
-                                |""".stripMargin),
-  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.13/${(Compile / version).value}",
-  micrositeDocumentationLabelDescription := "Scaladoc",
-  micrositeName := "Scalaz",
-  micrositeDescription := "Scalaz",
-  micrositeAuthor := "Scalaz contributors",
-  micrositeOrganizationHomepage := "https://github.com/scalaz/scalaz",
-  micrositeGitterChannelUrl := "scalaz/scalaz",
-  micrositeGitHostingUrl := "https://github.com/scalaz/scalaz",
-  micrositeGithubOwner := "scalaz",
-  micrositeGithubRepo := "scalaz",
-  micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
-  micrositeBaseUrl := "/7",
-  micrositePalette := Map(
-    "brand-primary"   -> "#ED2124",
-    "brand-secondary" -> "#251605",
-    "brand-tertiary"  -> "#491119",
-    "gray-dark"       -> "#453E46",
-    "gray"            -> "#837F84",
-    "gray-light"      -> "#E3E2E3",
-    "gray-lighter"    -> "#F4F3F4",
-    "white-color"     -> "#FFFFFF"
-  )
-)
