@@ -27,6 +27,7 @@ jobs:
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
+    - uses: sbt/setup-sbt@v1
     - run: |
         sbt -v \
         checkGenTypeClasses \
