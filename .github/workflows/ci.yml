@@ -23,7 +23,7 @@ jobs:
             project: rootJVM
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+    - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+    - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
       with:
         java-version: 21
         distribution: adopt
@@ -96,7 +96,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+    - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
       with:
         java-version: 21
         distribution: adopt
