@@ -13,7 +13,6 @@ import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Utilities.*
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.*
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport.*
-import xerial.sbt.Sonatype.autoImport.*
 
 object build {
   type Sett = Def.Setting[_]
@@ -263,11 +262,7 @@ object build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
 
-    credentialsSetting,
-    publishTo := sonatypePublishToBundle.value,
-    sonatypeBundleDirectory := {
-      (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
-    },
+    publishTo := (if (isSnapshot.value) None else localStaging.value),
     Test / publishArtifact := false,
 
     // adapted from sbt-release defaults
@@ -282,7 +277,7 @@ object build {
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
-      releaseStepCommandAndRemaining("sonatypeBundleRelease"),
+      releaseStepCommandAndRemaining("sonaRelease"),
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -396,26 +391,6 @@ object build {
     )
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
-
-  lazy val credentialsSetting = credentials ++= {
-    val name = "Sonatype Nexus Repository Manager"
-    val realm = "oss.sonatype.org"
-    (
-      sys.props.get("build.publish.user"),
-      sys.props.get("build.publish.password"),
-      sys.env.get("SONATYPE_USERNAME"),
-      sys.env.get("SONATYPE_PASSWORD")
-    ) match {
-      case (Some(user), Some(pass), _, _)  => Seq(Credentials(name, realm, user, pass))
-      case (_, _, Some(user), Some(pass))  => Seq(Credentials(name, realm, user, pass))
-      case _                           =>
-        val ivyFile = Path.userHome / ".ivy2" / ".credentials"
-        val m2File = Path.userHome / ".m2" / "credentials"
-        if (ivyFile.exists()) Seq(Credentials(ivyFile))
-        else if (m2File.exists()) Seq(Credentials(m2File))
-        else Nil
-    }
-  }
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
