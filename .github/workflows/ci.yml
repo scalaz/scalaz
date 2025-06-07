@@ -88,8 +88,10 @@ jobs:
         java-version: 21
         distribution: adopt
     - uses: coursier/cache-action@v6
+    - id: scala_3_version
+      run: echo "value=$(cat .github/scala_3_latest.txt)" >> $GITHUB_OUTPUT
     - run: ./sbt -v
-           "++ 3.7.1!"
+           "++ ${{ steps.scala_3_version.outputs.value }}!"
            Test/compile
   wasm:
     runs-on: ubuntu-latest
