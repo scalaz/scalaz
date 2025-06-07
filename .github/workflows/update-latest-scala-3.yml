@@ -27,12 +27,12 @@ jobs:
            tail -1 > .github/scala_3_latest.txt
     - id: push
       run: |
-        git checkout -b update-scala-3-latest
+        git checkout -b update-scala-3-latest-version
         git add -u
         git config --global user.email "74843977+scalaz-bot[bot]@users.noreply.github.com"
         git config --global user.name "scalaz-bot[bot]"
         if git commit -m "update scala 3 latest version"; then
-          git push -f origin update-scala-3-latest
+          git push -f origin update-scala-3-latest-version
           echo "pushed=true"  >> $GITHUB_OUTPUT
         else
           echo "pushed=false" >> $GITHUB_OUTPUT
@@ -45,7 +45,7 @@ jobs:
           await github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: "update-scala-3-latest",
+            head: "update-scala-3-latest-version",
             base: "${{ github.ref_name }}",
             title: "update scala 3 latest version"
           });
