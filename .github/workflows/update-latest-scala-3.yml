@@ -1,0 +1,53 @@
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '0 9 * * 3'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'scalaz' }}
+    timeout-minutes: 10
+    steps:
+    - name: Generate token
+      id: generate_token
+      uses: tibdex/github-app-token@v2
+      with:
+        app_id: 89659
+        private_key: ${{ secrets.SCALAZ_BOT_KEY }}
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ steps.generate_token.outputs.token }}
+    - run: sudo apt-get install -y libxml2-utils
+    - run: wget https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/maven-metadata.xml
+    - run: xmllint
+           --xpath
+           "/metadata/versioning/versions//version/text()"
+           maven-metadata.xml |
+           grep -v NIGHTLY |
+           grep -v RC |
+           sort |
+           tail -1 > .github/scala_3_latest.txt
+    - id: push
+      run: |
+        git checkout -b update-scala-3-latest-version
+        git add -u
+        git config --global user.email "74843977+scalaz-bot[bot]@users.noreply.github.com"
+        git config --global user.name "scalaz-bot[bot]"
+        if git commit -m "update scala 3 latest version"; then
+          git push -f origin update-scala-3-latest-version
+          echo "pushed=true"  >> $GITHUB_OUTPUT
+        else
+          echo "pushed=false" >> $GITHUB_OUTPUT
+        fi
+    - uses: actions/github-script@v7
+      if: steps.push.outputs.pushed == 'true'
+      with:
+        github-token: ${{ steps.generate_token.outputs.token }}
+        script: |
+          await github.rest.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            head: "update-scala-3-latest-version",
+            base: "${{ github.ref_name }}",
+            title: "update scala 3 latest version"
+          });
