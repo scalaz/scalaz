@@ -142,7 +142,7 @@ lazy val scalacheckBinding =
     .settings(
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.1",
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
       osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
