@@ -222,7 +222,7 @@ def scalacheckBindingProject(
 lazy val scalacheckBinding_1_15 = scalacheckBindingProject(
   id = "scalacheck-binding_1_15",
   base = "scalacheck-binding_1_15",
-  scalacheckVersion = "1.18.1",
+  scalacheckVersion = "1.19.0",
   versionSuffix = "1.15",
   platforms = Seq(JVMPlatform, JSPlatform, NativePlatform)
 )
