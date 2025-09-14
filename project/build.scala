@@ -15,7 +15,7 @@ import scalajscrossproject.ScalaJSCrossPlugin.autoImport.*
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport.*
 
 object build {
-  type Sett = Def.Setting[_]
+  type Sett = Def.Setting[?]
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
