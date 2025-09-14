@@ -46,7 +46,7 @@ lazy val scalaz = Project(
   },
   Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
-  jvmProjects ++ jsProjects ++ nativeProjects : _*
+  (jvmProjects ++ jsProjects ++ nativeProjects)*
 ).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
@@ -55,7 +55,7 @@ lazy val rootNative = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(nativeProjects: _*)
+).aggregate(nativeProjects*)
 
 lazy val rootJS = Project(
   "rootJS",
@@ -63,7 +63,7 @@ lazy val rootJS = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jsProjects: _*)
+).aggregate(jsProjects*)
 
 lazy val rootJVM = Project(
   "rootJVM",
@@ -71,7 +71,7 @@ lazy val rootJVM = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jvmProjects: _*)
+).aggregate(jvmProjects*)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
@@ -158,7 +158,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
         "-maxDiscardRatio", "50",
         "-minSuccessfulTests", minSuccessfulTests.value.toString
       )
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions*)
     },
     (Test / sources) := {
       val exclude = Set(
