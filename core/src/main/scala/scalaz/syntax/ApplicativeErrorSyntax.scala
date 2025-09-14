@@ -26,7 +26,7 @@ trait ToApplicativeErrorOps0[TC[F[_], S] <: ApplicativeError[F, S]] {
 
 trait ApplicativeErrorSyntax[F[_], S] extends ApplicativeSyntax[F] {
   implicit def ToApplicativeErrorOps[A](v: F[A]): ApplicativeErrorOps[F, S, A] =
-    new ApplicativeErrorOps[F, S, A](v)(ApplicativeErrorSyntax.this.F)
+    new ApplicativeErrorOps[F, S, A](v)(using ApplicativeErrorSyntax.this.F)
 
   def F: ApplicativeError[F, S]
   ////

@@ -12,7 +12,7 @@ final class BindRecOps[F[_],A] private[syntax](val self: F[A])(implicit val F: B
 
 sealed trait ToBindRecOpsU[TC[F[_]] <: BindRec[F]] {
   implicit def ToBindRecOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): BindRecOps[F0.M, F0.A] =
-    new BindRecOps[F0.M, F0.A](F0(v))(F0.TC)
+    new BindRecOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -28,7 +28,7 @@ trait ToBindRecOps0[TC[F[_]] <: BindRec[F]] extends ToBindRecOpsU[TC] {
 trait ToBindRecOps[TC[F[_]] <: BindRec[F]] extends ToBindRecOps0[TC] with ToBindOps[TC]
 
 trait BindRecSyntax[F[_]] extends BindSyntax[F] {
-  implicit def ToBindRecOps[A](v: F[A]): BindRecOps[F, A] = new BindRecOps[F,A](v)(BindRecSyntax.this.F)
+  implicit def ToBindRecOps[A](v: F[A]): BindRecOps[F, A] = new BindRecOps[F,A](v)(using BindRecSyntax.this.F)
 
   def F: BindRec[F]
   ////

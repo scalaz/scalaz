@@ -10,7 +10,7 @@ final class DivisibleOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 
 sealed trait ToDivisibleOpsU[TC[F[_]] <: Divisible[F]] {
   implicit def ToDivisibleOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): DivisibleOps[F0.M, F0.A] =
-    new DivisibleOps[F0.M, F0.A](F0(v))(F0.TC)
+    new DivisibleOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -26,7 +26,7 @@ trait ToDivisibleOps0[TC[F[_]] <: Divisible[F]] extends ToDivisibleOpsU[TC] {
 trait ToDivisibleOps[TC[F[_]] <: Divisible[F]] extends ToDivisibleOps0[TC] with ToDivideOps[TC] with ToInvariantApplicativeOps[TC]
 
 trait DivisibleSyntax[F[_]] extends DivideSyntax[F] with InvariantApplicativeSyntax[F] {
-  implicit def ToDivisibleOps[A](v: F[A]): DivisibleOps[F, A] = new DivisibleOps[F,A](v)(DivisibleSyntax.this.F)
+  implicit def ToDivisibleOps[A](v: F[A]): DivisibleOps[F, A] = new DivisibleOps[F,A](v)(using DivisibleSyntax.this.F)
 
   def F: Divisible[F]
   ////

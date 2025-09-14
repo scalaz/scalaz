@@ -10,7 +10,7 @@ final class NondeterminismOps[F[_],A] private[syntax](val self: F[A])(implicit v
 
 sealed trait ToNondeterminismOpsU[TC[F[_]] <: Nondeterminism[F]] {
   implicit def ToNondeterminismOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): NondeterminismOps[F0.M, F0.A] =
-    new NondeterminismOps[F0.M, F0.A](F0(v))(F0.TC)
+    new NondeterminismOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -26,7 +26,7 @@ trait ToNondeterminismOps0[TC[F[_]] <: Nondeterminism[F]] extends ToNondetermini
 trait ToNondeterminismOps[TC[F[_]] <: Nondeterminism[F]] extends ToNondeterminismOps0[TC] with ToMonadOps[TC]
 
 trait NondeterminismSyntax[F[_]] extends MonadSyntax[F] {
-  implicit def ToNondeterminismOps[A](v: F[A]): NondeterminismOps[F, A] = new NondeterminismOps[F,A](v)(NondeterminismSyntax.this.F)
+  implicit def ToNondeterminismOps[A](v: F[A]): NondeterminismOps[F, A] = new NondeterminismOps[F,A](v)(using NondeterminismSyntax.this.F)
 
   def F: Nondeterminism[F]
   ////

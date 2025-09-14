@@ -9,7 +9,7 @@ final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unz
 
 sealed trait ToUnzipOpsU[TC[F[_]] <: Unzip[F]] {
   implicit def ToUnzipOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): UnzipOps[F0.M, F0.A] =
-    new UnzipOps[F0.M, F0.A](F0(v))(F0.TC)
+    new UnzipOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -38,7 +38,7 @@ trait ToUnzipOps0[TC[F[_]] <: Unzip[F]] extends ToUnzipOpsU[TC] {
 trait ToUnzipOps[TC[F[_]] <: Unzip[F]] extends ToUnzipOps0[TC]
 
 trait UnzipSyntax[F[_]]  {
-  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A](v)(UnzipSyntax.this.F)
+  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A](v)(using UnzipSyntax.this.F)
 
   def F: Unzip[F]
   ////

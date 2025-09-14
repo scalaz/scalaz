@@ -13,7 +13,7 @@ final class AltOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Alt[F
 
 sealed trait ToAltOpsU[TC[F[_]] <: Alt[F]] {
   implicit def ToAltOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): AltOps[F0.M, F0.A] =
-    new AltOps[F0.M, F0.A](F0(v))(F0.TC)
+    new AltOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -29,7 +29,7 @@ trait ToAltOps0[TC[F[_]] <: Alt[F]] extends ToAltOpsU[TC] {
 trait ToAltOps[TC[F[_]] <: Alt[F]] extends ToAltOps0[TC] with ToApplicativeOps[TC] with ToInvariantAltOps[TC]
 
 trait AltSyntax[F[_]] extends ApplicativeSyntax[F] with InvariantAltSyntax[F] {
-  implicit def ToAltOps[A](v: F[A]): AltOps[F, A] = new AltOps[F,A](v)(AltSyntax.this.F)
+  implicit def ToAltOps[A](v: F[A]): AltOps[F, A] = new AltOps[F,A](v)(using AltSyntax.this.F)
 
   def F: Alt[F]
   ////

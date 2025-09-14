@@ -25,7 +25,7 @@ final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 
 sealed trait ToProfunctorOpsU[TC[F[_, _]] <: Profunctor[F]] {
   implicit def ToProfunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ProfunctorOps[F0.M, F0.A, F0.B] =
-    new ProfunctorOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
+    new ProfunctorOps[F0.M, F0.A, F0.B](F0(v))(using F0.TC)
 
 }
 
@@ -36,7 +36,7 @@ trait ToProfunctorOps0[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOpsU[TC
 
 
   implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ProfunctorOps[F[G, *, *], A, B] =
-    new ProfunctorOps[F[G, *, *], A, B](v)(F0)
+    new ProfunctorOps[F[G, *, *], A, B](v)(using F0)
 
   ////
 
@@ -46,7 +46,7 @@ trait ToProfunctorOps0[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOpsU[TC
 trait ToProfunctorOps[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOps0[TC]
 
 trait ProfunctorSyntax[F[_, _]]  {
-  implicit def ToProfunctorOps[A, B](v: F[A, B]): ProfunctorOps[F, A, B] = new ProfunctorOps[F, A, B](v)(ProfunctorSyntax.this.F)
+  implicit def ToProfunctorOps[A, B](v: F[A, B]): ProfunctorOps[F, A, B] = new ProfunctorOps[F, A, B](v)(using ProfunctorSyntax.this.F)
 
   def F: Profunctor[F]
   ////

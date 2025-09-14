@@ -18,7 +18,7 @@ trait ToBandOps extends ToSemigroupOps {
 }
 
 trait BandSyntax[F] extends SemigroupSyntax[F] {
-  implicit def ToBandOps(v: F): BandOps[F] = new BandOps[F](v)(BandSyntax.this.F)
+  implicit def ToBandOps(v: F): BandOps[F] = new BandOps[F](v)(using BandSyntax.this.F)
 
   def F: Band[F]
   ////

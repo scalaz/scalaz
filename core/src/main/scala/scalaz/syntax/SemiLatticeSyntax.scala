@@ -18,7 +18,7 @@ trait ToSemiLatticeOps extends ToBandOps {
 }
 
 trait SemiLatticeSyntax[F] extends BandSyntax[F] {
-  implicit def ToSemiLatticeOps(v: F): SemiLatticeOps[F] = new SemiLatticeOps[F](v)(SemiLatticeSyntax.this.F)
+  implicit def ToSemiLatticeOps(v: F): SemiLatticeOps[F] = new SemiLatticeOps[F](v)(using SemiLatticeSyntax.this.F)
 
   def F: SemiLattice[F]
   ////
