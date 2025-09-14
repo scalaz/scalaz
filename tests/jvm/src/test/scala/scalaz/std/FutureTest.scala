@@ -48,8 +48,8 @@ class FutureTest extends SpecLite {
     implicit val cogenThrowable: Cogen[Throwable] =
       Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
 
-    checkAll(monoid.laws[Future[Int]](implicitly, implicitly, futureArb))
-    checkAll(monoid.laws[Future[Int @@ Multiplication]](implicitly, implicitly, futureArb))
+    checkAll(monoid.laws[Future[Int]](using implicitly, implicitly, futureArb))
+    checkAll(monoid.laws[Future[Int @@ Multiplication]](using implicitly, implicitly, futureArb))
 
 
     def futureSuccessArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
@@ -62,17 +62,17 @@ class FutureTest extends SpecLite {
       ))
 
     val `Arbitrary[Throwable => Future[Int]]` : Arbitrary[Throwable => Future[Int]] =
-      Arbitrary.arbFunction1(futureArb, implicitly)
+      Arbitrary.arbFunction1(using futureArb, implicitly)
 
     // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
-    checkAll(monadError.laws[Future, Throwable](implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
-    checkAll(bindRec.laws[Future](implicitly, futureArb, Arbitrary.arbFunction1(futureArb, implicitly), futureArb, futureEqual))
+    checkAll(monadError.laws[Future, Throwable](using implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
+    checkAll(bindRec.laws[Future](using implicitly, futureArb, Arbitrary.arbFunction1(using futureArb, implicitly), futureArb, futureEqual))
 
     // Scope these away from the rest as Comonad[Future] is a little evil.
     // Should fail to compile by default: implicitly[Comonad[Future]]
     {
       implicit val cm: Comonad[Future] = futureComonad(duration)
-      checkAll(comonad.laws[Future](implicitly, futureSuccessArb, implicitly, implicitly))
+      checkAll(comonad.laws[Future](using implicitly, futureSuccessArb, implicitly, implicitly))
     }
 
     "issues 964" ! {

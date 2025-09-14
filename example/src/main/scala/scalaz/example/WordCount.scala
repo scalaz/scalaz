@@ -32,12 +32,12 @@ object WordCount {
     val Count = Monoid[Int].applicative
 
     // Compose the applicative instance for [a]State[Boolean,a] with the Count applicative
-    val WordCount = StateT.stateMonad[Boolean].compose[λ[α=>Int]](Count)
+    val WordCount = StateT.stateMonad[Boolean].compose[λ[α=>Int]](using Count)
 
     // Fuse the three applicatives together in parallel...
     val A = Count
-      .product[λ[α=>Int]](Count)
-      .product[λ[α=>State[Boolean,Int]]](WordCount)
+      .product[λ[α=>Int]](using Count)
+      .product[λ[α=>State[Boolean,Int]]](using WordCount)
 
     // ... and execute them in a single traversal
     val ((charCount, lineCount), wordCountState) = A.traverse(text)((c: Char) => ((1, test(c == '\n')), atWordStart(c)))

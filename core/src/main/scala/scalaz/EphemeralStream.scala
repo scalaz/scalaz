@@ -213,7 +213,7 @@ sealed abstract class EphemeralStreamInstances {
         F.unfoldrOpt[EphemeralStream[A], B, List[B]](fa){
           case a ##:: as => Maybe.just((f(a), as))
           case emptyEphemeralStream => Maybe.empty
-        }(Reducer.ReverseListReducer[B])
+        }(using Reducer.ReverseListReducer[B])
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

@@ -74,7 +74,7 @@ trait ListInstances extends ListInstances0 {
           F.unfoldrOpt[List[A], B, List[B]](l){
             case a :: as => just((f(a), as))
             case Nil => Maybe.empty
-          }(Reducer.ReverseListReducer[B])
+          }(using Reducer.ReverseListReducer[B])
 
         val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

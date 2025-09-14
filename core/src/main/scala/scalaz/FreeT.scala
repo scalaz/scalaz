@@ -34,7 +34,7 @@ object FreeT extends FreeTInstances {
 
   /** A version of `liftM` that infers the nested type constructor. */
   def liftMU[S[_], MA](value: MA)(implicit M: Unapply[Functor, MA]): FreeT[S, M.M, M.A] =
-    liftM[S, M.M, M.A](M(value))(M.TC)
+    liftM[S, M.M, M.A](M(value))(using M.TC)
 
   /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
   def liftF[S[_], M[_], A](value: S[A])(implicit M: Applicative[M]): FreeT[S, M, A] =
@@ -213,9 +213,9 @@ sealed abstract class FreeTInstances3 extends FreeTInstances4 {
     new MonadError[FreeT[S, M, *], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def handleError[A](fa: FreeT[S, M, A])(f: E => FreeT[S, M, A]) =
-        FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM)(f.andThen(_.toM)))(M).flatMap(identity)
+        FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM)(f.andThen(_.toM)))(using M).flatMap(identity)
       override def raiseError[A](e: E) =
-        FreeT.liftM(E.raiseError[A](e))(M)
+        FreeT.liftM(E.raiseError[A](e))(using M)
     }
 }
 
@@ -277,7 +277,7 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
       override def M1 = implicitly
       override def M2 = implicitly
 
-      override def empty[A] = FreeT.liftM[S, M, A](PlusEmpty[M].empty[A])(M)
+      override def empty[A] = FreeT.liftM[S, M, A](PlusEmpty[M].empty[A])(using M)
 
       override def alt[A](a1: => FreeT[S, M, A], a2: => FreeT[S, M, A]): FreeT[S, M, A] =
         plus(a1, a2)
@@ -305,7 +305,7 @@ private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, *]] {
   implicit def M1: BindRec[M]
   def M2: Plus[M]
   override final def plus[A](a: FreeT[S, M, A], b: => FreeT[S, M, A]) =
-    FreeT.liftM(M2.plus(a.toM, b.toM))(M).flatMap(identity)
+    FreeT.liftM(M2.plus(a.toM, b.toM))(using M).flatMap(identity)
 }
 
 private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, *]] with Foldable.FromFoldMap[FreeT[S, M, *]] {
@@ -333,9 +333,9 @@ private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, *]] with Fr
     G.map(
       M2.traverseImpl(fa.resume){
         case -\/(a) =>
-          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
+          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(using M))
         case \/-(a) =>
           G.map(f(a))(FreeT.point[S, M, B])
       }
-    )(FreeT.liftM(_)(M).flatMap(identity))
+    )(FreeT.liftM(_)(using M).flatMap(identity))
 }

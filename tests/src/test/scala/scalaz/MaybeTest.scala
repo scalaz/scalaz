@@ -148,7 +148,7 @@ object MaybeTest extends SpecLite {
   }
 
   "lifted Reducer is short-circuiting" in {
-    val R: Reducer[Maybe[Int], Maybe[Int]] = Apply[Maybe].liftReducer(Reducer.identityReducer[Int])
+    val R: Reducer[Maybe[Int], Maybe[Int]] = Apply[Maybe].liftReducer(using Reducer.identityReducer[Int])
 
     val f: Int => Maybe[(Maybe[Int], Int)] = i => {
       if (i > 0) just((just(i), i-1))

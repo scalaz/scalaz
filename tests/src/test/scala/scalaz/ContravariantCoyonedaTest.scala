@@ -58,13 +58,13 @@ object ContravariantCoyonedaTest extends SpecLite {
 
   "contravariant identity law" ! forAll {(xs: List[Int]) =>
     val co = CtCoOrder(identity[Int])
-    xs.sorted(co.run.toScalaOrdering) must_=== xs.sorted
+    xs.sorted(using co.run.toScalaOrdering) must_=== xs.sorted
   }
 
   "Schwartzian-transformed sort equals normal sort" ! forAll{
     (xs: List[Int], o: CtCoOrder[Int]) =>
     xs.map(o.schwartzianPre)
-      .sorted(o.schwartzianOrder.toScalaOrdering)
-      .map(o.schwartzianPost) must_=== xs.sorted(o.run.toScalaOrdering)
+      .sorted(using o.schwartzianOrder.toScalaOrdering)
+      .map(o.schwartzianPost) must_=== xs.sorted(using o.run.toScalaOrdering)
   }
 }

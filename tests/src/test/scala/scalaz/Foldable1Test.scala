@@ -38,26 +38,26 @@ object Foldable1Test extends SpecLite {
   "distinct1" ! forAll {
     (xs: NonEmptyList[Int]) =>
       xs.distinct1.toList must_== xs.toList.distinct
-      xs.distinct1(Order.order((_,_) => Ordering.EQ)).length must_== 1
+      xs.distinct1(using Order.order((_,_) => Ordering.EQ)).length must_== 1
   }
 
   "distinctE1" ! forAll {
     (xs: NonEmptyList[Int]) =>
       xs.distinctE1.toList must_== xs.toList.distinct
-      xs.distinctE1(Equal.equal((_,_) => true)).length must_== 1
+      xs.distinctE1(using Equal.equal((_,_) => true)).length must_== 1
   }
 
   private val L = Foldable1[NonEmptyList]
 
   "product foldRight1 equivalence" ! forAll {
     (l: NonEmptyList[IList[Int]], l2: NonEmptyList[IList[Int]]) =>
-      (L.product(L).foldRight1((l, l2))(_ ++ _)
+      (L.product(using L).foldRight1((l, l2))(_ ++ _)
        must_===((l.list ++ l2.list).flatten))
   }
 
   "product foldLeft1 equivalence" ! forAll {
     (l: NonEmptyList[IList[Int]], l2: NonEmptyList[IList[Int]]) =>
-      (L.product(L).foldLeft1((l, l2))((xs, x) => x ++ xs)
+      (L.product(using L).foldLeft1((l, l2))((xs, x) => x ++ xs)
        must_===((l.list ++ l2.list).reverse.flatten))
   }
 

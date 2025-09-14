@@ -94,7 +94,7 @@ object Plus {
     def plus[A](x: G[F[A]], y: => G[F[A]]): G[F[A]] = G.apply2(x, y)(F.plus(_, _))
 
     override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(G[F[A]], S)]): Maybe[G[F[A]]] =
-      G.unfoldrOpt(seed)(f)(Reducer.identityReducer[F[A]](F.semigroup))
+      G.unfoldrOpt(seed)(f)(using Reducer.identityReducer[F[A]](using F.semigroup))
   }
 
   def liftPlus[G[_], F[_]](implicit G0: Apply[G], F0: Plus[F]): Plus[λ[a => G[F[a]]]] =

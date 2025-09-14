@@ -140,7 +140,7 @@ object EphemeralStreamTest extends SpecLite {
 
   "foldMap evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(false)(identity)
-    Foldable[EphemeralStream].foldMap(infiniteStream)(identity)(booleanInstance.conjunction) must_===(false)
+    Foldable[EphemeralStream].foldMap(infiniteStream)(identity)(using booleanInstance.conjunction) must_===(false)
   }
 
   "foldMap1Opt identity" ! forAll {
@@ -150,7 +150,7 @@ object EphemeralStreamTest extends SpecLite {
 
   "foldMap1Opt evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(false)(identity)
-    Foldable[EphemeralStream].foldMap1Opt(infiniteStream)(identity)(booleanInstance.conjunction) must_===(Some(false))
+    Foldable[EphemeralStream].foldMap1Opt(infiniteStream)(identity)(using booleanInstance.conjunction) must_===(Some(false))
   }
 
   "foldRight evaluates lazily" in {

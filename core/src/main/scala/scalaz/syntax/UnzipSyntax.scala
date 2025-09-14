@@ -19,7 +19,7 @@ trait ToUnzipOps0[TC[F[_]] <: Unzip[F]] extends ToUnzipOpsU[TC] {
 
   ////
   implicit def ToUnzipPairOps[F[_],A,B](v: F[(A, B)])(implicit F0: TC[F]): UnzipPairOps[F, A, B] =
-    new UnzipPairOps[F,A,B](v)(F0)
+    new UnzipPairOps[F,A,B](v)(using F0)
 
   final class UnzipPairOps[F[_],A, B] private[syntax](self: F[(A, B)])(implicit F: TC[F]) {
     def unfzip: (F[A], F[B]) =

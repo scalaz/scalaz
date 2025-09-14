@@ -22,7 +22,7 @@ object TrampolineUsage {
   }
 
   def runQuickSort[F[_] : Applicative : Comonad, T: Order](xs: List[T]): List[T] =
-    quickSort[F, T](xs).go(f => Comonad[F].copoint(f))(Applicative[F])
+    quickSort[F, T](xs).go(f => Comonad[F].copoint(f))(using Applicative[F])
 
   def main(args: Array[String]): Unit = {
     val xs = List.fill(32)(util.Random.nextInt())

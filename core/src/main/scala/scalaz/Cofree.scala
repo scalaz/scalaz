@@ -126,7 +126,7 @@ sealed abstract class CofreeInstances6 {
 
   implicit def cofreeZipEqual[F[_], A](implicit A: Equal[A], F: => Equal[F[CofreeZip[F, A]]]): Equal[CofreeZip[F, A]] =
     Tags.Zip.subst(
-      cofreeEqual[F, A](A, F.contramap(Tags.Zip.subst))
+      cofreeEqual[F, A](using A, F.contramap(Tags.Zip.subst))
     )
 
 }
@@ -144,7 +144,7 @@ sealed abstract class CofreeInstances5 extends CofreeInstances6 {
 
   implicit def cofreeZipOrder[F[_], A](implicit A: Order[A], F: => Order[F[CofreeZip[F, A]]]): Order[CofreeZip[F, A]] =
     Tags.Zip.subst(
-      cofreeOrder[F, A](A, F.contramap(Tags.Zip.subst))
+      cofreeOrder[F, A](using A, F.contramap(Tags.Zip.subst))
     )
 
 }

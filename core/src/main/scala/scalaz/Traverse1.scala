@@ -47,10 +47,10 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
 
   /** A version of `traverse1` where a subsequent monadic join is applied to the inner result. */
   def traverse1M[A, G[_], B](fa: F[A])(f: A => G[F[B]])(implicit G: Apply[G], F: Bind[F]): G[F[B]] =
-    G.map(G.traverse1(fa)(f)(this))(F.join)
+    G.map(G.traverse1(fa)(f)(using this))(F.join)
 
   final def traverse1U[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Apply, GB]): G.M[F[G.A]] =
-    traverse1(fa)(G.leibniz.onF(f))(G.TC)
+    traverse1(fa)(G.leibniz.onF(f))(using G.TC)
 
   def sequence1[G[_]:Apply,A](fga: F[G[A]]): G[F[A]] =
     traverse1Impl[G, G[A], A](fga)(identity)
@@ -77,7 +77,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
                                                (implicit N: Apply[N], M: Apply[M], MN: Equal[M[N[F[C]]]]): Boolean = {
       type MN[A] = M[N[A]]
       val t1: MN[F[C]] = M.map(traverse1[M, A, B](fa)(amb))(fb => traverse1[N, B, C](fb)(bnc))
-      val t2: MN[F[C]] = traverse1[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
+      val t2: MN[F[C]] = traverse1[MN, A, C](fa)(a => M.map(amb(a))(bnc))(using M.compose(using N))
       MN.equal(t1, t2)
     }
 
@@ -97,7 +97,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
                                         (implicit N: Apply[N], M: Apply[M], MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {
       type MN[A] = (M[A], N[A])
       val t1: MN[F[B]] = (traverse1[M, A, B](fa)(amb), traverse1[N, A, B](fa)(anb))
-      val t2: MN[F[B]] = traverse1[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
+      val t2: MN[F[B]] = traverse1[MN, A, B](fa)(a => (amb(a), anb(a)))(using M.product(using N))
       MN.equal(t1, t2)
     }
   }

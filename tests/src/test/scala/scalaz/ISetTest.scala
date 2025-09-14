@@ -27,7 +27,7 @@ object ISetTest extends SpecLite {
 
   def structurallySound[A: Order: Show](s: ISet[A]) = {
     val al = s.toAscIList
-    al must_===(al.sorted)(Order[A])
+    al must_===(al.sorted)(using Order[A])
   }
 
   private[this] case class Foo(a: Int)

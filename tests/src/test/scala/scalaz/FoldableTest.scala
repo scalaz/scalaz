@@ -79,13 +79,13 @@ object FoldableTest extends SpecLite {
     (xs: List[Int]) =>
       val F = implicitly[Foldable[List]]
       F.distinct(xs).toList must_== xs.distinct
-      if (xs.length > 0) F.distinct(xs)(Order.order((_,_) => Ordering.EQ)).length must_== 1
+      if (xs.length > 0) F.distinct(xs)(using Order.order((_,_) => Ordering.EQ)).length must_== 1
   }
 
   "distinctE" ! forAll {
     (xs: List[Int]) =>
       xs.distinctE.toList must_== xs.distinct
-      if (xs.length > 0) xs.distinctE(Equal.equal((_,_) => true)).length must_== 1
+      if (xs.length > 0) xs.distinctE(using Equal.equal((_,_) => true)).length must_== 1
   }
 
   "distinctBy" ! {
@@ -268,12 +268,12 @@ object FoldableTest extends SpecLite {
 
   "product foldRight equivalence" ! forAll {
     (l: List[Int], l2: List[Int]) =>
-      L.product(L).foldRight((l, l2), List.empty[Int])(_ :: _) must_===(l ++ l2)
+      L.product(using L).foldRight((l, l2), List.empty[Int])(_ :: _) must_===(l ++ l2)
   }
 
   "product foldLeft equivalence" ! forAll {
     (l: List[Int], l2: List[Int]) =>
-      (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
+      (L.product(using L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
   }
 

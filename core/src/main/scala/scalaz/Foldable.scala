@@ -52,7 +52,7 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
     import Dual._, Endo._, syntax.std.all._
-    Tag.unwrap(foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid)) apply (z)
+    Tag.unwrap(foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(using dualMonoid)) apply (z)
   }
 
   /**Right-associative, monadic fold of a structure. */
@@ -79,7 +79,7 @@ trait Foldable[F[_]]  { self =>
 
   /** A version of `traverse_` that infers the type constructor `M`. */
   final def traverseU_[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[Unit] =
-    traverse_[G.M, A, G.A](fa)(G.leibniz.onF(f))(G.TC)
+    traverse_[G.M, A, G.A](fa)(G.leibniz.onF(f))(using G.TC)
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
@@ -296,7 +296,7 @@ trait Foldable[F[_]]  { self =>
    * no more elements than is needed to determine the result.
    */
   def psumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
-    foldMap(fa)(f)(G.monoid)
+    foldMap(fa)(f)(using G.monoid)
 
   /**
    * Sum using a polymorphic monoid ([[PlusEmpty]]).
@@ -390,7 +390,7 @@ trait Foldable[F[_]]  { self =>
     }.reverse
 
   def distinctBy[A, B: Equal](fa: F[A])(f: A => B): IList[A] =
-    distinctE(fa)(Equal.equalBy(f))
+    distinctE(fa)(using Equal.equalBy(f))
 
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))

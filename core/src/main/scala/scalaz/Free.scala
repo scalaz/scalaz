@@ -151,7 +151,7 @@ sealed abstract class Free[S[_], A] {
    * `Free` is a monad in an endofunctor category and this is its monadic bind.
    */
   final def flatMapSuspension[T[_]](f: S ~> Free[T, *]): Free[T, A] =
-    foldMap[Free[T,*]](f)(freeMonad[T])
+    foldMap[Free[T,*]](f)(using freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
   final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =

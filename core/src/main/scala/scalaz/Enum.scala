@@ -13,8 +13,8 @@ trait Enum[F] extends Order[F] { self =>
 
   // derived functions
 
-  def succn(n: Int, a: F): F = Enum.succn(n, a)(self)
-  def predn(n: Int, a: F): F = Enum.predn(n, a)(self)
+  def succn(n: Int, a: F): F = Enum.succn(n, a)(using self)
+  def predn(n: Int, a: F): F = Enum.predn(n, a)(using self)
 
   def min: Option[F] =
     None
@@ -202,10 +202,10 @@ trait Enum[F] extends Order[F] { self =>
       min forall (x => max forall (y => equal(succ(y), x)))
 
     def succn(x: F, n: Int): Boolean =
-      equal(self.succn(n, x), Enum.succn(n, x)(self))
+      equal(self.succn(n, x), Enum.succn(n, x)(using self))
 
     def predn(x: F, n: Int): Boolean =
-      equal(self.predn(n, x), Enum.predn(n, x)(self))
+      equal(self.predn(n, x), Enum.predn(n, x)(using self))
 
     def succorder(x: F): Boolean =
       (max exists (equal(_, x))) || greaterThanOrEqual(succ(x), x)

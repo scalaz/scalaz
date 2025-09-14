@@ -94,11 +94,11 @@ object ContravariantCoyonedaUsage {
 
     def schwartzian[A, B](xs: List[A])(f: A => B)(implicit B: Order[B]): List[A] =
       xs.map(a => (a, f(a)))
-        .sortBy(_._2)(B.toScalaOrdering)
+        .sortBy(_._2)(using B.toScalaOrdering)
         .map(_._1)
 
     def nonschwartzian[A, B](xs: List[A])(f: A => B)(implicit B: Order[B]): List[A] =
-      xs.sorted(Order.orderBy(f).toScalaOrdering)
+      xs.sorted(using Order.orderBy(f).toScalaOrdering)
 
     // The above two functions are guaranteed to return the same result for
     // pure `f', but `schwartzian' may be faster for complex `f'.  By
@@ -156,7 +156,7 @@ object ContravariantCoyonedaUsage {
       (ord, i) <- List((caseInsensitivelyOrd, 0),
                        (dateOrd, 1),
                        (numerically2, 2))
-    } yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
+    } yield unstructuredData.sortBy(v => v(i))(using ord.toScalaOrdering)
 
     // We can no longer use `schwartzian', though, because there is no
     // way to separate the sort key from the underlying Order.  We could
@@ -204,7 +204,7 @@ object ContravariantCoyonedaUsage {
 
     val bySchwartzianListSorts: List[List[Vector[String]]] = for {
       (ccord, i) <- decomposedSortKeys
-    } yield schwartzian(unstructuredData)(v => ccord.k(v(i)))(ccord.fi)
+    } yield schwartzian(unstructuredData)(v => ccord.k(v(i)))(using ccord.fi)
 
     // But we know that for each `schwartzian' call, the result type of
     // the lambda we give it changes; for `caseInsensitively', it’s
@@ -214,7 +214,7 @@ object ContravariantCoyonedaUsage {
     val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
       (ccord, i) <- decomposedSortKeys
     } yield (schwartzian[Vector[String], ccord.I]
-               (unstructuredData)(v => ccord.k(v(i)))(ccord.fi))
+               (unstructuredData)(v => ccord.k(v(i)))(using ccord.fi))
 
     // `I' is the “pivot”, how the function `k' result type and `fi'
     // order type relate to each other.  As seen above, this existential
@@ -321,7 +321,7 @@ object ContravariantCoyonedaUsage {
     def sortDataBy(xs: List[Vector[String]], o: SortSpec)
         : List[Vector[String]] = {
       val coyo = sortSpecOrd(o)
-      schwartzian(xs)(coyo.k)(coyo.fi)
+      schwartzian(xs)(coyo.k)(using coyo.fi)
     }
 
     val sortedBySpec: List[Vector[String]] =
@@ -407,7 +407,7 @@ object ContravariantCoyonedaUsage {
 
     val sortedByNonCityL: List[Vector[String]] = {
       val coyo = sortSpecOrdL(mainLtoRsort.tail)
-      schwartzian(unstructuredData)(coyo.k)(coyo.fi)
+      schwartzian(unstructuredData)(coyo.k)(using coyo.fi)
     }
 
     println("sortedByNonCityL: " |+| sortedByNonCity.shows)
@@ -546,7 +546,7 @@ object ContravariantCoyonedaUsage {
     val (binfmtdesc, finalsort) = {
       val bo = sortSpecBinOrdF(mainLtoRsort)
       (bo.fi._1.describe,
-       schwartzian(unstructuredData)(bo.k)(bo.fi._2))
+       schwartzian(unstructuredData)(bo.k)(using bo.fi._2))
     }
 
     // For your edification, the binfmtdesc is:

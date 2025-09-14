@@ -82,7 +82,7 @@ object ApplyTest extends SpecLite {
 
   def unfoldrOptShortCircuiting[F[_]](empty: F[Int])(implicit F: Applicative[F]): Unit = {
     val reducer: Reducer[F[Int], F[Int]] =
-      F.liftReducer(Reducer.identityReducer[Int])
+      F.liftReducer(using Reducer.identityReducer[Int])
 
     val f: Int => Maybe[(F[Int], Int)] = i => {
       if (i > 0) Maybe.just((F.point(i), i - 1))

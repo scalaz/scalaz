@@ -76,14 +76,14 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def intercalate(a: A)(implicit A: Monoid[A]): A = F.intercalate(self, a)
   final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
   final def traverseU_[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[Unit] =
-    F.traverseU_[A, GB](self)(f)(G)
+    F.traverseU_[A, GB](self)(f)(using G)
   final def traverseS_[S, B](f: A => State[S, B]): State[S, Unit] = F.traverseS_(self)(f)
-  final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(G)
+  final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(using G)
   final def sequenceS_[S, B](implicit ev: A === State[S,B]): State[S,Unit] = F.sequenceS_(ev.subst[F](self))
   def sequenceF_[M[_],B](implicit ev: F[A] <~< F[Free[M,B]]): Free[M, Unit] = F.sequenceF_(ev(self))
-  final def asum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.asum(ev.subst[F](self))(G)
-  final def psum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.psum(ev.subst[F](self))(G)
-  final def psumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.psumMap(self)(f)(G)
+  final def asum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.asum(ev.subst[F](self))(using G)
+  final def psum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.psum(ev.subst[F](self))(using G)
+  final def psumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.psumMap(self)(f)(using G)
 
   ////
 }

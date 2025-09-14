@@ -484,7 +484,7 @@ object ScalazArbitrary {
       case n => {
         val nextSize = n.abs / 2
         ^^(FingerArbitrary[V, A].arbitrary,
-          fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A], implicitly),
+          fingerTree[Node[V, A]](nextSize)(using NodeArbitrary[V, A], implicitly),
           FingerArbitrary[V, A].arbitrary
         )(deep[V, A](_, _, _))
       }
@@ -543,7 +543,7 @@ object ScalazArbitrary {
 
   // backwards compatibility
   def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
-    indexedStateTArb[S, S, F, A](A)
+    indexedStateTArb[S, S, F, A](using A)
 
   implicit def indexedReaderWriterStateTArb[R, W, S1, S2, F[_], A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[R, W, S1, S2, F, A]] =
     Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[R, W, S1, S2, F, A](_))
@@ -586,7 +586,7 @@ object ScalazArbitrary {
   }
 
   // backwards compatibility
-  def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = indexedStoreTArb[F, A, A, B](A)
+  def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = indexedStoreTArb[F, A, A, B](using A)
 
   implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 

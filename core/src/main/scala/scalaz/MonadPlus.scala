@@ -18,22 +18,22 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
 
   /** Generalized version of Haskell's `catMaybes` */
   def unite[T[_], A](value: F[T[A]])(implicit T: Foldable[T]): F[A] =
-    bind(value)((ta) => T.foldMap(ta)(a => point(a))(monoid[A]))
+    bind(value)((ta) => T.foldMap(ta)(a => point(a))(using monoid[A]))
 
   /** Generalized version of Haskell's `lefts` */
   def lefts[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): F[A] =
-    bind(value)((aa) => G.leftFoldable.foldMap(aa)(a => point(a))(monoid[A]))
+    bind(value)((aa) => G.leftFoldable.foldMap(aa)(a => point(a))(using monoid[A]))
 
   /** Generalized version of Haskell's `rights` */
   def rights[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): F[B] =
-    bind(value)((bb) => G.rightFoldable.foldMap(bb)(b => point(b))(monoid[B]))
+    bind(value)((bb) => G.rightFoldable.foldMap(bb)(b => point(b))(using monoid[B]))
 
   /** Generalized version of Haskell's `partitionEithers` */
   def separate[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): (F[A], F[B]) = (lefts(value), rights(value))
 
   /** A version of `unite` that infers the type constructor `T`. */
   final def uniteU[T](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =
-    unite(T.leibniz.subst(value))(T.TC)
+    unite(T.leibniz.subst(value))(using T.TC)
 
   /**The product of MonadPlus `F` and `G`, `[x](F[x], G[x]])`, is a MonadPlus */
   def product[G[_]](implicit G0: MonadPlus[G]): MonadPlus[λ[α => (F[α], G[α])]] =

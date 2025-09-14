@@ -68,10 +68,10 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
 
   /** Performs the action `n` times, returning nothing. */
   def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
-    listInstance.sequence_(List.fill(n)(fa))(this)
+    listInstance.sequence_(List.fill(n)(fa))(using this)
 
   /** Filter `map` according to an applicative predicate. **/
-  def filterM[A,B](map: A ==>> B)(f: B => F[Boolean])(implicit O:Order[A]):F[A ==>> B] = map.filterM(f)(this, O)
+  def filterM[A,B](map: A ==>> B)(f: B => F[Boolean])(implicit O:Order[A]):F[A ==>> B] = map.filterM(f)(using this, O)
 
   /** Filter `l` according to an applicative predicate. */
   def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
@@ -81,7 +81,7 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
     }
 
   /** Filter `l` according to an applicative predicate. */
-  def filterM[A](l: IList[A])(f: A => F[Boolean]): F[IList[A]] = l.filterM(f)(this)
+  def filterM[A](l: IList[A])(f: A => F[Boolean]): F[IList[A]] = l.filterM(f)(using this)
 
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into F.

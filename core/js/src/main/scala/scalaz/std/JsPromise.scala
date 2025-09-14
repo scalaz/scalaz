@@ -7,7 +7,7 @@ import scala.scalajs.js.|
 
 trait JSPromiseInstances { this: jsPromise.type =>
   implicit def jsPromiseSemigroup[A](implicit A: Semigroup[A]): Semigroup[js.Promise[A]] =
-    Semigroup.liftSemigroup[js.Promise, A](JSPromiseInstance, A)
+    Semigroup.liftSemigroup[js.Promise, A](using JSPromiseInstance, A)
 }
 
 object jsPromise extends JSPromiseInstances {
@@ -23,11 +23,11 @@ object jsPromise extends JSPromiseInstances {
 
       @inline
       private def promiseToUnion[A](promise: js.Promise[A]): A | js.Thenable[A]
-        = |.from(promise)(|.Evidence.right(|.Evidence.base))
+        = |.from(promise)(using |.Evidence.right(using |.Evidence.base))
 
       @inline
       private def valueToUndefOr[A](a: A): js.UndefOr[A]
-        = |.from(a)(|.Evidence.left(|.Evidence.base))
+        = |.from(a)(using |.Evidence.left(using |.Evidence.base))
 
       @inline
       def point[A](a: => A): js.Promise[A] = js.Promise.resolve[A](a)

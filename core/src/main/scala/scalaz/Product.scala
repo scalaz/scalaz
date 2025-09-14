@@ -154,7 +154,7 @@ private trait ProductTraverse1L[F[_], G[_]] extends Traverse1[λ[α => (F[α], G
 
   def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
     def resume = F.traverse1(a._1)(f)
-    X0.applyApplicative.traverse(a._2)(f andThen \/.left[X[B], B])(G)
+    X0.applyApplicative.traverse(a._2)(f andThen \/.left[X[B], B])(using G)
       .fold(X0.tuple2(resume, _),
             pr => X0.map(resume)((_, pr)))
   }
@@ -168,7 +168,7 @@ private trait ProductTraverse1R[F[_], G[_]] extends Traverse1[λ[α => (F[α], G
 
   def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
     def resume = G.traverse1(a._2)(f)
-    X0.applyApplicative.traverse(a._1)(f andThen \/.left[X[B], B])(F)
+    X0.applyApplicative.traverse(a._1)(f andThen \/.left[X[B], B])(using F)
       .fold(X0.tuple2(_, resume),
             pr => X0.map(resume)((pr, _)))
   }

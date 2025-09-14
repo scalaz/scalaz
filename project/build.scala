@@ -181,6 +181,7 @@ object build {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((0 | 3, _)) =>
           Seq(
+            "-Wconf:msg=Implicit parameters should be provided with a:error",
             "-Ykind-projector",
             s"-language:$common",
           )
