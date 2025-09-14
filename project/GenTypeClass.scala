@@ -35,7 +35,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
-  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
+  lazy val `enum` = TypeClass("Enum", *, extendsList = Seq(order))
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
@@ -112,7 +112,7 @@ object TypeClass {
     equal,
     show,
     order,
-    enum,
+    `enum`,
     plusEmpty,
     isEmpty,
     optional,
@@ -541,21 +541,17 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
 """
       case Kind.*^*->* =>
 
-        val ToVUnapply =
-  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ${typeClassName}Ops[F0.M, F0.A, F0.B] =
+        val ToVUnapply = s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ${typeClassName}Ops[F0.M, F0.A, F0.B] =
     new ${typeClassName}Ops[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 """
-        val ToVKleisli =
-  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ${typeClassName}Ops[F[G, *, *], A, B] =
+        val ToVKleisli = s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ${typeClassName}Ops[F[G, *, *], A, B] =
     new ${typeClassName}Ops[F[G, *, *], A, B](v)(F0)
 """
-       val ToVFAB =
-  s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): ${typeClassName}Ops[F, A, B] =
+        val ToVFAB = s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): ${typeClassName}Ops[F, A, B] =
     new ${typeClassName}Ops[F, A, B](v)
 """
 
-
-    s"""$syntaxPackString
+        s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
 final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: ${typeClassName}[F]) extends Ops[F[A, B]] {
@@ -591,12 +587,11 @@ trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = Map(Kind
 """
       case Kind.|*->*|->* =>
 
-        val ToOps =
-  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: TC[F, S]): ${typeClassName}Ops[F, S, A] =
+        val ToOps = s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: TC[F, S]): ${typeClassName}Ops[F, S, A] =
     new ${typeClassName}Ops[F, S, A](v)"""
 
 
-    s"""$syntaxPackString
+        s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
 final class ${typeClassName}Ops[F[_], S, A] private[syntax](self: F[A])(implicit val F: ${typeClassName}[F, S]) {
