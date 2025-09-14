@@ -349,8 +349,8 @@ object build {
   )
 
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
     .settings(
+      standardSettings,
       unmanagedSourcePathSettings,
       name := "scalaz-core",
       Compile / sourceGenerators += (Compile / sourceManaged).map{
@@ -372,25 +372,25 @@ object build {
     )
 
   lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
     .settings(
+      standardSettings,
       unmanagedSourcePathSettings,
       name := "scalaz-effect",
     )
     .dependsOn(core)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
     .jvmSettings(
       typeClasses := TypeClass.effect
     )
 
   lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
     .settings(
+      standardSettings,
       unmanagedSourcePathSettings,
       name := "scalaz-iteratee",
     )
     .dependsOn(core, effect)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
