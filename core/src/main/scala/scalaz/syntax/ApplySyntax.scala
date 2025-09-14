@@ -46,7 +46,7 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
 
 sealed trait ToApplyOpsU[TC[F[_]] <: Apply[F]] {
   implicit def ToApplyOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): ApplyOps[F0.M, F0.A] =
-    new ApplyOps[F0.M, F0.A](F0(v))(F0.TC)
+    new ApplyOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -86,7 +86,7 @@ trait ToApplyOps0[TC[F[_]] <: Apply[F]] extends ToApplyOpsU[TC] {
 trait ToApplyOps[TC[F[_]] <: Apply[F]] extends ToApplyOps0[TC] with ToFunctorOps[TC]
 
 trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A](v)(ApplySyntax.this.F)
+  implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A](v)(using ApplySyntax.this.F)
 
   def F: Apply[F]
   ////

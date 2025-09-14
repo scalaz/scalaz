@@ -29,7 +29,7 @@ trait ToOrderOps extends ToEqualOps {
 }
 
 trait OrderSyntax[F] extends EqualSyntax[F] {
-  implicit def ToOrderOps(v: F): OrderOps[F] = new OrderOps[F](v)(OrderSyntax.this.F)
+  implicit def ToOrderOps(v: F): OrderOps[F] = new OrderOps[F](v)(using OrderSyntax.this.F)
 
   def F: Order[F]
   ////

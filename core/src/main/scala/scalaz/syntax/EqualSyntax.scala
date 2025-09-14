@@ -28,7 +28,7 @@ trait ToEqualOps  {
 }
 
 trait EqualSyntax[F]  {
-  implicit def ToEqualOps(v: F): EqualOps[F] = new EqualOps[F](v)(EqualSyntax.this.F)
+  implicit def ToEqualOps(v: F): EqualOps[F] = new EqualOps[F](v)(using EqualSyntax.this.F)
 
   def F: Equal[F]
   ////

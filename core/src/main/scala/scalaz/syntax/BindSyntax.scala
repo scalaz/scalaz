@@ -32,7 +32,7 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
 
 sealed trait ToBindOpsU[TC[F[_]] <: Bind[F]] {
   implicit def ToBindOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): BindOps[F0.M, F0.A] =
-    new BindOps[F0.M, F0.A](F0(v))(F0.TC)
+    new BindOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -48,7 +48,7 @@ trait ToBindOps0[TC[F[_]] <: Bind[F]] extends ToBindOpsU[TC] {
 trait ToBindOps[TC[F[_]] <: Bind[F]] extends ToBindOps0[TC] with ToApplyOps[TC]
 
 trait BindSyntax[F[_]] extends ApplySyntax[F] {
-  implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A](v)(BindSyntax.this.F)
+  implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A](v)(using BindSyntax.this.F)
 
   def F: Bind[F]
   ////

@@ -11,7 +11,7 @@ final class ChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit 
 
 sealed trait ToChoiceOpsU[TC[F[_, _]] <: Choice[F]] {
   implicit def ToChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ChoiceOps[F0.M, F0.A, F0.B] =
-    new ChoiceOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
+    new ChoiceOps[F0.M, F0.A, F0.B](F0(v))(using F0.TC)
 
 }
 
@@ -22,7 +22,7 @@ trait ToChoiceOps0[TC[F[_, _]] <: Choice[F]] extends ToChoiceOpsU[TC] {
 
 
   implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ChoiceOps[F[G, *, *], A, B] =
-    new ChoiceOps[F[G, *, *], A, B](v)(F0)
+    new ChoiceOps[F[G, *, *], A, B](v)(using F0)
 
   ////
 
@@ -32,7 +32,7 @@ trait ToChoiceOps0[TC[F[_, _]] <: Choice[F]] extends ToChoiceOpsU[TC] {
 trait ToChoiceOps[TC[F[_, _]] <: Choice[F]] extends ToChoiceOps0[TC] with ToCategoryOps[TC]
 
 trait ChoiceSyntax[F[_, _]] extends CategorySyntax[F] {
-  implicit def ToChoiceOps[A, B](v: F[A, B]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B](v)(ChoiceSyntax.this.F)
+  implicit def ToChoiceOps[A, B](v: F[A, B]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B](v)(using ChoiceSyntax.this.F)
 
   def F: Choice[F]
   ////

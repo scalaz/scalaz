@@ -28,7 +28,7 @@ trait ToMonoidOps extends ToSemigroupOps {
 }
 
 trait MonoidSyntax[F] extends SemigroupSyntax[F] {
-  implicit def ToMonoidOps(v: F): MonoidOps[F] = new MonoidOps[F](v)(MonoidSyntax.this.F)
+  implicit def ToMonoidOps(v: F): MonoidOps[F] = new MonoidOps[F](v)(using MonoidSyntax.this.F)
 
   def F: Monoid[F]
   ////

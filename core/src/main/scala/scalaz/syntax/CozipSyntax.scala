@@ -10,7 +10,7 @@ final class CozipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Coz
 
 sealed trait ToCozipOpsU[TC[F[_]] <: Cozip[F]] {
   implicit def ToCozipOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): CozipOps[F0.M, F0.A] =
-    new CozipOps[F0.M, F0.A](F0(v))(F0.TC)
+    new CozipOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -26,7 +26,7 @@ trait ToCozipOps0[TC[F[_]] <: Cozip[F]] extends ToCozipOpsU[TC] {
 trait ToCozipOps[TC[F[_]] <: Cozip[F]] extends ToCozipOps0[TC]
 
 trait CozipSyntax[F[_]]  {
-  implicit def ToCozipOps[A](v: F[A]): CozipOps[F, A] = new CozipOps[F,A](v)(CozipSyntax.this.F)
+  implicit def ToCozipOps[A](v: F[A]): CozipOps[F, A] = new CozipOps[F,A](v)(using CozipSyntax.this.F)
 
   def F: Cozip[F]
   ////

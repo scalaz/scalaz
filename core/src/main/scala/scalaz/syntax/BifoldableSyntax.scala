@@ -17,7 +17,7 @@ final class BifoldableOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 
 sealed trait ToBifoldableOpsU[TC[F[_, _]] <: Bifoldable[F]] {
   implicit def ToBifoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): BifoldableOps[F0.M, F0.A, F0.B] =
-    new BifoldableOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
+    new BifoldableOps[F0.M, F0.A, F0.B](F0(v))(using F0.TC)
 
 }
 
@@ -28,7 +28,7 @@ trait ToBifoldableOps0[TC[F[_, _]] <: Bifoldable[F]] extends ToBifoldableOpsU[TC
 
 
   implicit def ToBifoldableVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): BifoldableOps[F[G, *, *], A, B] =
-    new BifoldableOps[F[G, *, *], A, B](v)(F0)
+    new BifoldableOps[F[G, *, *], A, B](v)(using F0)
 
   ////
 
@@ -38,7 +38,7 @@ trait ToBifoldableOps0[TC[F[_, _]] <: Bifoldable[F]] extends ToBifoldableOpsU[TC
 trait ToBifoldableOps[TC[F[_, _]] <: Bifoldable[F]] extends ToBifoldableOps0[TC]
 
 trait BifoldableSyntax[F[_, _]]  {
-  implicit def ToBifoldableOps[A, B](v: F[A, B]): BifoldableOps[F, A, B] = new BifoldableOps[F, A, B](v)(BifoldableSyntax.this.F)
+  implicit def ToBifoldableOps[A, B](v: F[A, B]): BifoldableOps[F, A, B] = new BifoldableOps[F, A, B](v)(using BifoldableSyntax.this.F)
 
   def F: Bifoldable[F]
   ////

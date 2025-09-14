@@ -10,7 +10,7 @@ final class InvariantApplicativeOps[F[_],A] private[syntax](val self: F[A])(impl
 
 sealed trait ToInvariantApplicativeOpsU[TC[F[_]] <: InvariantApplicative[F]] {
   implicit def ToInvariantApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): InvariantApplicativeOps[F0.M, F0.A] =
-    new InvariantApplicativeOps[F0.M, F0.A](F0(v))(F0.TC)
+    new InvariantApplicativeOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -26,7 +26,7 @@ trait ToInvariantApplicativeOps0[TC[F[_]] <: InvariantApplicative[F]] extends To
 trait ToInvariantApplicativeOps[TC[F[_]] <: InvariantApplicative[F]] extends ToInvariantApplicativeOps0[TC] with ToInvariantFunctorOps[TC]
 
 trait InvariantApplicativeSyntax[F[_]] extends InvariantFunctorSyntax[F] {
-  implicit def ToInvariantApplicativeOps[A](v: F[A]): InvariantApplicativeOps[F, A] = new InvariantApplicativeOps[F,A](v)(InvariantApplicativeSyntax.this.F)
+  implicit def ToInvariantApplicativeOps[A](v: F[A]): InvariantApplicativeOps[F, A] = new InvariantApplicativeOps[F,A](v)(using InvariantApplicativeSyntax.this.F)
 
   def F: InvariantApplicative[F]
   ////

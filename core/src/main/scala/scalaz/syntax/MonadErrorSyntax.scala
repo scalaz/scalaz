@@ -23,7 +23,7 @@ trait ToMonadErrorOps0[TC[F[_], S] <: MonadError[F, S]] {
 
 trait MonadErrorSyntax[F[_], S] extends MonadSyntax[F] with ApplicativeErrorSyntax[F, S] {
   implicit def ToMonadErrorOps[A](v: F[A]): MonadErrorOps[F, S, A] =
-    new MonadErrorOps[F, S, A](v)(MonadErrorSyntax.this.F)
+    new MonadErrorOps[F, S, A](v)(using MonadErrorSyntax.this.F)
 
   def F: MonadError[F, S]
   ////

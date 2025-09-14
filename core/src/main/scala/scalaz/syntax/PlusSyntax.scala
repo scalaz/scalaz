@@ -12,7 +12,7 @@ final class PlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Plus
 
 sealed trait ToPlusOpsU[TC[F[_]] <: Plus[F]] {
   implicit def ToPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): PlusOps[F0.M, F0.A] =
-    new PlusOps[F0.M, F0.A](F0(v))(F0.TC)
+    new PlusOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -28,7 +28,7 @@ trait ToPlusOps0[TC[F[_]] <: Plus[F]] extends ToPlusOpsU[TC] {
 trait ToPlusOps[TC[F[_]] <: Plus[F]] extends ToPlusOps0[TC]
 
 trait PlusSyntax[F[_]]  {
-  implicit def ToPlusOps[A](v: F[A]): PlusOps[F, A] = new PlusOps[F,A](v)(PlusSyntax.this.F)
+  implicit def ToPlusOps[A](v: F[A]): PlusOps[F, A] = new PlusOps[F,A](v)(using PlusSyntax.this.F)
 
   def F: Plus[F]
   ////

@@ -86,7 +86,7 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
 
 sealed trait ToTraverseOpsU[TC[F[_]] <: Traverse[F]] {
   implicit def ToTraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): TraverseOps[F0.M, F0.A] =
-    new TraverseOps[F0.M, F0.A](F0(v))(F0.TC)
+    new TraverseOps[F0.M, F0.A](F0(v))(using F0.TC)
 
 }
 
@@ -102,7 +102,7 @@ trait ToTraverseOps0[TC[F[_]] <: Traverse[F]] extends ToTraverseOpsU[TC] {
 trait ToTraverseOps[TC[F[_]] <: Traverse[F]] extends ToTraverseOps0[TC] with ToFunctorOps[TC] with ToFoldableOps[TC]
 
 trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
-  implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A](v)(TraverseSyntax.this.F)
+  implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A](v)(using TraverseSyntax.this.F)
 
   def F: Traverse[F]
   ////
