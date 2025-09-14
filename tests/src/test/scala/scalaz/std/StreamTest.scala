@@ -77,7 +77,7 @@ object StreamTest extends SpecLite {
   }
 
   "foldMap evaluates lazily" in {
-    Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(false)
+    Foldable[Stream].foldMap(Stream.continually(false))(identity)(using booleanInstance.conjunction) must_===(false)
   }
 
   "foldMap1Opt identity" ! forAll {
@@ -86,7 +86,7 @@ object StreamTest extends SpecLite {
   }
 
   "foldMap1Opt evaluates lazily" in {
-    Foldable[Stream].foldMap1Opt(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(Some(false))
+    Foldable[Stream].foldMap1Opt(Stream.continually(false))(identity)(using booleanInstance.conjunction) must_===(Some(false))
   }
 
   "foldRight evaluates lazily" in {

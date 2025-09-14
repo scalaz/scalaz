@@ -342,7 +342,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     drop(from).take((until max 0)- (from max 0))
 
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
-    IList.fromSeq(toList.sortBy(f)(B.toScalaOrdering))
+    IList.fromSeq(toList.sortBy(f)(using B.toScalaOrdering))
 
   def sorted(implicit ev: Order[A]): IList[A] =
     sortBy(identity)
@@ -439,7 +439,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     uncons(LazyList.empty, (h, t) => h #:: t.toLazyList)
 
   override def toString: String =
-    IList.show(Show.showA).shows(this) // lame, but helpful for debugging
+    IList.show(using Show.showA).shows(this) // lame, but helpful for debugging
 
   def toVector: Vector[A] =
     Foldable[IList].toVector(this)
@@ -634,7 +634,7 @@ sealed abstract class IListInstances extends IListInstance0 {
           F.unfoldrOpt[IList[A], B, List[B]](fa){
             case ICons(a, as) => just((f(a), as))
             case INil() => Maybe.empty
-          }(Reducer.ReverseListReducer[B])
+          }(using Reducer.ReverseListReducer[B])
 
         val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

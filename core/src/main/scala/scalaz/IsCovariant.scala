@@ -30,13 +30,13 @@ trait IsCovariant[F[_]]  { self =>
 
   // derived methods
   def substCo[G[+_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
-    liftLiskovCo(ev).substCo[G](g)
+    liftLiskovCo(using ev).substCo[G](g)
 
   def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
-    liftLiskovCo(ev).substCt[G](g)
+    liftLiskovCo(using ev).substCt[G](g)
 
   def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
-    liftLiskovCo(ev).apply(fa)
+    liftLiskovCo(using ev).apply(fa)
 
   ////
   val isCovariantSyntax: scalaz.syntax.IsCovariantSyntax[F] =

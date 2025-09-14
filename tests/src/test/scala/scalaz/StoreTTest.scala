@@ -24,7 +24,7 @@ object StoreTTest extends SpecLite {
     val af: Arbitrary[Int => Store[Int, Int]] = implicitly
     val ag: Arbitrary[Store[Int, Int => Int]] = implicitly
     val eq: Equal[Store[Int, Int]]            = implicitly
-    monad.laws[Store[Int, *]](implicitly, am, af, ag, eq)
+    monad.laws[Store[Int, *]](using implicitly, am, af, ag, eq)
   }
 
   object instances {

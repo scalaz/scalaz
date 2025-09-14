@@ -39,13 +39,13 @@ sealed abstract class IndexedReaderWriterStateT[R, W, S1, S2, F[_], A] {
     exec(r,S.zero)
 
   def map[B](f: A => B)(implicit F: Functor[F]): IndexedReaderWriterStateT[R, W, S1, S2, F, B] =
-    IndexedReaderWriterStateT.create[R, W, S1, S2, F, B]( (G: Monad[F]) => (r: R, s: S1) => F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
+    IndexedReaderWriterStateT.create[R, W, S1, S2, F, B]( (G: Monad[F]) => (r: R, s: S1) => F.map(self.run(r, s)(using G))(t => (t._1, f(t._2), t._3)))
 
   def flatMap[B, RR <: R, S3](f: A => IndexedReaderWriterStateT[RR, W, S2, S3, F, B])(implicit F: Bind[F], W: Semigroup[W]): IndexedReaderWriterStateT[RR, W, S1, S3, F, B] =
     IndexedReaderWriterStateT.create[RR, W, S1, S3, F, B]( (G: Monad[F]) => (r: RR, s1: S1) =>
-      F.bind(self.run(r, s1)(G)) {
+      F.bind(self.run(r, s1)(using G)) {
         case (w1, a, s2) => {
-          F.map(f(a).run(r, s2)(G)) {
+          F.map(f(a).run(r, s2)(using G)) {
             case (w2, b, s3) => (W.append(w1, w2), b, s3)
           }
         }
@@ -141,7 +141,7 @@ private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2] extends Plus[Ind
   def F: Plus[F]
 
   override final def plus[A](a: IRWST[R, W, S1, S2, F, A], b: => IRWST[R, W, S1, S2, F, A]) =
-    IRWST.create((G: Monad[F]) => (r: R, s: S1) => F.plus(a.run(r, s)(G), b.run(r, s)(G)))
+    IRWST.create((G: Monad[F]) => (r: R, s: S1) => F.plus(a.run(r, s)(using G), b.run(r, s)(using G)))
 }
 
 private trait IndexedReaderWriterStateTPlusEmpty[F[_], R, W, S1, S2]

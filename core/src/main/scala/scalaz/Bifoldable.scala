@@ -21,7 +21,7 @@ trait Bifoldable[F[_, _]]  { self =>
   /** `bifoldRight`, but defined to run in the opposite direction. */
   def bifoldLeft[A,B,C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C = {
     import Dual._, Endo._, syntax.std.all._
-    Tag.unwrap(bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]])) apply z
+    Tag.unwrap(bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(using dualMonoid[Endo[C]])) apply z
   }
 
   /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */

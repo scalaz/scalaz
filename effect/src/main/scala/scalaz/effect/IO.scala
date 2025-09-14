@@ -133,7 +133,7 @@ sealed abstract class IO[A] {
 
 sealed abstract class IOInstances1 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
-      Semigroup.liftSemigroup[IO, A](IO.ioMonad, A)
+      Semigroup.liftSemigroup[IO, A](using IO.ioMonad, A)
 
   implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
 
@@ -142,7 +142,7 @@ sealed abstract class IOInstances1 {
 
 sealed abstract class IOInstances0 extends IOInstances1 {
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
-    Monoid.liftMonoid[IO, A](ioMonad, A)
+    Monoid.liftMonoid[IO, A](using ioMonad, A)
 
   implicit val ioMonadIO: MonadIO[IO] = new MonadIO[IO] with IOLiftIO with IOMonad
 }

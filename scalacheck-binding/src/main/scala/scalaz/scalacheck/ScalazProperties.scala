@@ -274,7 +274,7 @@ object ScalazProperties {
     def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
       newProperties("apply") { p =>
-        implicit val r: Reducer[F[Int], F[Int]] = F.liftReducer(Reducer.identityReducer[Int])
+        implicit val r: Reducer[F[Int], F[Int]] = F.liftReducer(using Reducer.identityReducer[Int])
 
         p.include(functor.laws[F])
         p.include(reducer.laws[F[Int], F[Int]])
@@ -491,7 +491,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit F: Plus[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]): Properties =
       newProperties("plus") { p =>
-        p.include(semigroup.laws[F[Int]](F.semigroup[Int], implicitly, implicitly))
+        p.include(semigroup.laws[F[Int]](using F.semigroup[Int], implicitly, implicitly))
         p.property("associative") = associative[F, Int]
       }
   }
@@ -506,7 +506,7 @@ object ScalazProperties {
     def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]): Properties =
       newProperties("plusEmpty") { p =>
         p.include(plus.laws[F])
-        p.include(monoid.laws[F[Int]](F.monoid[Int], implicitly, implicitly))
+        p.include(monoid.laws[F[Int]](using F.monoid[Int], implicitly, implicitly))
         p.property("left plus identity") = leftPlusIdentity[F, Int]
         p.property("right plus identity") = rightPlusIdentity[F, Int]
       }
@@ -688,7 +688,7 @@ object ScalazProperties {
     def laws[=>:[_, _]](implicit C: Compose[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]): Properties =
       newProperties("compose") { p =>
         p.property("associative") = associative[=>:, Int, Int, Int, Int]
-        p.include(semigroup.laws[Int =>: Int](C.semigroup[Int], implicitly, implicitly))
+        p.include(semigroup.laws[Int =>: Int](using C.semigroup[Int], implicitly, implicitly))
       }
   }
 
@@ -704,7 +704,7 @@ object ScalazProperties {
         p.include(compose.laws[=>:])
         p.property("left identity") = leftIdentity[=>:, Int, Int]
         p.property("right identity") = rightIdentity[=>:, Int, Int]
-        p.include(monoid.laws[Int =>: Int](C.monoid[Int], implicitly, implicitly))
+        p.include(monoid.laws[Int =>: Int](using C.monoid[Int], implicitly, implicitly))
       }
   }
 
@@ -728,8 +728,8 @@ object ScalazProperties {
     def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]): Properties =
       newProperties("bifunctor") { p =>
-        p.include(functor.laws[F[*, Int]](F.leftFunctor[Int], implicitly, implicitly, implicitly))
-        p.include(functor.laws[F[Int, *]](F.rightFunctor[Int], implicitly, implicitly, implicitly))
+        p.include(functor.laws[F[*, Int]](using F.leftFunctor[Int], implicitly, implicitly, implicitly))
+        p.include(functor.laws[F[Int, *]](using F.rightFunctor[Int], implicitly, implicitly, implicitly))
       }
   }
 

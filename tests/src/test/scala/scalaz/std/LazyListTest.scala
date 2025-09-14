@@ -75,7 +75,7 @@ object LazyListTest extends SpecLite {
   }
 
   "foldMap evaluates lazily" in {
-    Foldable[LazyList].foldMap(LazyList.continually(false))(identity)(booleanInstance.conjunction) must_===(false)
+    Foldable[LazyList].foldMap(LazyList.continually(false))(identity)(using booleanInstance.conjunction) must_===(false)
   }
 
   "foldMap1Opt identity" ! forAll {
@@ -84,7 +84,7 @@ object LazyListTest extends SpecLite {
   }
 
   "foldMap1Opt evaluates lazily" in {
-    Foldable[LazyList].foldMap1Opt(LazyList.continually(false))(identity)(booleanInstance.conjunction) must_===(Some(false))
+    Foldable[LazyList].foldMap1Opt(LazyList.continually(false))(identity)(using booleanInstance.conjunction) must_===(Some(false))
   }
 
   "foldRight evaluates lazily" in {

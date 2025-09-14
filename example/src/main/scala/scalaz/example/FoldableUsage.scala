@@ -45,7 +45,7 @@ object FoldableUsage {
     assert(digits.minimum === Some(0))
 
     // Foldables can be composed:
-    val FoldListOfOptions = Foldable[List] compose Foldable[Option]
+    val FoldListOfOptions = Foldable[List].compose(using Foldable[Option])
 
     val listOfOptions: List[Option[Int]] = List(1.some, 2.some, none[Int], 3.some, 4.some)
     assert(FoldListOfOptions.fold(listOfOptions) === 10)
@@ -60,7 +60,7 @@ object FoldableUsage {
     assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(listOfOptions.flatten *))
 
     // we can go deeeeep:
-    val deepFolder = Foldable[List] compose Foldable[Vector] compose Foldable[LazyList] compose Foldable[Option]
+    val deepFolder = Foldable[List].compose(using Foldable[Vector]).compose(using Foldable[LazyList]).compose(using Foldable[Option])
     val deep: List[Vector[LazyList[Option[Int]]]] = List(Vector(LazyList(1.some, none[Int]), LazyList(2.some)), Vector(LazyList(3.some)))
     assert(deepFolder.fold(deep) === 6)
     assert(deepFolder.collapse[IList, Int](deep) === IList(1,2,3))

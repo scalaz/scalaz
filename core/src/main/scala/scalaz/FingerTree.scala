@@ -550,7 +550,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   override def toString = {
     val showV = Show.showFromToString[V]
     val showA = Show.showFromToString[A]
-    fingerTreeShow(showV, showA).shows(this)
+    fingerTreeShow(using showV, showA).shows(this)
   }
 }
 
@@ -1097,7 +1097,7 @@ object IndSeq extends IndSeqInstances {
   import std.anyVal._
 
   def apply[A](as: A*): IndSeq[A] = fromSeq(as)
-  def fromSeq[A](as: Seq[A]): IndSeq[A] = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
+  def fromSeq[A](as: Seq[A]): IndSeq[A] = indSeq(as.foldLeft(empty[Int, A](using UnitReducer(a => 1)))((x, y) => x :+ y))
 }
 
 sealed abstract class IndSeqInstances {

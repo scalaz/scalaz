@@ -54,7 +54,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traversal[G[_]:Applicative]: Traversal[G] =
     new Traversal[G]
   def traversalS[S]: Traversal[State[S, *]] =
-    new Traversal[State[S, *]]()(StateT.stateMonad) {
+    new Traversal[State[S, *]]()(using StateT.stateMonad) {
       override def run[A, B](fa: F[A])(f: A => State[S, B]) = traverseS(fa)(f)
     }
 
@@ -63,11 +63,11 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** A version of `traverse` that infers the type constructor `G`. */
   final def traverseU[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ =
-    G.TC.traverse(fa)(G.leibniz.onF(f))(this)
+    G.TC.traverse(fa)(G.leibniz.onF(f))(using this)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
   final def traverseM[A, G[_], B](fa: F[A])(f: A => G[F[B]])(implicit G: Applicative[G], F: Bind[F]): G[F[B]] =
-    G.map(G.traverse(fa)(f)(this))(F.join)
+    G.map(G.traverse(fa)(f)(using this))(F.join)
 
   /** Traverse with `State`. */
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
@@ -80,7 +80,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
     implicit val A: Applicative[({type l[a] = StateT[S, Trampoline, G[a]]})#l] =
-      StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
+      StateT.stateTMonadState[S, Trampoline].compose(using Applicative[G])
     State[S, G[F[B]]](s => {
       val st = traverse[λ[α => StateT[S, Trampoline, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
       st.run(s).run
@@ -91,7 +91,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
     implicit val A: Applicative[({type l[a] = Kleisli[Trampoline, S, G[a]]})#l] =
-      Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
+      Kleisli.kleisliMonadReader[Trampoline, S].compose(using Applicative[G])
     Kleisli[G, S, F[B]](s => {
       val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run
@@ -108,7 +108,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** A version of `sequence` that infers the nested type constructor. */
   final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ =
-    G.TC.traverse(self)(x => G.apply(x))(this)
+    G.TC.traverse(self)(x => G.apply(x))(using this)
 
   /** A version of `sequence` where a subsequent monadic join is applied to the inner result */
   def sequenceM[A, G[_]](fgfa: F[G[F[A]]])(implicit G: Applicative[G], F: Bind[F]): G[F[A]] =
@@ -170,7 +170,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
                                                (implicit N: Applicative[N], M: Applicative[M], MN: Equal[M[N[F[C]]]]): Boolean = {
       type MN[A] = M[N[A]]
       val t1: MN[F[C]] = M.map(traverse[M, A, B](fa)(amb))(fb => traverse[N, B, C](fb)(bnc))
-      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(using M compose N)
+      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(using M.compose(using N))
       MN.equal(t1, t2)
     }
 
@@ -196,7 +196,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
                                         (implicit N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {
       type MN[A] = (M[A], N[A])
       val t1: MN[F[B]] = (traverse[M, A, B](fa)(amb), traverse[N, A, B](fa)(anb))
-      val t2: MN[F[B]] = traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(using M product N)
+      val t2: MN[F[B]] = traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(using M.product(using N))
       MN.equal(t1, t2)
     }
   }

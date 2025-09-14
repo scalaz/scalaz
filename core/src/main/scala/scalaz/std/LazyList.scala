@@ -119,7 +119,7 @@ trait LazyListInstances {
         F.unfoldrOpt[LazyList[A], B, List[B]](fa){
           case a #:: as => Maybe.just((f(a), as))
           case _ => Maybe.empty
-        }(Reducer.ReverseListReducer[B])
+        }(using Reducer.ReverseListReducer[B])
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

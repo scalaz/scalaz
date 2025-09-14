@@ -579,7 +579,7 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
         )
 
       def point[A](a: => A): StreamT[F, A] @@ Tags.Parallel =
-        Tags.Parallel(StreamTMonadPlus(F0).point(a))
+        Tags.Parallel(StreamTMonadPlus(using F0).point(a))
     }
 }
 
@@ -607,7 +607,7 @@ object StreamT extends StreamTInstances {
     StreamT[M, A](M point Done())
 
   def liftM[M[_], A](a: M[A])(implicit M: Applicative[M]): StreamT[M, A] =
-    StreamT[M, A](M.map(a)(Yield(_, empty[M, A](M))))
+    StreamT[M, A](M.map(a)(Yield(_, empty[M, A](using M))))
 
   def fromLazyList[M[_], A](
       mas: M[LazyList[A]]

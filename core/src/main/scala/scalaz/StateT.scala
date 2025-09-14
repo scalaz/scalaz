@@ -261,7 +261,7 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
 
 abstract class StateTInstances extends StateTInstances0 {
   implicit def stateMonad[S]: MonadState[State[S, *], S] =
-      StateT.stateTMonadState[S, Id](Id.id)
+      StateT.stateTMonadState[S, Id](using Id.id)
 
   implicit def contravariantS1[S2, F[_], A]: IsContravariant[IndexedStateT[*, S2, F, A]] =
     IsContravariant.force[IndexedStateT[*, S2, F, A]]

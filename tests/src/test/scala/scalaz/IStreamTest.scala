@@ -27,7 +27,7 @@ object IStreamTest extends SpecLite {
   }
 
   "foldMap evaluates lazily" in {
-    Foldable[IStream].foldMap(IStream.Lazy.infinite(false))(identity)(booleanInstance.conjunction) must_===(false)
+    Foldable[IStream].foldMap(IStream.Lazy.infinite(false))(identity)(using booleanInstance.conjunction) must_===(false)
   }
 
   // https://github.com/scalaz/scalaz/issues/1515

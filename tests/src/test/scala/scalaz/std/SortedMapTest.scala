@@ -29,7 +29,7 @@ object SortedMapTest extends SpecLite {
 
   "SortedMap ordering" ! forAll {
     val O = implicitly[Order[SortedMap[String,Int]]]
-    val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
+    val O2 = SOrdering.Iterable(using implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {
       val (m1, m2) = (SortedMap(kvs*), SortedMap(kvs2*))
       ((m1.size == kvs.size) && (m2.size == kvs2.size)) ==> {

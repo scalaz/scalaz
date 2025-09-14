@@ -358,7 +358,7 @@ sealed abstract class ==>>[A, B] {
     foldlWithKey(IList.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
 
   def member(k: A)(implicit n: Order[A]): Boolean =
-    lookup(k)(n).isJust
+    lookup(k)(using n).isJust
 
   def notMember(k: A)(implicit n: Order[A]): Boolean =
     !member(k)
@@ -1558,12 +1558,12 @@ object ==>> extends MapInstances {
       (a, b) match {
         case (t1, Tip()) => g1(t1)
         case (Tip(), Bin(kx, x, l, r)) =>
-          val t2 = link(kx, x, l.filterGt(blo)(o), r.filterLt(bhi)(o))
+          val t2 = link(kx, x, l.filterGt(blo)(using o), r.filterLt(bhi)(using o))
           g2(t2)
         case (Bin(kx, x, l, r), t2) =>
           val bmi = just(kx)
-          val l2 = hedgeMerge(blo, bmi, l, trim(blo, bmi, t2)(o))
-          val (found, trim_t2) = trimLookupLo(kx, bhi, t2)(o)
+          val l2 = hedgeMerge(blo, bmi, l, trim(blo, bmi, t2)(using o))
+          val (found, trim_t2) = trimLookupLo(kx, bhi, t2)(using o)
           val r2 = hedgeMerge(bmi, bhi, r, trim_t2)
           found match {
             case Maybe.Empty() =>

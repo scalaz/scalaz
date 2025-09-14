@@ -133,7 +133,7 @@ object ApplyUsage {
     // Apply instances can be composed, which allows us to lift a
     // function into a computation in multiple nested contexts, while
     // applying the effects of all contexts:
-    val applyVLO = Apply[Vector] compose Apply[List] compose Apply[Option]
+    val applyVLO = Apply[Vector].compose(using Apply[List]).compose(using Apply[Option])
 
     val deepResult =
       applyVLO.apply2(Vector(List(1.some, none[Int]),

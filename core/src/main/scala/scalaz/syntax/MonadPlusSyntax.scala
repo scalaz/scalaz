@@ -12,7 +12,7 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
     filter(f)
 
   final def uniteU[T](implicit T: Unapply[Foldable, A]): F[T.A] =
-    F.uniteU(self)(T)
+    F.uniteU(self)(using T)
 
   def unite[T[_], B](implicit ev: A === T[B], T: Foldable[T]): F[B] = {
     val ftb: F[T[B]] = ev.subst(self)

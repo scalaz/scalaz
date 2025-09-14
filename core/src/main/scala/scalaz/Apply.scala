@@ -25,7 +25,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
   // derived functions
 
   def traverse1[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse1[G]): F[G[B]] =
-    G.traverse1(value)(f)(this)
+    G.traverse1(value)(f)(using this)
 
   def sequence1[A, G[_]: Traverse1](as: G[F[A]]): F[G[A]] =
     traverse1(as)(a => a)
@@ -191,7 +191,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
 
   def liftReducer[A, B](implicit r: Reducer[A, B]): Reducer[F[A], F[B]] =
     new Reducer[F[A], F[B]] {
-      def semigroup: Semigroup[F[B]] = Semigroup.liftSemigroup(Apply.this, r.semigroup)
+      def semigroup: Semigroup[F[B]] = Semigroup.liftSemigroup(using Apply.this, r.semigroup)
       def unit(fa: F[A]): F[B] = map(fa)(r.unit)
       def cons(fa: F[A], fb: F[B]): F[B] = apply2(fa, fb)(r.cons)
       def snoc(fb: F[B], fa: F[A]): F[B] = apply2(fb, fa)(r.snoc)

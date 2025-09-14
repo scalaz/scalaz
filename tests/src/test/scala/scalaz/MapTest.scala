@@ -24,7 +24,7 @@ object MapTest extends SpecLite {
 
   private def isSortedByKey[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
     val al = m.toAscList
-    al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+    al must_===(al.sortBy(_._1)(using Order[A].toScalaOrdering))
   }
 
   private def isBalanced[A, B](m: A ==>> B) = {
@@ -799,7 +799,7 @@ object MapTest extends SpecLite {
       val f = (i: Byte, j: Byte) => i.toInt + j.toInt
       val res = a.toList.foldLeft(0: Int)((acc, kv) => acc + kv._1.toInt + kv._2.toInt)
 
-      a.foldMapWithKey(f)(intInstance) must_=== res
+      a.foldMapWithKey(f)(using intInstance) must_=== res
     }
   }
 

@@ -170,7 +170,7 @@ object ST extends STInstances {
       def apply[S] = for {
         a <- newArr(size, z)
         _ <- {
-          F.foldMap(ivs)((x: (Int, B)) => a.update(f, x._1, x._2))(stMonoid[S, Unit])
+          F.foldMap(ivs)((x: (Int, B)) => a.update(f, x._1, x._2))(using stMonoid[S, Unit])
         }
         frozen <- a.freeze
       } yield frozen
@@ -180,12 +180,12 @@ object ST extends STInstances {
 
 sealed abstract class STInstance0 {
   implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
-      Semigroup.liftSemigroup[ST[S, *], A](ST.stMonad[S], A)
+      Semigroup.liftSemigroup[ST[S, *], A](using ST.stMonad[S], A)
 }
 
 sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
-    Monoid.liftMonoid[ST[S, *], A](stMonad[S], A)
+    Monoid.liftMonoid[ST[S, *], A](using stMonad[S], A)
 
   implicit def stMonad[S]: Monad[ST[S, *]] =
     new Monad[ST[S, *]] {

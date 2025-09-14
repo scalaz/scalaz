@@ -30,13 +30,13 @@ trait IsContravariant[F[_]]  { self =>
 
   // derived methods
   def substCo[G[+_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
-    liftLiskovCt(ev).substCo[G](g)
+    liftLiskovCt(using ev).substCo[G](g)
 
   def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
-    liftLiskovCt(ev).substCt[G](g)
+    liftLiskovCt(using ev).substCt[G](g)
 
   def narrow[A, B](fa: F[B])(implicit ev: A <~< B): F[A] =
-    liftLiskovCt(ev).apply(fa)
+    liftLiskovCt(using ev).apply(fa)
 
   ////
   val isContravariantSyntax: scalaz.syntax.IsContravariantSyntax[F] =

@@ -30,7 +30,7 @@ object StateTTest extends SpecLite {
     val am: Arbitrary[State[Int, Int]]        = implicitly
     val af: Arbitrary[State[Int, Int] => Int] = implicitly
     val eq: Equal[State[Int, Int]]            = implicitly
-    comonad.laws[State[Int, *]](implicitly, am, af, eq)
+    comonad.laws[State[Int, *]](using implicitly, am, af, eq)
   }
 
   object instances {

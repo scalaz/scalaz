@@ -58,7 +58,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     new Bitraversal[G]
 
   def bitraversalS[S]: Bitraversal[State[S, *]] =
-    new Bitraversal[State[S, *]]()(StateT.stateMonad)
+    new Bitraversal[State[S, *]]()(using StateT.stateMonad)
 
   def bitraverse[G[_]:Applicative,A,B,C,D](fa: F[A,B])(f: A => G[C])(g: B => G[D]): G[F[C, D]] =
     bitraversal[G].run(fa)(f)(g)
@@ -73,7 +73,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def traverseSTrampoline[S, G[_] : Applicative, A, B, C, D](fa: F[A, B])(f: A => State[S, G[C]])(g: B => State[S, G[D]]): State[S, G[F[C, D]]] = {
     import Free._
     implicit val A: Applicative[({type l[a] = StateT[S, Trampoline, G[a]]})#l] =
-      StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
+      StateT.stateTMonadState[S, Trampoline].compose(using Applicative[G])
 
     State[S, G[F[C, D]]]{
       initial =>
@@ -86,7 +86,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bitraverseKTrampoline[S, G[_] : Applicative, A, B, C, D](fa: F[A, B])(f: A => Kleisli[G, S, C])(g: B => Kleisli[G, S, D]): Kleisli[G, S, F[C, D]] = {
     import Free._
     implicit val A: Applicative[({type l[a] = Kleisli[Trampoline, S, G[a]]})#l] =
-      Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
+      Kleisli.kleisliMonadReader[Trampoline, S].compose(using Applicative[G])
 
     Kleisli[G, S, F[C, D]](s => {
       val kl = bitraverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B, C, D](fa)(z => Kleisli[Id, S, G[C]](i => f(z)(i)).lift[Trampoline])(z => Kleisli[Id, S, G[D]](i => g(z)(i)).lift[Trampoline])

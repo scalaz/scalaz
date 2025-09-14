@@ -99,7 +99,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     }
 
   /** @since 7.0.2 */
-  def sorted(implicit o: Order[A]): NonEmptyList[A] = (list.sorted(o): @unchecked) match {
+  def sorted(implicit o: Order[A]): NonEmptyList[A] = (list.sorted(using o): @unchecked) match {
     case ICons(x, xs) => nel(x, xs)
   }
 
@@ -179,14 +179,14 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f).toOption
 
       override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
-        Foldable[IList].foldMap(fa.list)(f)(M)
+        Foldable[IList].foldMap(fa.list)(f)(using M)
 
       override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
         val revOpt: Maybe[F[NonEmptyList[B]]] =
           F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list){
             case ICons(a, as) => Maybe.just((f(a), as))
             case INil() => Maybe.empty
-          }(Reducer.ReverseNonEmptyListReducer[B])
+          }(using Reducer.ReverseNonEmptyListReducer[B])
 
         val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
         F.map(rev)(_.reverse)
@@ -210,7 +210,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def psumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
         fa.tail match {
           case INil() => f(fa.head)
-          case ICons(snd, rest) => G.plus(f(fa.head), psumMap1(NonEmptyList.nel(snd, rest))(f)(G))
+          case ICons(snd, rest) => G.plus(f(fa.head), psumMap1(NonEmptyList.nel(snd, rest))(f)(using G))
         }
 
       // would otherwise use traverse1Impl

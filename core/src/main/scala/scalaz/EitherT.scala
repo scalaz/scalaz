@@ -111,7 +111,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
   /** Alias for `filter`.
    */
   def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[A, F, B] =
-    filter(p)(M, F)
+    filter(p)(using M, F)
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
