@@ -7,7 +7,7 @@ sealed abstract class CaseInsensitive[A] {
   final def map[B: FoldCase](f: A => B): CaseInsensitive[B] = CaseInsensitive(f(original))
 
   final override def equals(other: Any): Boolean = other match {
-    case that: CaseInsensitive[_] => foldedCase == that.foldedCase
+    case that: CaseInsensitive[?] => foldedCase == that.foldedCase
     case _ => false
   }
 

@@ -595,7 +595,7 @@ abstract class PLensInstances {
   }
 
   /** Partial Lenses may be used implicitly as State monadic actions that get the potentially viewed portion of the state */
-  implicit def PLensFamilyState[A, B](plens: PLensFamily[A, _, B, _]): PState[A, B] =
+  implicit def PLensFamilyState[A, B](plens: PLensFamily[A, ?, B, ?]): PState[A, B] =
     plens.st
 
   implicit def PLensFamilyUnzip[S, R]: Unzip[λ[α => PLensFamily[S, R, α, α]]] =

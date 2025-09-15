@@ -424,7 +424,7 @@ abstract class LensInstances extends LensInstances0 {
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def LensFamilyState[A, B](lens: LensFamily[A, _, B, _]): State[A, B] =
+  implicit def LensFamilyState[A, B](lens: LensFamily[A, ?, B, ?]): State[A, B] =
     lens.st
 
   implicit def LensFamilyUnzip[S, R]: Unzip[λ[α => LensFamily[S, R, α, α]]] =

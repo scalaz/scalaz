@@ -137,7 +137,7 @@ object ImmutableArray extends ImmutableArrayInstances {
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
 
-    def componentType: Class[_] = arr.getClass().getComponentType
+    def componentType: Class[?] = arr.getClass().getComponentType
 
     def apply(idx: Int) = arr(idx)
 
@@ -217,7 +217,7 @@ object ImmutableArray extends ImmutableArrayInstances {
     import ImmutableArray.{WrappedImmutableArray => IAO}
     immArray match {
       case a: StringArray => new IAO.ofStringArray(a)
-      case a: ofRef[_] => new IAO.ofRef(a)
+      case a: ofRef[?] => new IAO.ofRef(a)
       case a: ofByte => new IAO.ofByte(a)
       case a: ofShort => new IAO.ofShort(a)
       case a: ofChar => new IAO.ofChar(a)
