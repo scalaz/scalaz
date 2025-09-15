@@ -41,7 +41,7 @@ final class OneAnd[F[_], A] private (
   override def toString: String = s"OneAnd($head,$tail)"
   override def hashCode: Int = head.hashCode + 13*tail.hashCode
   override def equals(that: Any): Boolean = that match {
-    case that: OneAnd[_, _] => (this eq that) || ((head == that.head) && (tail == that.tail))
+    case that: OneAnd[?, ?] => (this eq that) || ((head == that.head) && (tail == that.tail))
     case _ => false
   }
 }

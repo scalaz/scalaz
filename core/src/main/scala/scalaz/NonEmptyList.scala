@@ -130,7 +130,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   override def equals(any: Any): Boolean =
     any match {
-      case that: NonEmptyList[_] => this.list == that.list
+      case that: NonEmptyList[?] => this.list == that.list
       case _                     => false
     }
 

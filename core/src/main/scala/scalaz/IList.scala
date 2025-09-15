@@ -304,16 +304,16 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def reverse: IList[A] = {
     @tailrec def go(as: IList[A], acc: IList[A]): IList[A] = as match {
-      case c : ICons[_] => go(c.tail, ICons(c.head, acc))
-      case _ : INil[_] => acc
+      case c : ICons[?] => go(c.tail, ICons(c.head, acc))
+      case _ : INil[?] => acc
     }
     go(this, IList.empty)
   }
 
   def reverseMap[B](f: A => B): IList[B] = {
     @tailrec def go(as: IList[A], acc: IList[B]): IList[B] = as match {
-      case c : ICons[_] => go(c.tail, ICons(f(c.head), acc))
-      case _ : INil[_] => acc
+      case c : ICons[?] => go(c.tail, ICons(f(c.head), acc))
+      case _ : INil[?] => acc
     }
     go(this, IList.empty)
   }

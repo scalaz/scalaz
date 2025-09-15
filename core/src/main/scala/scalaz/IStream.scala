@@ -31,14 +31,14 @@ sealed abstract class IStream[A] { self =>
   // sacrifice stack safety for non-terminating programs instead? That's what
   // foldLeft is for. Life is meaningless, etc, etc.
   final def foldRightByName[B](z: =>B)(f: (=>A, =>B) => B): B = self match {
-    case _: Nil[_]        => z
+    case _: Nil[?]        => z
     case Cons(head, tail) => f(head.value, tail.value.foldRightByName(z)(f))
   }
 
   // Stack safe, but can't exit early. You may never escape.
   final def foldLeftByName[B](z: B)(f: (=>B, =>A) => B): B = {
     @tailrec def loop(t: IStream[A], acc: B): B = t match {
-      case _: Nil[_]        => acc
+      case _: Nil[?]        => acc
       case Cons(head, tail) => loop(tail.value, f(acc, head.value))
     }
     loop(self, z)
@@ -114,7 +114,7 @@ object IStream {
         a.foldRightByName(b)(Lazy.cons)
       def empty[A]: IStream[A] = IStream.empty[A]
 
-      def isEmpty[A](fa: IStream[A]): Boolean = fa.isInstanceOf[Nil[_]]
+      def isEmpty[A](fa: IStream[A]): Boolean = fa.isInstanceOf[Nil[?]]
 
       override def foldMap[A, B](fa: IStream[A])(f: A => B)(implicit F: Monoid[B]): B =
         foldRight(fa, F.zero)((a, b) => F.append(f(a), b))
@@ -123,7 +123,7 @@ object IStream {
         f: (A, =>B) => B
       ): B =
         fa match {
-          case _: Nil[_]        => z
+          case _: Nil[?]        => z
           case Cons(head, tail) => f(head.value, foldRight(tail.value, z)(f))
         }
 
@@ -146,7 +146,7 @@ object IStream {
 
       override def foldLeft[A, B](fa: IStream[A], z: B)(f: (B, A) => B): B = {
         @tailrec def loop(t: IStream[A], acc: B): B = t match {
-          case _: Nil[_]        => acc
+          case _: Nil[?]        => acc
           case Cons(head, tail) => loop(tail.value, f(acc, head.value))
         }
         loop(fa, z)
@@ -166,7 +166,7 @@ object IStream {
         @tailrec def loop(t: IStream[A], acc: Int): Int = t match {
           case Cons(_, tail) =>
             loop(tail.value, acc + 1)
-          case _: Nil[_] =>
+          case _: Nil[?] =>
             acc
         }
         loop(fa, 0)
