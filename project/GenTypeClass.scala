@@ -211,17 +211,17 @@ object GenTypeClass {
         val old = IO.read(f)
         val updated = updateSource(old)
         if(updated == old){
-          log.debug("No changed %s".format(f))
+          log.debug(s"No changed ${f}")
           (FileStatus.NoChange, updated)
         }else{
-          log.info("Updating %s".format(f))
+          log.info(s"Updating ${f}")
           (FileStatus.Updated, updated)
         }
       } else {
-        log.info("Creating %s".format(f))
+        log.info(s"Creating ${f}")
         (FileStatus.Created, source)
       }
-      log.debug("Contents: %s".format(updatedSource))
+      log.debug(s"Contents: ${updatedSource}")
       IO.delete(f)
       IO.write(f, updatedSource)
       (status, f)
