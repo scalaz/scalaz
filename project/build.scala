@@ -248,8 +248,8 @@ object build {
     typeClasses := Seq(),
     genToSyntax := {
       val tcs = typeClasses.value
-      val objects = tcs.map(tc => "object %s extends To%sSyntax".format(ScalazUtil.initLower(tc.name), tc.name)).mkString("\n")
-      val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
+      val objects = tcs.map(tc => s"object ${ScalazUtil.initLower(tc.name)} extends To${tc.name}Syntax").mkString("\n")
+      val all = "object all extends " + tcs.map(tc => s"To${tc.name}Syntax").mkString(" with ")
       objects + "\n\n" + all
     },
     typeClassTree := {
