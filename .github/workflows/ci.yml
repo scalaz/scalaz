@@ -27,7 +27,7 @@ jobs:
       with:
         java-version: ${{matrix.java}}
         distribution: zulu
-    - uses: coursier/cache-action@v6
+    - uses: coursier/cache-action@v7
     - run: ./sbt -v
            -Dcheck_build_file_imports
            checkGenTypeClasses
@@ -87,7 +87,7 @@ jobs:
       with:
         java-version: 25
         distribution: zulu
-    - uses: coursier/cache-action@v6
+    - uses: coursier/cache-action@v7
     - id: scala_3_version
       run: echo "value=$(cat .github/scala_3_latest.txt)" >> $GITHUB_OUTPUT
     - run: ./sbt -v
@@ -105,7 +105,7 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: 22
-    - uses: coursier/cache-action@v6
+    - uses: coursier/cache-action@v7
     - run: ./sbt -v
            -Dscala_js_wasm
            rootJS/Test/compile
