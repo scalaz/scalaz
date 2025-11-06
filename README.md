@@ -312,3 +312,4 @@ type Id[A] = A
 Support for Scalaz development is provided by [Jetbrains](https://www.jetbrains.com/idea/).
 
 Thanks to Mark Harrah and the sbt contributors for providing [our build tool](https://www.scala-sbt.org).
+<!-- Minor formatting fix -->
