@@ -138,7 +138,7 @@ object build {
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
-  private def Scala212 = "2.12.20"
+  private def Scala212 = "2.12.21"
   private def Scala213 = "2.13.18"
   private def Scala3 = "3.3.7"
 
