@@ -37,12 +37,12 @@ object IListUsage {
     val prod = ns.reduceLeftOption(_ * _)
 
     // Destructure with uncons
-    val s1 = ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))
+    val s1 = ns.uncons("empty", (h, t) => s"head is $h and tail is $t")
 
     // Destructure with matching
     val s2 = ns match {
       case INil() => "empty"
-      case ICons(h, t) => "head is %s and tail is %s".format(h, t)
+      case ICons(h, t) => s"head is $h and tail is $t"
     }
 
     // Same typeclass instances as List

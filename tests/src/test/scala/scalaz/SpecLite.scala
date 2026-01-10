@@ -49,14 +49,14 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
     def must_===(expected: A)(implicit show: Show[A], equal: Equal[A]): Unit = {
       val act = actual
       def test = Equal[A].equal(expected, act)
-      def koMessage = "%s !== %s".format(Show[A].shows(act), Show[A].shows(expected))
+      def koMessage = s"${Show[A].shows(act)} !== ${Show[A].shows(expected)}"
       if (!test)
         fail(koMessage)
     }
     def must_==(expected: A): Unit = {
       val act = actual
       def test = expected == act
-      def koMessage = "%s !== %s".format(act, expected)
+      def koMessage = s"$act !== $expected"
       if (!test)
         fail(koMessage)
     }
@@ -64,7 +64,7 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
     def mustMatch(f: PartialFunction[A, Boolean]): Unit = {
       val act = actual
       def test = f.isDefinedAt(act) && f(act)
-      def koMessage = "%s does not satisfy partial function".format(act)
+      def koMessage = s"$act does not satisfy partial function"
       if (!test)
         fail(koMessage)
     }
@@ -77,7 +77,7 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
     def mustBe_<(x: Int)(implicit ev: A <:< Int) = {
       val act = actual
       def test = ev(act) < x
-      def koMessage = "%s <! %s".format(actual, x)
+      def koMessage = s"$actual <! $x"
       if (!test)
         fail(koMessage)
     }

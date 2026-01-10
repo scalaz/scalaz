@@ -177,7 +177,7 @@ sealed abstract class LazyOptionInstances {
     }
 
   implicit def lazyOptionShow[A](implicit S: Show[A]): Show[LazyOption[A]] =
-    Show.shows(_.fold(a => "LazySome(%s)".format(S.shows(a)), "LazyNone"))
+    Show.shows(_.fold(a => s"LazySome(${S.shows(a)})", "LazyNone"))
 
   /* TODO
 implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
