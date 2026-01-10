@@ -497,10 +497,7 @@ sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
 
 sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
-    new Equal[A \/ B] {
-      def equal(a1: A \/ B, a2: A \/ B) =
-        a1 === a2
-    }
+    (a1: A \/ B, a2: A \/ B) => a1 === a2
 
   implicit def DisjunctionShow[A: Show, B: Show]: Show[A \/ B] =
     Show.show(_.show)

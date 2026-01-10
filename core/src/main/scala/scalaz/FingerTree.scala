@@ -617,10 +617,9 @@ sealed abstract class FingerTreeInstances {
     }
 
   implicit def fingerTreeEqual[V, A : Equal]: Equal[FingerTree[V, A]] =
-    new Equal[FingerTree[V, A]] {
+    (x: FingerTree[V, A], y: FingerTree[V, A]) => {
       import std.lazylist._
-      def equal(x: FingerTree[V, A], y: FingerTree[V, A]) =
-        Equal[LazyList[A]].equal(x.toLazyList, y.toLazyList)
+      Equal[LazyList[A]].equal(x.toLazyList, y.toLazyList)
     }
 }
 
