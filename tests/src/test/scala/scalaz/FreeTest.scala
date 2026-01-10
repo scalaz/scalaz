@@ -39,9 +39,9 @@ object FreeList extends FreeListInstances {
       Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeListArb[A].arbitrary.map(_.f)))
     ).map(FreeList.apply))
 
-  implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] = new Equal[FreeList[A]] {
-    def equal(a: FreeList[A], b: FreeList[A]) = Equal[List[A]].equal(a.f.runM(identity), b.f.runM(identity))
-  }
+  implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] =
+    (a: FreeList[A], b: FreeList[A]) =>
+      Equal[List[A]].equal(a.f.runM(identity), b.f.runM(identity))
 
   implicit def freeListMonoid[A:Monoid]: Monoid[FreeList[A]] = new Monoid[FreeList[A]] {
     def zero = FreeList(Monoid[Free[List, A]].zero)
@@ -75,9 +75,9 @@ object FreeOption {
       Gen.choose(0, 1).flatMap(Gen.listOfN(_, freeOptionArb[A].arbitrary.map(_.f)).map(_.headOption))
     ).map(FreeOption.apply))
 
-  implicit def freeOptionEq[A](implicit A: Equal[A]): Equal[FreeOption[A]] = new Equal[FreeOption[A]] {
-    def equal(a: FreeOption[A], b: FreeOption[A]) = Equal[Option[A]].equal(a.f.runRecM(identity), b.f.runRecM(identity))
-  }
+  implicit def freeOptionEq[A](implicit A: Equal[A]): Equal[FreeOption[A]] =
+    (a: FreeOption[A], b: FreeOption[A]) =>
+      Equal[Option[A]].equal(a.f.runRecM(identity), b.f.runRecM(identity))
 }
 
 object FreeState {

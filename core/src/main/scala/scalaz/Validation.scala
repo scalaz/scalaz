@@ -492,10 +492,7 @@ final class ValidationFlatMap[E, A] private[scalaz](private val self: Validation
 
 sealed abstract class ValidationInstances1 extends ValidationInstances2 {
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
-      new Equal[Validation[E, A]] {
-        def equal(a1: Validation[E, A], a2: Validation[E, A]) =
-          a1 === a2
-      }
+    _ === _
 
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] = {
     import scalaz.syntax.show._

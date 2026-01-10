@@ -125,13 +125,12 @@ sealed abstract class InputInstances {
       )
     }
 
-  implicit def inputEqual[A](implicit A: Equal[A]): Equal[Input[A]] = new Equal[Input[A]] {
-    def equal(a1: Input[A], a2: Input[A]): Boolean = a1.fold(
+  implicit def inputEqual[A](implicit A: Equal[A]): Equal[Input[A]] =
+    (a1: Input[A], a2: Input[A]) => a1.fold(
       empty = a2.isEmpty
       , el = a => a2.exists(z => A.equal(a, z))
       , eof = a2.isEof
     )
-  }
 
   implicit def inputShow[A](implicit A: Show[A]): Show[Input[A]] = Show.show { i =>
     import scalaz.syntax.show._
