@@ -376,7 +376,7 @@ abstract class StreamT[M[_], A] { self =>
   /** Returns a new [[StreamT]] only containing items that are different from
     * their previous items.
     *
-    * @param `latest`
+    * @param latest
     *   the assuming previous item of the head element of this [[StreamT]]
     *
     * <img style="max-width: 100%"
