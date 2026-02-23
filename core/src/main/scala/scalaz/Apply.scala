@@ -91,6 +91,34 @@ trait Apply[F[_]] extends Functor[F] { self =>
     ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))
   def ap8[A,B,C,D,E,FF,G,H,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: F[(A,B,C,D,E,FF,G,H) => R]): F[R] =
     ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))
+  def ap9[A,B,C,D,E,FF,G,H,I,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I])(f: F[(A,B,C,D,E,FF,G,H,I) => R]): F[R] =
+    ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))
+  def ap10[A,B,C,D,E,FF,G,H,I,J,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J])(f: F[(A,B,C,D,E,FF,G,H,I,J) => R]): F[R] =
+    ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))
+  def ap11[A,B,C,D,E,FF,G,H,I,J,K,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K])(f: F[(A,B,C,D,E,FF,G,H,I,J,K) => R]): F[R] =
+    ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))
+  def ap12[A,B,C,D,E,FF,G,H,I,J,K,L,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L) => R]): F[R] =
+    ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))
+  def ap13[A,B,C,D,E,FF,G,H,I,J,K,L,M,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M) => R]): F[R] =
+    ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))))
+  def ap14[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N) => R]): F[R] =
+    ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))))
+  def ap15[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O) => R]): F[R] =
+    ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))))))
+  def ap16[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P) => R]): F[R] =
+    ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))))))
+  def ap17[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q) => R]): F[R] =
+    ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))))))))
+  def ap18[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[RR])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR) => R]): F[R] =
+    ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))))))))
+  def ap19[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[RR], fs: => F[S])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S) => R]): F[R] =
+    ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))))))))))
+  def ap20[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T) => R]): F[R] =
+    ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))))))))))
+  def ap21[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T,U,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T], fu: => F[U])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T,U) => R]): F[R] =
+    ap(fu)(ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))))))))))))))))
+  def ap22[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T,U,V,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T], fu: => F[U], fv: => F[V])(f: F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,RR,S,T,U,V) => R]): F[R] =
+    ap(fv)(ap(fu)(ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))))))))))))))))
 
   def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     ap(fb)(map(fa)(f.curried))
@@ -121,6 +149,64 @@ trait Apply[F[_]] extends Functor[F] { self =>
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): F[R] =
     ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))
+  def apply13[A, B, C, D, E, FF, G, H, I, J, K, L, M, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M) => R): F[R] =
+    ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))))
+  def apply14[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N) => R): F[R] =
+    ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))))
+  def apply15[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O) => R): F[R] =
+    ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))))))
+  def apply16[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P) => R): F[R] =
+    ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))))))
+  def apply17[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q) => R): F[R] =
+    ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))))))))
+  def apply18[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q], fr: => F[RR])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR) => R): F[R] =
+    ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))))))))
+  def apply19[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q], fr: => F[RR], fs: => F[S])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S) => R): F[R] =
+    ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))))))))))
+  def apply20[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T) => R): F[R] =
+    ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))))))))))
+  def apply21[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T],
+                                          fu: => F[U])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U) => R): F[R] =
+    ap(fu)(ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))))))))))))
+  def apply22[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, V, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
+                                          fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
+                                          fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L],
+                                          fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P],
+                                          fq: => F[Q], fr: => F[RR], fs: => F[S], ft: => F[T],
+                                          fu: => F[U], fv: => F[V])(f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, V) => R): F[R] =
+    ap(fv)(ap(fu)(ap(ft)(ap(fs)(ap(fr)(ap(fq)(ap(fp)(ap(fo)(ap(fn)(ap(fm)(ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))))))))))))
 
   final def applying1[Z, A1](f: A1 => Z)(
     implicit a1: F[A1]
@@ -146,6 +232,40 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply4(fa, fb, fc, fd)((_,_,_,_))
   def tuple5[A,B,C,D,E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E]): F[(A,B,C,D,E)] =
     apply5(fa, fb, fc, fd, fe)((_,_,_,_,_))
+  def tuple6[A,B,C,D,E,FF](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF]): F[(A,B,C,D,E,FF)] =
+    apply6(fa, fb, fc, fd, fe, ff)((_,_,_,_,_,_))
+  def tuple7[A,B,C,D,E,FF,G](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G]): F[(A,B,C,D,E,FF,G)] =
+    apply7(fa, fb, fc, fd, fe, ff, fg)((_,_,_,_,_,_,_))
+  def tuple8[A,B,C,D,E,FF,G,H](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H]): F[(A,B,C,D,E,FF,G,H)] =
+    apply8(fa, fb, fc, fd, fe, ff, fg, fh)((_,_,_,_,_,_,_,_))
+  def tuple9[A,B,C,D,E,FF,G,H,I](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I]): F[(A,B,C,D,E,FF,G,H,I)] =
+    apply9(fa, fb, fc, fd, fe, ff, fg, fh, fi)((_,_,_,_,_,_,_,_,_))
+  def tuple10[A,B,C,D,E,FF,G,H,I,J](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J]): F[(A,B,C,D,E,FF,G,H,I,J)] =
+    apply10(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj)((_,_,_,_,_,_,_,_,_,_))
+  def tuple11[A,B,C,D,E,FF,G,H,I,J,K](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K]): F[(A,B,C,D,E,FF,G,H,I,J,K)] =
+    apply11(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk)((_,_,_,_,_,_,_,_,_,_,_))
+  def tuple12[A,B,C,D,E,FF,G,H,I,J,K,L](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L]): F[(A,B,C,D,E,FF,G,H,I,J,K,L)] =
+    apply12(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl)((_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple13[A,B,C,D,E,FF,G,H,I,J,K,L,M](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M)] =
+    apply13(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm)((_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple14[A,B,C,D,E,FF,G,H,I,J,K,L,M,N](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N)] =
+    apply14(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn)((_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple15[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O)] =
+    apply15(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple16[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P)] =
+    apply16(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple17[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q)] =
+    apply17(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple18[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[R]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R)] =
+    apply18(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq, fr)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple19[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[R], fs: => F[S]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S)] =
+    apply19(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq, fr, fs)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple20[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[R], fs: => F[S], ft: => F[T]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T)] =
+    apply20(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq, fr, fs, ft)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple21[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[R], fs: => F[S], ft: => F[T], fu: => F[U]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U)] =
+    apply21(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq, fr, fs, ft, fu)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+  def tuple22[A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L], fm: => F[M], fn: => F[N], fo: => F[O], fp: => F[P], fq: => F[Q], fr: => F[R], fs: => F[S], ft: => F[T], fu: => F[U], fv: => F[V]): F[(A,B,C,D,E,FF,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V)] =
+    apply22(fa, fb, fc, fd, fe, ff, fg, fh, fi, fj, fk, fl, fm, fn, fo, fp, fq, fr, fs, ft, fu, fv)((_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
 
   def lift2[A, B, C](f: (A, B) => C): (F[A], F[B]) => F[C] =
     apply2(_, _)(f)
@@ -169,6 +289,26 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply11(_, _, _, _, _, _, _, _, _, _, _)(f)
   def lift12[A, B, C, D, E, FF, G, H, I, J, K, L, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L]) => F[R] =
     apply12(_, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift13[A, B, C, D, E, FF, G, H, I, J, K, L, M, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M]) => F[R] =
+    apply13(_, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift14[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N]) => F[R] =
+    apply14(_, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift15[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O]) => F[R] =
+    apply15(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift16[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P]) => F[R] =
+    apply16(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift17[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q]) => F[R] =
+    apply17(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift18[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q], F[RR]) => F[R] =
+    apply18(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift19[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q], F[RR], F[S]) => F[R] =
+    apply19(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift20[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q], F[RR], F[S], F[T]) => F[R] =
+    apply20(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift21[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q], F[RR], F[S], F[T], F[U]) => F[R] =
+    apply21(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
+  def lift22[A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, V, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L, M, N, O, P, Q, RR, S, T, U, V) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L], F[M], F[N], F[O], F[P], F[Q], F[RR], F[S], F[T], F[U], F[V]) => F[R] =
+    apply22(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)(f)
 
   /** Combine `fa` and `fb` according to `Apply[F]` with a function that discards the `A`(s) */
   def discardLeft[A, B](fa: => F[A], fb: => F[B]): F[B] = apply2(fa,fb)((_,b) => b)
