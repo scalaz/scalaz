@@ -15,7 +15,7 @@ jobs:
       id: generate_token
       uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
       with:
-        app-id: 89659
+        client-id: 89659
         private-key: ${{ secrets.SCALAZ_BOT_KEY }}
     - uses: sbt/setup-sbt@508b753e53cb6095967669e0911487d2b9bc9f41 # v1.1.22
     - name: Launch Scala Steward
