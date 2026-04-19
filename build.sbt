@@ -73,13 +73,57 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects*)
 
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(
+    standardSettings,
+    unmanagedSourcePathSettings,
+    name := "scalaz-core",
+    Compile / sourceGenerators += (Compile / sourceManaged).map{
+      dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
+    }.taskValue,
+    buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+    buildInfoPackage := build.buildInfoPackageName,
+    buildInfoObject := "ScalazBuildInfo",
+  )
+  .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+  .jsSettings(
+    jvm_js_settings,
+    scalajsProjectSettings,
+    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
+  )
+  .jvmSettings(
+    jvm_js_settings,
+    typeClasses := TypeClass.core
+  )
+
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
+lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(
+    standardSettings,
+    unmanagedSourcePathSettings,
+    name := "scalaz-effect",
+  )
+  .dependsOn(core)
+  .jsSettings(scalajsProjectSettings)
+  .jvmSettings(
+    typeClasses := TypeClass.effect
+  )
+
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
 lazy val effectNative = effect.native
+
+lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(
+    standardSettings,
+    unmanagedSourcePathSettings,
+    name := "scalaz-iteratee",
+  )
+  .dependsOn(core, effect)
+  .jsSettings(scalajsProjectSettings)
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
