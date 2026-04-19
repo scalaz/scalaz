@@ -126,7 +126,7 @@ object build {
   private def Scala213 = "2.13.18"
   private def Scala3 = "3.3.7"
 
-  private[this] val buildInfoPackageName = "scalaz"
+  val buildInfoPackageName = "scalaz"
 
   lazy val unmanagedSourcePathSettings: Seq[Sett] = Def.settings(
     Seq(Compile, Test).map { scope =>
@@ -343,55 +343,11 @@ object build {
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
   }
 
-  private[this] val jvm_js_settings = Seq(
+  val jvm_js_settings = Seq(
     (Compile / unmanagedSourceDirectories) += {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
-
-  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-core",
-      Compile / sourceGenerators += (Compile / sourceManaged).map{
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      }.taskValue,
-      buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := buildInfoPackageName,
-      buildInfoObject := "ScalazBuildInfo",
-    )
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
-    .jsSettings(
-      jvm_js_settings,
-      scalajsProjectSettings,
-      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
-    )
-    .jvmSettings(
-      jvm_js_settings,
-      typeClasses := TypeClass.core
-    )
-
-  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-effect",
-    )
-    .dependsOn(core)
-    .jsSettings(scalajsProjectSettings)
-    .jvmSettings(
-      typeClasses := TypeClass.effect
-    )
-
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-iteratee",
-    )
-    .dependsOn(core, effect)
-    .jsSettings(scalajsProjectSettings)
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
