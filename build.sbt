@@ -204,6 +204,7 @@ def scalacheckBindingProject(
     )
     .nativeSettings(
       nativeSettings,
+      evictionErrorLevel := Level.Warn,
       (Compile / unmanagedSourceDirectories) += {
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/native/src/main/scala"
       },
@@ -247,6 +248,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .nativeSettings(
     nativeSettings,
+    evictionErrorLevel := Level.Warn,
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33
