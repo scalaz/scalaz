@@ -184,6 +184,9 @@ lazy val scalacheckBinding =
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
+    .nativeSettings(
+      evictionErrorLevel := Level.Warn,
+    )
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
@@ -223,6 +226,9 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33,
+  )
+  .nativeSettings(
+    evictionErrorLevel := Level.Warn,
   )
   .jsSettings(
     minSuccessfulTests := 10,
