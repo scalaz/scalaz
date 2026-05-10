@@ -2,8 +2,8 @@ name: CI
 on:
   pull_request:
   push:
-  schedule:
-  - cron: '0 2 * * *'
+    branches:
+      - "series/7.3.x"
 defaults:
   run:
     shell: bash
