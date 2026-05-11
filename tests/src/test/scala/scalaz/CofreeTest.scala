@@ -77,7 +77,6 @@ object CofreeTest extends SpecLite with CofreeTestInstances {
     implicitly[Cogen[OneAndList[A]]].contramap(oneAndListCofreeOptionIso.from.apply)
 
   implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
-    import org.scalacheck.Arbitrary._
     import org.scalacheck.Gen
     val arb = Arbitrary { Gen.listOfN(20, implicitly[Arbitrary[A]].arbitrary ) }
     Functor[Arbitrary].map(arb){

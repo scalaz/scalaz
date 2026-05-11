@@ -35,12 +35,10 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
   )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
-    import std.option._
     F.foldRight[Option[A], Z](run, z)((a, b) => Foldable[Option].foldRight[A, Z](a, b)(f))
   }
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[OptionT[F, B]] = {
-    import std.option._
     G.map(F.traverse(run)(o => Traverse[Option].traverse(o)(f)))(OptionT(_))
   }
 
