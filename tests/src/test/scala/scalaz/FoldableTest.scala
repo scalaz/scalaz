@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import syntax.apply._
 import syntax.foldable._
-import syntax.equal._
 import org.scalacheck.Prop.forAll
 import scalaz.Maybe.{Empty, Just}
 

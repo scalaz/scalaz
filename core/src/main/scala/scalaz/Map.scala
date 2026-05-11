@@ -1087,7 +1087,6 @@ sealed abstract class MapInstances0 extends MapInstances1 {
 sealed abstract class MapInstances extends MapInstances0 {
   import ==>>._
 
-  import std.list._
   import std.tuple._
   import std.list._
 
