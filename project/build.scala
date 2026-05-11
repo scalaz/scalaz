@@ -117,9 +117,7 @@ object build {
   }
 
   private val stdOptions = Seq(
-    "-opt:l:method",
     "-deprecation",
-    "-Xlint:adapted-args",
     "-encoding", "UTF-8",
     "-feature",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
@@ -127,10 +125,16 @@ object build {
   )
 
   val unusedWarnOptions = Def.setting {
-    Seq("-Ywarn-unused:imports")
+    scalaBinaryVersion.value match {
+      case "3" =>
+        Seq("-Wunused:imports")
+      case _ =>
+        Seq("-Ywarn-unused:imports")
+    }
   }
 
-  val lintOptions = Seq(
+  val oldLintOptions = Seq(
+    "-Xlint:adapted-args",
     "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -202,7 +206,14 @@ object build {
           Nil
       }
     },
-    scalacOptions ++= lintOptions,
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Nil
+        case _ =>
+          oldLintOptions
+      }
+    },
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((0 | 3, _)) =>
         Seq(
