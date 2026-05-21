@@ -10,7 +10,7 @@ trait AnyValInstances {
 
   implicit val unitInstance: Monoid[Unit] & Enum[Unit] & Show[Unit] & SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
     override def show(f: Unit): Cord = Cord()
-    override def shows(f: Unit): String = ().toString
+    override def shows(f: Unit): String = "()"
 
     def append(f1: Unit, f2: => Unit) = ()
 
