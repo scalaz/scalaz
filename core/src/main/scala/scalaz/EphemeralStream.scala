@@ -333,11 +333,6 @@ object EphemeralStream extends EphemeralStreamInstances {
   def range(lower: Int, upper: Int): EphemeralStream[Int] =
     if (lower >= upper) emptyEphemeralStream else cons(lower, range(lower + 1, upper))
 
-  def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
-    case Stream() => emptyEphemeralStream
-    case h #:: t  => cons(h, fromStream(t))
-  }
-
   def fromLazyList[A](s: LazyList[A]): EphemeralStream[A] = s match {
     case LazyList() => emptyEphemeralStream
     case h #:: t  => cons(h, fromLazyList(t))

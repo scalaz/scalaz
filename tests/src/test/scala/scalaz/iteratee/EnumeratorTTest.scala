@@ -10,7 +10,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import Id._
 
 object EnumeratorTTest extends SpecLite {
-  implicit def enumeratorTArb[F[_], A](implicit FA: Arbitrary[List[A]], F: Monad[F]): Arbitrary[EnumeratorT[A, F]] = Functor[Arbitrary].map(FA)(l => EnumeratorT.enumStream[A, F](l.toStream))
+  implicit def enumeratorTArb[F[_], A](implicit FA: Arbitrary[List[A]], F: Monad[F]): Arbitrary[EnumeratorT[A, F]] = Functor[Arbitrary].map(FA)(l => EnumeratorT.enumLazyList[A, F](l.to(LazyList)))
 
   implicit def enumeratorEqual[A](implicit EQ: Equal[A]): Equal[Enumerator[A]] = (en1: Enumerator[A], en2: Enumerator[A]) => {
     val l1 = (consume[A, Id, List] &= en1).run
@@ -32,12 +32,12 @@ object EnumeratorTTest extends SpecLite {
   }
 
   "map" in {
-    val e = enumStream[Int, Id](Stream(1, 2, 3))
+    val e = enumLazyList[Int, Id](LazyList(1, 2, 3))
     (consume[Int, Id, List] &= e.map(_ * 2)).run must_===(List(2, 4, 6))
   }
 
   "flatMap" in {
-    val e = enumStream[Int, Id](Stream(1, 2, 3))
+    val e = enumLazyList[Int, Id](LazyList(1, 2, 3))
     (consume[Int, Id, List] &= e.flatMap(i => e.map(_ + i))).run must_===(List(2, 3, 4, 3, 4, 5, 4, 5, 6))
   }
 
@@ -47,22 +47,22 @@ object EnumeratorTTest extends SpecLite {
   }
 
   "uniq" in {
-    val e = enumStream[Int, Id](Stream(1, 1, 2, 2, 2, 3, 3))
+    val e = enumLazyList[Int, Id](LazyList(1, 1, 2, 2, 2, 3, 3))
     (consume[Int, Id, List] &= e.uniq).run must_===(List(1, 2, 3))
   }
 
   "zipWithIndex" in {
-    val e = enumStream[Int, Id](Stream(3, 4, 5))
+    val e = enumLazyList[Int, Id](LazyList(3, 4, 5))
     (consume[(Int, Long), Id, List] &= e.zipWithIndex).run must_===(List((3, 0L), (4, 1L), (5, 2L)))
   }
 
   "zipWithIndex" in {
-    val e = enumStream[Int, Id](Stream(3, 4, 5))
+    val e = enumLazyList[Int, Id](LazyList(3, 4, 5))
     (consume[(Int, Long), Id, List] &= e.zipWithIndex).run must_===(List((3, 0L), (4, 1L), (5, 2L)))
   }
 
   "zipWithIndex in combination with another function" in {
-    val e = enumStream[Int, Id](Stream(3, 4, 4, 5))
+    val e = enumLazyList[Int, Id](LazyList(3, 4, 4, 5))
     (consume[(Int, Long), Id, List] &= e.uniq.zipWithIndex).run must_===(List((3, 0L), (4, 1L), (5, 2L)))
   }
 
@@ -83,16 +83,16 @@ object EnumeratorTTest extends SpecLite {
   }
 
   "drain" in {
-    val e = enumStream[Int, Id](Stream(1, 2, 3))
+    val e = enumLazyList[Int, Id](LazyList(1, 2, 3))
     e.drainTo[List] must_===(List(1, 2, 3))
   }
 
   "perform an interleaved effect" in {
     import scalaz.syntax.monoid._
     var v: Int = 0
-    val enum1 = enumStream[Int, IO](Stream(1, 2))
+    val enum1 = enumLazyList[Int, IO](LazyList(1, 2))
     val effect = EnumeratorT.perform[Int, IO, Unit](IO { v = 1 })
-    val enum2 = enumStream[Int, IO](Stream(3, 4))
+    val enum2 = enumLazyList[Int, IO](LazyList(3, 4))
 
     val testIter = IterateeT.fold[Int, IO, Boolean](true) {
       case (false, _) => false

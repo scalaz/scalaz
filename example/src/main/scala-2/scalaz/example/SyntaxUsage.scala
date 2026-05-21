@@ -69,9 +69,9 @@ object SyntaxUsage {
   def stdSyntax(): Unit = {
     import scalaz.Tags.Last
     import scalaz.std.anyVal._
-    import scalaz.std.stream.streamSyntax._
+    import scalaz.std.lazylist.lazylistSyntax._
 
-    val interleaved = Stream(1, 3, 5).interleave(Stream(2, 4, 6))
+    val interleaved = LazyList(1, 3, 5).interleave(LazyList(2, 4, 6))
 
     import scalaz.std.list._
     import scalaz.std.option._

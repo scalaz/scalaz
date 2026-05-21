@@ -51,8 +51,6 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   def list: IList[A] = head :: tail
 
-  def stream: Stream[A] = head #:: tail.toStream
-
   def toZipper: Zipper[A] = zipper(LazyList.empty, head, tail.toLazyList)
 
   def zipperEnd: Zipper[A] = {

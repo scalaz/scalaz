@@ -73,9 +73,9 @@ trait EnumeratorPFunctions {
       EnumeratorT.perform[E, G, B](trans(f))
   }
 
-  def enumPStream[E, F[_]: Monad](xs : Stream[E]): EnumeratorP[E, F] = new EnumeratorP[E, F] {
+  def enumPLazyList[E, F[_]: Monad](xs : LazyList[E]): EnumeratorP[E, F] = new EnumeratorP[E, F] {
     def apply[G[_]: Monad](trans: F ~> G): EnumeratorT[E, G] =
-      enumStream[E, G](xs)
+      enumLazyList[E, G](xs)
   }
 
   def liftE2[J, K, I, F[_]](e2t: ForallM[({type l[β[_]] = Enumeratee2T[J, K, I, β]})#l]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {

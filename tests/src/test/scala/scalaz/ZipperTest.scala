@@ -26,7 +26,7 @@ object ZipperTest extends SpecLite {
 
   "Zipper Move Then To LazyList" in check {
     val n = NonEmptyList(1, 2, 3, 4)
-    n.toZipper.move(2).map(_.toLazyList).exists(_ ==(n.stream))
+    n.toZipper.move(2).map(_.toLazyList).exists(_ ==(n.toLazyList))
   }
 
   "Next Affects Lengths" ! forAll { (xs: LazyList[Int]) =>

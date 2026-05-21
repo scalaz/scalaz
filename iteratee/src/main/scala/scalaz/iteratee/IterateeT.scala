@@ -83,10 +83,10 @@ sealed abstract class IterateeT[E, F[_], A] {
   /**
    * Combine this Iteratee with an Enumerator-like function.
    *
-   * Often used in combination with the implicit views such as `enumStream` and `enumIterator`, for example:
+   * Often used in combination with the implicit views such as `enumLazyList` and `enumIterator`, for example:
    *
    * {{{
-   * head[Unit, Int, Id] >>== Stream.continually(1) // enumStream(Stream.continually(1))
+   * head[Unit, Int, Id] >>== LazyList.continually(1) // enumLazyList(LazyList.continually(1))
    * }}}
    *
    * @param f An Enumerator-like function. If the type parameters `EE` and `BB` are chosen to be

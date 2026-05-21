@@ -138,7 +138,7 @@ object MixedBag {
       changedExtZipper = zipperAtDot.copy(rights = "log".to(LazyList))
 
       // Convert the Zipper back to a string
-      newFileName = changedExtZipper.toStream.mkString
+      newFileName = changedExtZipper.toLazyList.mkString
     } yield (oldExtension, newFileName)
   }
 }

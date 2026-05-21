@@ -17,13 +17,6 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
     zipper(lefts map f, f(focus), rights map f)
 
   /**
-   * Get the Stream representation of this Zipper. This fully traverses `lefts`. `rights` is
-   * not evaluated.
-   */
-  def toStream: Stream[A] =
-    (lefts.reverse ++ focus #:: rights).toStream
-
-  /**
    * Get the LazyList representation of this Zipper. This fully traverses `lefts`. `rights` is
    * not evaluated.
    */

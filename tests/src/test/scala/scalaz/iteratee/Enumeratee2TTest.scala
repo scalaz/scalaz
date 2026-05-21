@@ -21,8 +21,8 @@ object Enumeratee2TTest extends SpecLite {
   }
 
   "join equal pairs" in {
-    val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 5, 7))
-    val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 6))
+    val enum1 = enumLazyList[Int, IterateeM](LazyList(1, 3, 5, 7))
+    val enum2 = enumLazyList[Int, Id](LazyList(2, 3, 4, 5, 6))
 
     val outer = joinI[Int, Int, Id](intO).apply(consume[(Int, Int), Id, List].value) &= enum1
     val inner = outer.run &= enum2
@@ -34,8 +34,8 @@ object Enumeratee2TTest extends SpecLite {
     type E3I = Either3[Int, (Int, Int), Int]
     type E3LI = List[E3I]
     "match equal elements, retaining unequal elements on the \"side\" they came from" in {
-      val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 3, 5, 7, 8, 8))
-      val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
+      val enum1 = enumLazyList[Int, IterateeM](LazyList(1, 3, 3, 5, 7, 8, 8))
+      val enum2 = enumLazyList[Int, Id](LazyList(2, 3, 4, 5, 5, 6, 8, 8))
 
       val consumer = consume[E3I, Id, List]
       val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id](intO).apply[E3LI], vtLift)
@@ -61,8 +61,8 @@ object Enumeratee2TTest extends SpecLite {
   }
 
   "merge sorted iteratees" in {
-    val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 5))
-    val enum2 = enumStream[Int, Id](Stream(2, 3, 3, 4, 5, 6))
+    val enum1 = enumLazyList[Int, IterateeM](LazyList(1, 3, 5))
+    val enum2 = enumLazyList[Int, Id](LazyList(2, 3, 3, 4, 5, 6))
 
     val outer = mergeI[Int, Id].apply(consume[Int, Id, List].value) &= enum1
     val inner = outer.run &= enum2
@@ -71,8 +71,8 @@ object Enumeratee2TTest extends SpecLite {
   }
 
   "cross the first element with all of the second iteratee's elements" in {
-    val enum1 = enumStream[Int, Id](Stream(1, 3, 5))
-    val enum2 = enumStream[Int, Id](Stream(2, 3, 4))
+    val enum1 = enumLazyList[Int, Id](LazyList(1, 3, 5))
+    val enum2 = enumLazyList[Int, Id](LazyList(2, 3, 4))
 
     val consumer = consume[(Int, Int), Id, List]
     val producer = enum1 cross enum2
@@ -84,12 +84,12 @@ object Enumeratee2TTest extends SpecLite {
   "join the first element with all of the second iteratee's elements, which compare equal" in {
     val enum1p = new EnumeratorP[Int, Id] {
       def apply[F[_]: Monad](trans: Id ~> F): EnumeratorT[Int, F] =
-        enumStream[Int, F](Stream(1))
+        enumLazyList[Int, F](LazyList(1))
     }
 
     val enum2p = new EnumeratorP[Int, Id] {
       def apply[F[_]: Monad](trans: Id ~> F): EnumeratorT[Int, F] =
-        enumStream[Int, F](Stream(1, 1, 1))
+        enumLazyList[Int, F](LazyList(1, 1, 1))
     }
 
     val consumer = consume[(Int, Int), Id, List]

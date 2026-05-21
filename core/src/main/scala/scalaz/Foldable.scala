@@ -1,7 +1,6 @@
 package scalaz
 
 ////
-import scala.annotation.nowarn
 /**
  * A type parameter implying the ability to extract zero or more
  * values of that type.
@@ -138,7 +137,7 @@ trait Foldable[F[_]]  { self =>
   /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
 
-  /** Deforested alias for `toStream(fa).size`. */
+  /** Deforested alias for `toLazyList(fa).size`. */
   def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   /**
@@ -165,8 +164,6 @@ trait Foldable[F[_]]  { self =>
   def toSet[A](fa: F[A]): Set[A] = {
     foldLeft(fa, Set.newBuilder[A])(_ += _).result()
   }
-  @nowarn("since=2.13.0")
-  def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
 
   def toLazyList[A](fa: F[A]): LazyList[A] = foldRight[A, LazyList[A]](fa, LazyList.empty)(LazyList.cons(_, _))
 
@@ -311,7 +308,7 @@ trait Foldable[F[_]]  { self =>
     psum(fa)
 
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
-  /** Deforested alias for `toStream(fa).isEmpty`. */
+  /** Deforested alias for `toLazyList(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
   /** Whether `a` is an element of `fa`. */
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))

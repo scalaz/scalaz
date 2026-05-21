@@ -31,7 +31,7 @@ object MonoidTest extends SpecLite {
   }
 
   "unfold" in {
-    val ss = std.stream.unfold(1) {
+    val ss = std.lazylist.unfold(1) {
       case x if x < 10 => Some((x.toString, x * 2))
       case _           => None
     }

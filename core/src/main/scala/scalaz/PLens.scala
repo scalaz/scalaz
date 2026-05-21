@@ -484,47 +484,6 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     plens(v =>
       v.lastOption map (a => Store(x => v.patch(v.length - 1, Vector(x), 1), a)))
 
-  import Stream._
-
-  def streamHeadPLens[A]: Stream[A] @?> A =
-    plens {
-      case Empty => None
-      case h #:: t => Some(Store(_ #:: t, h))
-    }
-
-  def streamTailPLens[A]: Stream[A] @?> Stream[A] =
-    plens {
-      case Empty => None
-      case h #:: t => Some(Store(h #:: _, t))
-    }
-
-  def streamNthPLens[A](n: Int): Stream[A] @?> A =
-    if(n < 0)
-      nil
-    else if(n == 0)
-      streamHeadPLens
-    else
-      streamNthPLens(n - 1) compose streamTailPLens
-
-  def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
-    @annotation.tailrec
-    def lookupr(t: (Stream[(K, V)], (K, V), Stream[(K, V)])): Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
-      t match {
-        case (_, (k, _), _) if p(k)    => Some(t)
-        case (_, _     , Stream.Empty) => None
-        case (l, x     , r #:: rs)     => lookupr((x #:: l, r, rs))
-      }
-    plens {
-      case Stream.Empty => None
-      case h #:: t => lookupr((Stream.empty, h, t)) map {
-        case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
-      }
-    }
-  }
-
-  def streamLookupPLens[K: Equal, V](k: K): Stream[(K, V)] @?> V =
-    streamLookupByPLens(Equal[K].equal(k, _))
-
   def ephemeralStreamHeadPLens[A]: EphemeralStream[A] @?> A =
     plens(s =>
       if(s.isEmpty)
