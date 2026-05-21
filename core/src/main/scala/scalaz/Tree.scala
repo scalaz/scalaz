@@ -5,7 +5,7 @@ import scalaz.Trampoline._
 import scalaz.EphemeralStream._
 
 /**
- * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
+ * A multi-way tree, also known as a rose tree. Also known as Cofree[LazyList, A].
  */
 sealed abstract class Tree[A] {
 

@@ -2,7 +2,6 @@ package scalaz
 
 import scala.annotation.tailrec
 import std.option.cata
-import std.stream.{ toZipper => sToZipper }
 import std.tuple.{ tuple2Bitraverse => BFT }
 import Liskov.{ <~<, refl }
 import IList.{empty, single}
@@ -432,9 +431,6 @@ sealed abstract class IList[A] extends Product with Serializable {
   def toMap[K, V](implicit ev0: A <~< (K, V), ev1: Order[K]): K ==>> V =
     widen[(K,V)].foldLeft(==>>.empty[K,V])(_ + _)
 
-  def toStream: Stream[A] =
-    uncons(Stream.empty, (h, t) => h #:: t.toStream)
-
   def toLazyList: LazyList[A] =
     uncons(LazyList.empty, (h, t) => h #:: t.toLazyList)
 
@@ -445,7 +441,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     Foldable[IList].toVector(this)
 
   def toZipper: Maybe[Zipper[A]] =
-    sToZipper(toStream)
+    std.lazylist.toZipper(toLazyList)
 
   /**
    * Referentially transparent replacement for traverse, specialised to
@@ -655,8 +651,6 @@ sealed abstract class IListInstances extends IListInstance0 {
       }
 
       override def toIList[A](fa: IList[A]) = fa
-
-      override def toStream[A](fa: IList[A]) = fa.toStream
 
       override def toLazyList[A](fa: IList[A]) = fa.toLazyList
 

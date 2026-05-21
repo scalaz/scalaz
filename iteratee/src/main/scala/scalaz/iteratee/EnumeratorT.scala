@@ -96,7 +96,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
 }
 
 trait EnumeratorTFunctions {
-  def enumerate[E](as: Stream[E]): Enumerator[E] = enumStream[E, Id](as)
+  def enumerate[E](as: LazyList[E]): Enumerator[E] = enumLazyList[E, Id](as)
 
   def empty[E, F[_]: Applicative]: EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
@@ -124,10 +124,10 @@ trait EnumeratorTFunctions {
       def apply[A] = _.mapCont(_(elInput(e)))
     }
 
-  def enumStream[E, F[_] : Monad](xs: Stream[E]): EnumeratorT[E, F] =
+  def enumLazyList[E, F[_] : Monad](xs: LazyList[E]): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = (s: StepT[E, F, A]) => xs match {
-        case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumStream[E, F](t).apply[A])
+        case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumLazyList[E, F](t).apply[A])
         case _       => s.pointI
       }
     }

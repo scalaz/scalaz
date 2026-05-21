@@ -171,13 +171,6 @@ sealed abstract class ReducerInstances {
     unitLazyConsReducer(LazyList.cons(_, LazyList.empty), LazyList.cons(_, _))
   }
 
-  /** Collect `C`s into a stream, in order. */
-  implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
-    import std.stream._
-    import Stream._
-    unitLazyConsReducer(cons(_, empty): Stream[C], cons(_, _))
-  }
-
   /** Ignore `C`s. */
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
     import std.anyVal._
