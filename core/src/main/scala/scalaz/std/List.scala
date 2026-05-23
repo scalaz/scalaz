@@ -82,8 +82,8 @@ trait ListInstances extends ListInstances0 {
       }
 
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
-        import scala.collection.mutable.ArrayStack
-        val s = new ArrayStack[A]
+        import scala.collection.mutable.Stack
+        val s = new Stack[A]
         fa.foreach(a => s push a)
         var r = z
         while (!s.isEmpty) {
