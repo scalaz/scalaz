@@ -2,11 +2,9 @@ import GenTypeClass.*
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishLocalSigned
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishSigned
 import java.awt.Desktop
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport.*
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
-import sbtbuildinfo.BuildInfoPlugin.autoImport.*
 import sbtcrossproject.CrossPlugin.autoImport.*
 import sbtrelease.ReleasePlugin.autoImport.*
 import sbtrelease.ReleaseStateTransformations.*
