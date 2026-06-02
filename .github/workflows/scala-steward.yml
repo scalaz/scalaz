@@ -19,7 +19,7 @@ jobs:
         private-key: ${{ secrets.SCALAZ_BOT_KEY }}
     - uses: sbt/setup-sbt@2e222825582620cc38d2a54e674f3c01b7c14f5d # v1.1.24
     - name: Launch Scala Steward
-      uses: scala-steward-org/scala-steward-action@b186ab858ce163f9af7b016fac32cfb3f2c2f503 # v2.88.0
+      uses: scala-steward-org/scala-steward-action@708c1d682b14b9785201afb25c8ffece0a9d126f # v2.90.0
       with:
         github-token: ${{ steps.generate_token.outputs.token }}
         author-email: "74843977+scalaz-bot[bot]@users.noreply.github.com"
