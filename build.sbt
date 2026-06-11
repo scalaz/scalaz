@@ -87,13 +87,14 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(
   )
   .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
   .jsSettings(
-    jvm_js_settings,
     scalajsProjectSettings,
     libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
   )
   .jvmSettings(
-    jvm_js_settings,
     typeClasses := TypeClass.core
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
   )
 
 lazy val coreJVM = core.jvm
@@ -111,6 +112,9 @@ lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTyp
   .jvmSettings(
     typeClasses := TypeClass.effect
   )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
 
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
@@ -124,6 +128,9 @@ lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossT
   )
   .dependsOn(core, effect)
   .jsSettings(scalajsProjectSettings)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
@@ -142,6 +149,9 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     name := "scalaz-example",
     notPublish,
     Compile / compile / scalacOptions -= "-Xlint:adapted-args",
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
   )
   .jvmSettings(
     TaskKey[Unit]("runAllMain") := {
@@ -186,6 +196,9 @@ lazy val scalacheckBinding =
     .jsSettings(scalajsProjectSettings)
     .nativeSettings(
       evictionErrorLevel := Level.Warn,
+    )
+    .platformsSettings(JVMPlatform, JSPlatform)(
+      jvm_js_settings,
     )
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
@@ -236,6 +249,9 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
