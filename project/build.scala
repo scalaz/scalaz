@@ -339,6 +339,20 @@ object build {
   }
 
   val jvm_js_settings = Seq(
+    scalacOptions ++= {
+      if (scalaVersion.value.startsWith("3.3.")) {
+        Seq(
+          "-Yfuture-lazy-vals",
+          "-release:11",
+        )
+      } else if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        Seq(
+          "-release:8",
+        )
+      }
+    },
     (Compile / unmanagedSourceDirectories) += {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }

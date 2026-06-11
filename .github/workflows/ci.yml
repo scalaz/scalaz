@@ -13,11 +13,8 @@ jobs:
       matrix:
         scala: [2, 3]
         project: [rootJVM, rootJS, rootNative]
-        java: [8]
+        java: [11]
         include:
-          - java: 11
-            scala: 2
-            project: rootJVM
           - java: 25
             scala: 2
             project: rootJVM
