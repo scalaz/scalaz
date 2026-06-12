@@ -101,6 +101,9 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     notPublish,
     Compile / compile / scalacOptions -= "-Xlint:adapted-args",
   )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
   .jvmSettings(
     TaskKey[Unit]("runAllMain") := {
       val r = (run / runner).value
@@ -145,6 +148,9 @@ lazy val scalacheckBinding =
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
       osgiExport("scalaz.scalacheck")
     )
+    .platformsSettings(JVMPlatform, JSPlatform)(
+      jvm_js_settings,
+    )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
     .nativeSettings(
@@ -169,6 +175,9 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       )
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
   )
   .nativeSettings(
     nativeSettings,

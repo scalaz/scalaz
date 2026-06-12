@@ -16,7 +16,7 @@ import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import com.typesafe.tools.mima.core.{ProblemFilters, IncompatibleSignatureProblem, InheritedNewAbstractMethodProblem}
+import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters, IncompatibleSignatureProblem, InheritedNewAbstractMethodProblem}
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
@@ -144,7 +144,7 @@ object build {
 
   private def Scala212 = "2.12.21"
   private def Scala213 = "2.13.18"
-  private def Scala3 = "3.3.7"
+  private def Scala3 = "3.3.8"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -356,7 +356,21 @@ object build {
     }
   )
 
-  private[this] val jvm_js_settings = Seq(
+  lazy val jvm_js_settings = Seq(
+    scalacOptions ++= {
+      if (scalaVersion.value.startsWith("3.3.")) {
+        Seq(
+          "-Yfuture-lazy-vals",
+          "-release:11",
+        )
+      } else if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        Seq(
+          "-release:8",
+        )
+      }
+    },
     (Compile / unmanagedSourceDirectories) += {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
@@ -405,12 +419,16 @@ object build {
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
-    .jsSettings(
+    .platformsSettings(JVMPlatform, JSPlatform)(
       jvm_js_settings,
+    )
+    .jsSettings(
       scalajsProjectSettings,
     )
     .jvmSettings(
-      jvm_js_settings,
+      mimaBinaryIssueFilters ++= Seq(
+        ProblemFilters.exclude[DirectMissingMethodProblem]("scalaz.std.AllInstances.<clinit>"),
+      ),
       typeClasses := TypeClass.core
     )
     .nativeSettings(
@@ -424,6 +442,9 @@ object build {
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .enablePlugins(MimaPlugin)
+    .platformsSettings(JVMPlatform, JSPlatform)(
+      jvm_js_settings,
+    )
     .jsSettings(scalajsProjectSettings : _*)
     .jvmSettings(
       typeClasses := TypeClass.effect
@@ -439,6 +460,9 @@ object build {
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .enablePlugins(MimaPlugin)
+    .platformsSettings(JVMPlatform, JSPlatform)(
+      jvm_js_settings,
+    )
     .jsSettings(scalajsProjectSettings : _*)
     .nativeSettings(
       nativeSettings
