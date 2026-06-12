@@ -265,7 +265,7 @@ object build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
 
-    publishTo := (if (isSnapshot.value) None else localStaging.value),
+    publishTo := localStaging.value,
     Test / publishArtifact := false,
 
     // adapted from sbt-release defaults
@@ -281,7 +281,7 @@ object build {
       publishSignedArtifacts,
       releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
-      releaseStepCommandAndRemaining("sonatypeBundleRelease"),
+      releaseStepCommandAndRemaining("sonaRelease"),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
