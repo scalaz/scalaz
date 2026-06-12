@@ -401,7 +401,7 @@ object build {
     },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+        organization.value % s"${name.value}_native0.5_${scalaBinaryVersion.value}" % _
       }.toSet
     },
   )
