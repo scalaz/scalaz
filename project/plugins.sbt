@@ -1,7 +1,5 @@
 scalacOptions += "-deprecation"
 
-val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("1.21.0")
-
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.1")
 addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.6.1")
 addSbtPlugin("com.github.sbt" % "sbt-release" % "1.5.0")
@@ -10,7 +8,7 @@ addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "3.0.2")
 addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.6")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1") // scala-steward:off
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.12")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.5")
 
