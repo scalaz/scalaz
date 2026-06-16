@@ -10,7 +10,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1") // scala-steward:off
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.12")
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.5")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.6")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
