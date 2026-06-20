@@ -55,7 +55,6 @@ object build {
           val config = NodeJSEnv.Config()
             .withArgs(List(
               "--experimental-wasm-exnref",
-              "--experimental-wasm-imported-strings",
             ))
           new NodeJSEnv(config)
         },
