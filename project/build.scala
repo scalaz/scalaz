@@ -329,7 +329,7 @@ object build {
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, _)) =>
         Seq(
-          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+          compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full))
         )
     }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
