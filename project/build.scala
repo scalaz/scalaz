@@ -357,18 +357,25 @@ object build {
     }
   )
 
+  @transient
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
+  @transient
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
+  @transient
   lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
+  @transient
   lazy val genToSyntax = taskKey[String]("")
 
+  @transient
   lazy val showDoc = taskKey[Unit]("")
 
+  @transient
   lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
 
+  @transient
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
 }
