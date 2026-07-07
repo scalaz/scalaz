@@ -352,8 +352,7 @@ object GenTypeClass {
       }
 
       kind match {
-        case Kind.* =>
-s"""
+        case Kind.* => s"""
 trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -361,8 +360,7 @@ trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsLis
   ////
 }
 """
-        case Kind.*->* =>
-s"""
+        case Kind.*->* => s"""
 trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -371,8 +369,7 @@ trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${exte
 }
 """
 
-        case Kind.*^*->* =>
- s"""
+        case Kind.*^*->* => s"""
 trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -381,8 +378,7 @@ trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] 
 }
 """
 
-       case Kind.|*->*|->* =>
- s"""
+       case Kind.|*->*|->* => s"""
 trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
   implicit def G: ${typeClassName}[G, S]
   ////
@@ -499,16 +495,14 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax")} {
 }
 """
     case Kind.*->* =>
-      val ToVUnapply =
-s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): ${typeClassName}Ops[F0.M, F0.A] =
+      val ToVUnapply = s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): ${typeClassName}Ops[F0.M, F0.A] =
     new ${typeClassName}Ops[F0.M, F0.A](F0(v))(using F0.TC)
 """
-      val ToVMA =
-s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: TC[F]): ${typeClassName}Ops[F, A] =
+      val ToVMA = s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: TC[F]): ${typeClassName}Ops[F, A] =
     new ${typeClassName}Ops[F, A](v)
 """
 
-    s"""$syntaxPackString
+      s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
 final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: ${typeClassName}[F]) extends Ops[F[A]] {
