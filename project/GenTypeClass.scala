@@ -352,8 +352,7 @@ object GenTypeClass {
       }
 
       kind match {
-        case Kind.* =>
-s"""
+        case Kind.* => s"""
 trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -361,8 +360,7 @@ trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsLis
   ////
 }
 """
-        case Kind.*->* =>
-s"""
+        case Kind.*->* => s"""
 trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -371,8 +369,7 @@ trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${exte
 }
 """
 
-        case Kind.*^*->* =>
- s"""
+        case Kind.*^*->* => s"""
 trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
   ////
@@ -381,8 +378,7 @@ trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] 
 }
 """
 
-       case Kind.|*->*|->* =>
- s"""
+       case Kind.|*->*|->* => s"""
 trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
   implicit def G: ${typeClassName}[G, S]
   ////
