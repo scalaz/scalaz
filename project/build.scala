@@ -157,7 +157,6 @@ object build {
     },
     scalaVersion := Scala213,
     crossScalaVersions := Seq(Scala213, Scala3),
-    fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
