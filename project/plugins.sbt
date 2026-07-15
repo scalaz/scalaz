@@ -10,9 +10,6 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1") // scala-steward:off
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.12")
 
-// https://github.com/sbt/sbt/issues/2217
-fullResolvers ~= {_.filterNot(_.name == "jcenter")}
-
 if (sys.env.isDefinedAt("GITHUB_ACTION")) {
   Def.settings(
     addSbtPlugin("net.virtual-void" % "sbt-hackers-digest" % "0.1.2")
