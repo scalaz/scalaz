@@ -14,15 +14,9 @@ import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLoca
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.sbt.osgi.SbtOsgi
 
-import sbtbuildinfo.BuildInfoPlugin.autoImport._
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
 
-import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters, IncompatibleSignatureProblem, InheritedNewAbstractMethodProblem}
-import com.typesafe.tools.mima.plugin.MimaPlugin
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
-
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
-import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
 
@@ -146,7 +140,7 @@ object build {
   private def Scala213 = "2.13.18"
   private def Scala3 = "3.3.8"
 
-  private[this] val buildInfoPackageName = "scalaz"
+  val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
@@ -405,68 +399,6 @@ object build {
       }.toSet
     },
   )
-
-  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
-    .settings(
-      name := "scalaz-core",
-      (Compile / sourceGenerators) += (Compile / sourceManaged).map{
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      }.taskValue,
-      buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := buildInfoPackageName,
-      buildInfoObject := "ScalazBuildInfo",
-      osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
-    .platformsSettings(JVMPlatform, JSPlatform)(
-      jvm_js_settings,
-    )
-    .jsSettings(
-      scalajsProjectSettings,
-    )
-    .jvmSettings(
-      mimaBinaryIssueFilters ++= Seq(
-        ProblemFilters.exclude[DirectMissingMethodProblem]("scalaz.std.AllInstances.<clinit>"),
-      ),
-      typeClasses := TypeClass.core
-    )
-    .nativeSettings(
-      nativeSettings
-    )
-
-  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
-    .settings(
-      name := "scalaz-effect",
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
-    .dependsOn(core)
-    .enablePlugins(MimaPlugin)
-    .platformsSettings(JVMPlatform, JSPlatform)(
-      jvm_js_settings,
-    )
-    .jsSettings(scalajsProjectSettings : _*)
-    .jvmSettings(
-      typeClasses := TypeClass.effect
-    )
-    .nativeSettings(
-      nativeSettings
-    )
-
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
-    .settings(
-      name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee"))
-    .dependsOn(core, effect)
-    .enablePlugins(MimaPlugin)
-    .platformsSettings(JVMPlatform, JSPlatform)(
-      jvm_js_settings,
-    )
-    .jsSettings(scalajsProjectSettings : _*)
-    .nativeSettings(
-      nativeSettings
-    )
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
