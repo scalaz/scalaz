@@ -1,5 +1,6 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
+import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters}
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 
 val minSuccessfulTests = settingKey[Int]("")
@@ -76,13 +77,75 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects: _*)
 
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(standardSettings: _*)
+  .settings(
+    name := "scalaz-core",
+    (Compile / sourceGenerators) += (Compile / sourceManaged).map{
+      dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
+    }.taskValue,
+    buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+    buildInfoPackage := buildInfoPackageName,
+    buildInfoObject := "ScalazBuildInfo",
+    osgiExport("scalaz"),
+    OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+  .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
+  .jsSettings(
+    scalajsProjectSettings,
+  )
+  .jvmSettings(
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("scalaz.std.AllInstances.<clinit>"),
+    ),
+    typeClasses := TypeClass.core
+  )
+  .nativeSettings(
+    nativeSettings
+  )
+
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
+lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(standardSettings: _*)
+  .settings(
+    name := "scalaz-effect",
+    osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+  .dependsOn(core)
+  .enablePlugins(MimaPlugin)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
+  .jsSettings(scalajsProjectSettings : _*)
+  .jvmSettings(
+    typeClasses := TypeClass.effect
+  )
+  .nativeSettings(
+    nativeSettings
+  )
+
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
 lazy val effectNative = effect.native
+
+lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  .settings(standardSettings: _*)
+  .settings(
+    name := "scalaz-iteratee",
+    osgiExport("scalaz.iteratee"))
+  .dependsOn(core, effect)
+  .enablePlugins(MimaPlugin)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings,
+  )
+  .jsSettings(scalajsProjectSettings : _*)
+  .nativeSettings(
+    nativeSettings
+  )
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
