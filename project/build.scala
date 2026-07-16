@@ -32,12 +32,12 @@ object build {
     enableCrossBuild = true
   )
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
-  private[this] val tagName = Def.setting{
+  private val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
-  private[this] val tagOrHash = Def.setting{
+  private val tagOrHash = Def.setting{
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
