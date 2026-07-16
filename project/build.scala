@@ -5,12 +5,10 @@ import java.awt.Desktop
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
-import sbtcrossproject.CrossPlugin.autoImport.*
+import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
 import sbtrelease.ReleasePlugin.autoImport.*
 import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Utilities.*
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.*
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport.*
 
 object build {
   type Sett = Def.Setting[?]
@@ -86,54 +84,26 @@ object build {
     publishLocalSigned := {}
   )
 
-  // avoid move files
-  object ScalazCrossType extends sbtcrossproject.CrossType {
-    override def projectDir(crossBase: File, projectType: String) =
-      crossBase / projectType
-
-    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
-      val dir = projectType match {
-        case JVMPlatform => "jvm"
-        case JSPlatform => "js"
-        case NativePlatform => "native"
-      }
-      crossBase / dir
-    }
-
-    def shared(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala"
-
-    def scala2(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala-2"
-
-    def scala3(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala-3"
-
-    override def sharedSrcDir(projectBase: File, conf: String) =
-      Some(shared(projectBase, conf))
-  }
-
   val unusedWarnOptions = Def.setting {
     Seq("-Ywarn-unused:imports")
   }
 
-  private def Scala213 = "2.13.18"
-  private def Scala3 = "3.3.8"
+  val Scala213 = "2.13.18"
+  val Scala3 = sys.props.getOrElse("scalaz_scala3_version", "3.3.8")
 
   val buildInfoPackageName = "scalaz"
 
   lazy val unmanagedSourcePathSettings: Seq[Sett] = Def.settings(
     Seq(Compile, Test).map { scope =>
-      (scope / unmanagedSourceDirectories) ++= {
-        val dir = Defaults.nameForSrc(scope.name)
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, _)) =>
-            Seq(ScalazCrossType.scala2(baseDirectory.value, dir))
-          case Some((0 | 3, _)) =>
-            Seq(ScalazCrossType.scala3(baseDirectory.value, dir))
-          case _ =>
-            Nil
+      (scope / unmanagedSourceDirectories) += {
+        val base = projectMatrixBaseDirectory.value / "src" / Defaults.nameForSrc(scope.name)
+        val dir = scalaBinaryVersion.value match {
+          case "2.13" =>
+            "scala-2"
+          case "3" =>
+            "scala-3"
         }
+        (base / dir).getAbsoluteFile
       }
     },
   )
@@ -150,11 +120,6 @@ object build {
       }
       (f, path)
     },
-    commands += Command.command("SetScala3") {
-      s"""++ ${Scala3}! -v""" :: _
-    },
-    scalaVersion := Scala213,
-    crossScalaVersions := Seq(Scala213, Scala3),
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
@@ -221,16 +186,19 @@ object build {
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
-        val dir = ScalazCrossType.shared(baseDirectory.value, "main")
-        val scala2dir = ScalazCrossType.scala2(baseDirectory.value, "main")
-        val scala3dir = ScalazCrossType.scala3(baseDirectory.value, "main")
-        val t = typeclassSource(tc)
+        projectMatrixBaseDirectory.?.value.map { p =>
+          val base = p / "src" / "main"
+          val dir = base / "scala"
+          val scala2dir = base / "scala-2"
+          val scala3dir = base / "scala-3"
+          val t = typeclassSource(tc)
 
-        List(
-          t.sources.map(_.createOrUpdate(dir, s.log)),
-          t.scala2sources.map(_.createOrUpdate(scala2dir, s.log)),
-          t.scala3sources.map(_.createOrUpdate(scala3dir, s.log)),
-        ).flatten
+          List(
+            t.sources.map(_.createOrUpdate(dir, s.log)),
+            t.scala2sources.map(_.createOrUpdate(scala2dir, s.log)),
+            t.scala3sources.map(_.createOrUpdate(scala3dir, s.log)),
+          ).flatten
+        }.toSeq.flatten
       }
     },
     checkGenTypeClasses := {
@@ -333,6 +301,25 @@ object build {
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
   }
 
+  private def platformSrcDirSetting(d: String) =
+    Seq(Compile, Test).map { x =>
+      x / unmanagedSourceDirectories += {
+        (projectMatrixBaseDirectory.value / d / "src" / Defaults.nameForSrc(x.name) / "scala").getAbsoluteFile
+      }
+    }
+
+  val jvmSettings = Def.settings(
+    platformSrcDirSetting("jvm"),
+  )
+
+  val jsSettings = Def.settings(
+    platformSrcDirSetting("js"),
+  )
+
+  val nativeSettings = Def.settings(
+    platformSrcDirSetting("native"),
+  )
+
   val jvm_js_settings = Seq(
     scalacOptions ++= {
       if (scalaVersion.value.startsWith("3.3.")) {
@@ -349,7 +336,7 @@ object build {
       }
     },
     (Compile / unmanagedSourceDirectories) += {
-      baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
+      (projectMatrixBaseDirectory.value / "jvm_js/src/main/scala/").getAbsoluteFile
     }
   )
 
