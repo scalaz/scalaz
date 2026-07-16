@@ -148,25 +148,24 @@ object build {
       (c / console / scalacOptions) --= unusedWarnOptions.value
     ),
 
-    (Compile / doc / scalacOptions) := {
+    (Compile / doc / scalacOptions) ++= {
       val tag = tagOrHash.value
       val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
-      val options = (Compile / doc / scalacOptions).value
 
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _)) =>
-          Nil
-        case _ =>
-          options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
-      }
-    },
-    (Compile / doc / sources) := {
-      val src = (Compile / doc / sources).value
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _)) =>
-          Nil
-        case _ =>
-          src
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Seq(
+            "-source-links:github://scalaz/scalaz",
+            "-revision",
+            tag,
+          )
+        case "2.13" =>
+          Seq(
+            "-sourcepath",
+            base,
+            "-doc-source-url",
+            "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala",
+          )
       }
     },
 
