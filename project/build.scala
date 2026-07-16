@@ -32,8 +32,6 @@ object build {
     enableCrossBuild = true
   )
 
-  val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
-
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
   private[this] val tagName = Def.setting{
@@ -324,11 +322,10 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    kindProjectorVersion := "0.13.4",
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, _)) =>
         Seq(
-          compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full))
+          compilerPlugin(("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full))
         )
     }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
