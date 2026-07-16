@@ -232,7 +232,7 @@ object GenTypeClass {
     def updateSource(oldSource: String): String = {
       val delimiter = "////"
       def parse(text: String): Seq[String] = {
-        text.split(delimiter)
+        text.split(delimiter).toSeq
       }
       val oldChunks: Seq[String] = parse(oldSource)
       val newChunks: Seq[String] = parse(source)
