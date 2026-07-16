@@ -291,37 +291,37 @@ object build {
     )),
     pomExtra := (
       <url>http://scalaz.org</url>
-        <licenses>
-          <license>
-            <name>BSD-style</name>
-            <url>https://opensource.org/licenses/BSD-3-Clause</url>
-            <distribution>repo</distribution>
-          </license>
-        </licenses>
-        <developers>
-          {
-          Seq(
-            ("runarorama", "Runar Bjarnason"),
-            ("pchiusano", "Paul Chiusano"),
-            ("tonymorris", "Tony Morris"),
-            ("retronym", "Jason Zaugg"),
-            ("ekmett", "Edward Kmett"),
-            ("alexeyr", "Alexey Romanov"),
-            ("copumpkin", "Daniel Peebles"),
-            ("rwallace", "Richard Wallace"),
-            ("nuttycom", "Kris Nuttycombe"),
-            ("larsrh", "Lars Hupel")
-          ).map {
-            case (id, name) =>
-              <developer>
-                <id>{id}</id>
-                <name>{name}</name>
-                <url>https://github.com/{id}</url>
-              </developer>
-          }
+      <licenses>
+        <license>
+          <name>BSD-style</name>
+          <url>https://opensource.org/licenses/BSD-3-Clause</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+      <developers>
+        {
+        Seq(
+          ("runarorama", "Runar Bjarnason"),
+          ("pchiusano", "Paul Chiusano"),
+          ("tonymorris", "Tony Morris"),
+          ("retronym", "Jason Zaugg"),
+          ("ekmett", "Edward Kmett"),
+          ("alexeyr", "Alexey Romanov"),
+          ("copumpkin", "Daniel Peebles"),
+          ("rwallace", "Richard Wallace"),
+          ("nuttycom", "Kris Nuttycombe"),
+          ("larsrh", "Lars Hupel")
+        ).map {
+          case (id, name) =>
+            <developer>
+              <id>{id}</id>
+              <name>{name}</name>
+              <url>https://github.com/{id}</url>
+            </developer>
         }
-        </developers>
-      ),
+      }
+      </developers>
+    ),  
 
     licenseFile := {
       val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
