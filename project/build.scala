@@ -88,7 +88,7 @@ object build {
   }
 
   val Scala213 = "2.13.18"
-  val Scala3 = sys.props.getOrElse("scalaz_scala3_version", "3.3.8")
+  val Scala3 = sys.props.getOrElse("scalaz_scala3_version", "3.8.4")
 
   val buildInfoPackageName = "scalaz"
 
