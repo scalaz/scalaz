@@ -283,7 +283,6 @@ lazy val tests = projectMatrix
     },
     (Test / sources) := {
       val exclude = Set(
-        "LeibnizTest.scala",
         "MonadErrorTest.scala",
         "UnapplyTest.scala",
       )
