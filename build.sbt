@@ -50,7 +50,7 @@ lazy val scalaz = Project(
   },
   Defaults.packageTaskSettings((Compile / packageDoc), (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
-  jvmProjects ++ jsProjects : _*
+  (jvmProjects ++ jsProjects)*
 ).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
@@ -59,7 +59,7 @@ lazy val rootNative = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(nativeProjects: _*)
+).aggregate(nativeProjects*)
 
 lazy val rootJS = Project(
   "rootJS",
@@ -67,7 +67,7 @@ lazy val rootJS = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jsProjects: _*)
+).aggregate(jsProjects*)
 
 lazy val rootJVM = Project(
   "rootJVM",
@@ -75,11 +75,11 @@ lazy val rootJVM = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jvmProjects: _*)
+).aggregate(jvmProjects*)
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-  .settings(standardSettings: _*)
   .settings(
+    standardSettings,
     name := "scalaz-core",
     (Compile / sourceGenerators) += (Compile / sourceManaged).map{
       dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
@@ -111,8 +111,8 @@ lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
 lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-  .settings(standardSettings: _*)
   .settings(
+    standardSettings,
     name := "scalaz-effect",
     osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
   .dependsOn(core)
@@ -120,7 +120,7 @@ lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTyp
   .platformsSettings(JVMPlatform, JSPlatform)(
     jvm_js_settings,
   )
-  .jsSettings(scalajsProjectSettings : _*)
+  .jsSettings(scalajsProjectSettings)
   .jvmSettings(
     typeClasses := TypeClass.effect
   )
@@ -133,8 +133,8 @@ lazy val effectJS  = effect.js
 lazy val effectNative = effect.native
 
 lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-  .settings(standardSettings: _*)
   .settings(
+    standardSettings,
     name := "scalaz-iteratee",
     osgiExport("scalaz.iteratee"))
   .dependsOn(core, effect)
@@ -142,7 +142,7 @@ lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossT
   .platformsSettings(JVMPlatform, JSPlatform)(
     jvm_js_settings,
   )
-  .jsSettings(scalajsProjectSettings : _*)
+  .jsSettings(scalajsProjectSettings)
   .nativeSettings(
     nativeSettings
   )
@@ -236,7 +236,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
         "-maxDiscardRatio", "50",
         "-minSuccessfulTests", minSuccessfulTests.value.toString
       )
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions*)
     },
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
