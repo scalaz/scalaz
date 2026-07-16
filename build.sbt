@@ -26,7 +26,9 @@ lazy val scalaz = Project(
   scalaVersion := rootScalaVersion,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Def.uncached(
+    Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value
+  ),
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -39,7 +41,13 @@ lazy val scalaz = Project(
   ScalaUnidoc / unidoc / unidocProjectFilter := {
     inProjects(all.map(_.jvm(rootScalaVersion): ProjectReference)*)
   },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(
+    Compile / packageDoc,
+    Def.task {
+      given FileConverter = fileConverter.value
+      (Compile / unidoc).value.flatMap(Mapper.allSubpaths)
+    }
+  ),
 ).aggregate(
   all.flatMap(_.allProjects().map(_._1: ProjectReference))*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -91,7 +99,7 @@ lazy val core = projectMatrix
       scalajsProjectSettings,
       jsSettings,
       jvm_js_settings,
-      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
+      libraryDependencies += ("org.scala-js" %% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
     )
   )
   .jvmPlatform(
@@ -185,12 +193,12 @@ lazy val example = projectMatrix
     Def.settings(
       jvm_js_settings,
       jvmSettings,
-      TaskKey[Unit]("runAllMain") := {
+      TaskKey[Unit]("runAllMain") := Def.uncached {
         val r = (run / runner).value
-        val classpath = (Compile / fullClasspath).value
+        val classpath = (Compile / fullClasspath).value.map(_.data).map(fileConverter.value.toPath)
         val log = streams.value.log
         (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-          r.run(c, classpath.map(_.data), Nil, log)
+          r.run(c, classpath, Nil, log)
         )
       },
     )
@@ -231,7 +239,7 @@ lazy val scalacheckBinding = projectMatrix
     unmanagedSourcePathSettings,
     name := "scalaz-scalacheck-binding",
     Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0",
   )
   .dependsOn(core, iteratee)
   .jvmPlatform(
@@ -313,7 +321,7 @@ lazy val tests = projectMatrix
       jsSettings,
       jvm_js_settings,
       minSuccessfulTests := 10,
-      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
+      libraryDependencies += ("org.scala-js" %% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
     )
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)

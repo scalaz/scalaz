@@ -5,7 +5,6 @@ import java.awt.Desktop
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
-import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
 import sbtrelease.ReleasePlugin.autoImport.*
 import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Utilities.*
@@ -30,7 +29,7 @@ object build {
     enableCrossBuild = true
   )
 
-  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lazyLines_!.head
 
   private val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
@@ -43,10 +42,10 @@ object build {
     if (sys.props.isDefinedAt("scala_js_wasm")) {
       println("enable wasm")
       Def.settings(
-        scalaJSLinkerConfig ~= (
-          _.withExperimentalUseWebAssembly(true).withModuleKind(ModuleKind.ESModule)
-        ),
-        jsEnv := {
+        scalaJSLinkerConfig ~= (_.withESFeatures(
+          _.withUseWebAssembly(true).withESVersion(org.scalajs.linker.interface.ESVersion.ES2022)
+        ).withModuleKind(ModuleKind.ESModule)),
+        jsEnv := Def.uncached {
           import org.scalajs.jsenv.nodejs.NodeJSEnv
           val config = NodeJSEnv.Config()
             .withArgs(List(
@@ -110,16 +109,6 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
-    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
-      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
-      val buildInfoDir = "sbt-buildinfo"
-      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
-      } else {
-        f.relativeTo((Compile / sourceManaged).value).get.getPath
-      }
-      (f, path)
-    },
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
@@ -204,7 +193,7 @@ object build {
     checkGenTypeClasses := {
       val classes = genTypeClasses.value
       if(classes.exists(_._1 != FileStatus.NoChange))
-        sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
+        sys.error(classes.groupBy(_._1).view.filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toMap.toString)
     },
     typeClasses := Seq(),
     genToSyntax := {
@@ -247,7 +236,7 @@ object build {
       x => false
     },
     scmInfo := Some(ScmInfo(
-      browseUrl = url("https://github.com/scalaz/scalaz"),
+      browseUrl = uri("https://github.com/scalaz/scalaz"),
       connection = "scm:git:git@github.com:scalaz/scalaz.git"
     )),
     pomExtra := (
@@ -287,7 +276,7 @@ object build {
     licenseFile := {
       val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
       if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
-      LICENSE_txt
+      fileConverter.value.toVirtualFile(LICENSE_txt.toPath)
     },
     // kind-projector plugin
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
@@ -298,7 +287,7 @@ object build {
     }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
-    inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
+    Project.inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
   }
 
   private def platformSrcDirSetting(d: String) =
@@ -341,7 +330,7 @@ object build {
   )
 
   @transient
-  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+  lazy val licenseFile = settingKey[HashedVirtualFileRef]("The license file to include in packaged artifacts")
 
   @transient
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
