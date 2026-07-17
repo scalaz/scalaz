@@ -180,7 +180,6 @@ object build {
     addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
     addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
-    fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= stdOptions,
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v <= 12 =>
