@@ -3,6 +3,8 @@ import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters}
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 
+val scalaVersions = Seq(Scala212, Scala213, Scala3)
+
 val minSuccessfulTests = settingKey[Int]("")
 
 /*
@@ -15,23 +17,17 @@ val minSuccessfulTests = settingKey[Int]("")
  * scalajs / scala-native stuff.
  */
 
-lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS, exampleJS
-)
 
-lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, exampleJVM
-)
+lazy val all = Seq(core, effect, iteratee, scalacheckBinding, tests, example)
 
-lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative, exampleNative
-)
+def rootScalaVersion = Scala3
 
 lazy val scalaz = Project(
   id = "scalaz",
   base = file(".")
 ).settings(
   standardSettings,
+  scalaVersion := rootScalaVersion,
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
@@ -46,11 +42,11 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   ScalaUnidoc / unidoc / unidocProjectFilter := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    inProjects(all.map(_.jvm(rootScalaVersion): ProjectReference)*)
   },
   Defaults.packageTaskSettings((Compile / packageDoc), (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
-  (jvmProjects ++ jsProjects)*
+  all.flatMap(_.allProjects().map(_._1: ProjectReference))*
 ).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
@@ -58,26 +54,30 @@ lazy val rootNative = Project(
   file("rootNative")
 ).settings(
   standardSettings,
+  autoScalaLibrary := false,
   notPublish
-).aggregate(nativeProjects*)
+).aggregate(all.flatMap(_.native.get).map(p => p: ProjectReference)*)
 
 lazy val rootJS = Project(
   "rootJS",
   file("rootJS")
 ).settings(
   standardSettings,
+  autoScalaLibrary := false,
   notPublish
-).aggregate(jsProjects*)
+).aggregate(all.flatMap(_.js.get).map(p => p: ProjectReference)*)
 
 lazy val rootJVM = Project(
   "rootJVM",
   file("rootJVM")
 ).settings(
   standardSettings,
+  autoScalaLibrary := false,
   notPublish
-).aggregate(jvmProjects*)
+).aggregate(all.flatMap(_.jvm.get).map(p => p: ProjectReference)*)
 
-lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+lazy val core = projectMatrix
+  .defaultAxes()
   .settings(
     standardSettings,
     name := "scalaz-core",
@@ -90,142 +90,179 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(
     osgiExport("scalaz"),
     OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
   .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    jvm_js_settings,
-  )
-  .jsSettings(
-    scalajsProjectSettings,
-  )
-  .jvmSettings(
-    mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[DirectMissingMethodProblem]("scalaz.std.AllInstances.<clinit>"),
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      jsSettings,
     ),
-    typeClasses := TypeClass.core
   )
-  .nativeSettings(
-    nativeSettings
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
+      jvm_js_settings,
+      mimaBinaryIssueFilters ++= Seq(
+        ProblemFilters.exclude[DirectMissingMethodProblem]("scalaz.std.AllInstances.<clinit>"),
+      ),
+      typeClasses := TypeClass.core
+    ),
+  )
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      nativeSettings,
+    ),
   )
 
-lazy val coreJVM = core.jvm
-lazy val coreJS  = core.js
-lazy val coreNative = core.native
-
-lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+lazy val effect = projectMatrix
+  .defaultAxes()
   .settings(
     standardSettings,
     name := "scalaz-effect",
     osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
   .dependsOn(core)
   .enablePlugins(MimaPlugin)
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    jvm_js_settings,
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      jsSettings,
+    ),
   )
-  .jsSettings(scalajsProjectSettings)
-  .jvmSettings(
-    typeClasses := TypeClass.effect
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
+      jvm_js_settings,
+      typeClasses := TypeClass.effect,
+    ),
   )
-  .nativeSettings(
-    nativeSettings
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      nativeSettings,
+    ),
   )
 
-lazy val effectJVM = effect.jvm
-lazy val effectJS  = effect.js
-lazy val effectNative = effect.native
-
-lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+lazy val iteratee = projectMatrix
+  .defaultAxes()
   .settings(
     standardSettings,
     name := "scalaz-iteratee",
     osgiExport("scalaz.iteratee"))
   .dependsOn(core, effect)
   .enablePlugins(MimaPlugin)
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    jvm_js_settings,
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
+      jvm_js_settings,
+    )
   )
-  .jsSettings(scalajsProjectSettings)
-  .nativeSettings(
-    nativeSettings
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      jsSettings,
+    ),
+  )
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      nativeSettings,
+    ),
   )
 
-lazy val iterateeJVM = iteratee.jvm
-lazy val iterateeJS  = iteratee.js
-lazy val iterateeNative = iteratee.native
-
-lazy val exampleJVM = example.jvm
-lazy val exampleJS = example.js
-lazy val exampleNative = example.native
-
-lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .crossType(ScalazCrossType)
+lazy val example = projectMatrix
+  .defaultAxes()
   .in(file("example"))
   .settings(
     standardSettings,
     name := "scalaz-example",
-    notPublish,
     Compile / compile / scalacOptions -= "-Xlint:adapted-args",
   )
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    jvm_js_settings,
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
+      jvm_js_settings,
+      TaskKey[Unit]("runAllMain") := {
+        val r = (run / runner).value
+        val classpath = (Compile / fullClasspath).value
+        val log = streams.value.log
+        (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+          r.run(c, classpath.map(_.data), Nil, log)
+        )
+      },
+      notPublish,
+    )
   )
-  .jvmSettings(
-    TaskKey[Unit]("runAllMain") := {
-      val r = (run / runner).value
-      val classpath = (Compile / fullClasspath).value
-      val log = streams.value.log
-      (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-        r.run(c, classpath.map(_.data), Nil, log)
-      )
-    },
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      scalaJSUseMainModuleInitializer := true,
+      commands += Command.command("runAllMain") { state1 =>
+        val extracted = Project.extract(state1)
+        val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+        classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+      },
+      notPublish,
+    ),
   )
-  .jsSettings(
-    scalaJSUseMainModuleInitializer := true,
-    commands += Command.command("runAllMain") { state1 =>
-      val extracted = Project.extract(state1)
-      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
-      classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
-    },
-  )
-  .nativeSettings(
-    nativeSettings,
-    commands += Command.command("runAllMain") { state1 =>
-      val extracted = Project.extract(state1)
-      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
-      classes.sorted.flatMap(c => s"""set Compile / selectMainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
-    },
-  )
-  .settings(
-    mimaPreviousArtifacts := Set.empty,
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      nativeSettings,
+      commands += Command.command("runAllMain") { state1 =>
+        val extracted = Project.extract(state1)
+        val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+        classes.sorted.flatMap(c => s"""set Compile / selectMainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+      },
+      notPublish,
+    ),
   )
   .dependsOn(
     iteratee
   )
 
-lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
-    .in(file("scalacheck-binding"))
-    .enablePlugins(MimaPlugin)
-    .settings(standardSettings)
-    .settings(
-      name := "scalaz-scalacheck-binding",
-      Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
-      osgiExport("scalaz.scalacheck")
-    )
-    .platformsSettings(JVMPlatform, JSPlatform)(
+lazy val scalacheckBinding = projectMatrix
+  .defaultAxes()
+  .in(file("scalacheck-binding"))
+  .enablePlugins(MimaPlugin)
+  .settings(standardSettings)
+  .settings(
+    name := "scalaz-scalacheck-binding",
+    Compile / compile / scalacOptions -= "-Ywarn-value-discard",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
+    osgiExport("scalaz.scalacheck")
+  )
+  .dependsOn(core, iteratee)
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
       jvm_js_settings,
     )
-    .dependsOn(core, iteratee)
-    .jsSettings(scalajsProjectSettings)
-    .nativeSettings(
+  )
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      jsSettings
+    )
+  )
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
       nativeSettings,
       evictionErrorLevel := Level.Warn,
-    )
+    ),
+  )
 
-lazy val scalacheckBindingJVM = scalacheckBinding.jvm
-lazy val scalacheckBindingJS  = scalacheckBinding.js
-lazy val scalacheckBindingNative = scalacheckBinding.native
-
-lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+lazy val tests = projectMatrix
+  .defaultAxes()
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -239,25 +276,31 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions*)
     },
   )
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    jvm_js_settings,
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      jvmSettings,
+      jvm_js_settings,
+      minSuccessfulTests := 33,
+      notPublish,
+    )
   )
-  .nativeSettings(
-    nativeSettings,
-    evictionErrorLevel := Level.Warn,
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      nativeSettings,
+      minSuccessfulTests := 33,
+      evictionErrorLevel := Level.Warn,
+      notPublish,
+    )
   )
-  .platformsSettings(JVMPlatform, NativePlatform)(
-    minSuccessfulTests := 33
-  )
-  .jsSettings(
-    minSuccessfulTests := 10
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      jvm_js_settings,
+      jsSettings,
+      minSuccessfulTests := 10,
+      notPublish,
+    )
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
-  .jsSettings(scalajsProjectSettings)
-  .settings(
-    notPublish
-  )
-
-lazy val testsJVM = tests.jvm
-lazy val testsJS  = tests.js
-lazy val testsNative = tests.native

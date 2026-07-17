@@ -14,13 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala: [2_12, 2_13, 3]
         project: [rootJVM, rootJS, rootNative]
-        java: [11]
-        include:
-          - scala: 2_13
-            project: rootJVM
-            java: 17
+        java: [11, 25]
     steps:
     - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
@@ -32,14 +27,12 @@ jobs:
         sbt -v \
         checkGenTypeClasses \
         "project ${{ matrix.project }}" \
-        "SetScala${{ matrix.scala }}" \
         "Test/compile" \
         "mimaReportBinaryIssues" \
         $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
     - run: |
         sbt -v \
         "project ${{ matrix.project }}" \
-        "SetScala${{ matrix.scala }}" \
         "test" \
         "project /" \
         $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; fi)
@@ -47,20 +40,29 @@ jobs:
         case ${{ matrix.project }} in
           "rootJVM")
             ./sbt -v \
-               "SetScala${{ matrix.scala }}" \
-               "project exampleJVM" \
+               "project exampleJVM3" \
+               runAllMain \
+               "project exampleJVM2_13" \
+               runAllMain \
+               "project exampleJVM2_12" \
                runAllMain
             ;;
           "rootJS")
             ./sbt -v \
-               "SetScala${{ matrix.scala }}" \
-               "project exampleJS" \
+               "project exampleJS3" \
+               runAllMain \
+               "project exampleJS2_13" \
+               runAllMain \
+               "project exampleJS2_12" \
                runAllMain
             ;;
           "rootNative")
             ./sbt -v \
-               "SetScala${{ matrix.scala }}" \
-               "project exampleNative" \
+               "project exampleNative3" \
+               runAllMain \
+               "project exampleNative2_13" \
+               runAllMain \
+               "project exampleNative2_12" \
                runAllMain
             ;;
           *)
