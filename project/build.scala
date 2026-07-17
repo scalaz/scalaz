@@ -13,9 +13,6 @@ import sbtrelease.Utilities._
 
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
 
-import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi
-
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
 
 object build {
@@ -310,9 +307,7 @@ object build {
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
-  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
-    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  ) ++ Def.settings(
+  } ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := (scalaBinaryVersion.value != "3"),
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
@@ -392,7 +387,6 @@ object build {
   @transient
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
-  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
 
 // vim: expandtab:ts=2:sw=2

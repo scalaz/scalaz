@@ -1,5 +1,4 @@
 import build._
-import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters}
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 
@@ -87,8 +86,7 @@ lazy val core = projectMatrix
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
     buildInfoPackage := buildInfoPackageName,
     buildInfoObject := "ScalazBuildInfo",
-    osgiExport("scalaz"),
-    OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+  )
   .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
   .jsPlatform(
     scalaVersions,
@@ -120,7 +118,7 @@ lazy val effect = projectMatrix
   .settings(
     standardSettings,
     name := "scalaz-effect",
-    osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+  )
   .dependsOn(core)
   .enablePlugins(MimaPlugin)
   .jsPlatform(
@@ -150,7 +148,7 @@ lazy val iteratee = projectMatrix
   .settings(
     standardSettings,
     name := "scalaz-iteratee",
-    osgiExport("scalaz.iteratee"))
+  )
   .dependsOn(core, effect)
   .enablePlugins(MimaPlugin)
   .jvmPlatform(
@@ -236,7 +234,6 @@ lazy val scalacheckBinding = projectMatrix
     name := "scalaz-scalacheck-binding",
     Compile / compile / scalacOptions -= "-Ywarn-value-discard",
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
-    osgiExport("scalaz.scalacheck")
   )
   .dependsOn(core, iteratee)
   .jvmPlatform(
