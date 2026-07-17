@@ -15,23 +15,22 @@ jobs:
       fail-fast: false
       matrix:
         project: [rootJVM, rootJS, rootNative]
-        java: [11, 25]
+        java: [17, 25]
     steps:
     - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
-    - uses: sbt/setup-sbt@v1
     - run: |
-        sbt -v \
+        ./sbt -v \
         checkGenTypeClasses \
         "project ${{ matrix.project }}" \
         "Test/compile" \
         "mimaReportBinaryIssues" \
         $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
     - run: |
-        sbt -v \
+        ./sbt -v \
         "project ${{ matrix.project }}" \
         "test" \
         "project /" \
