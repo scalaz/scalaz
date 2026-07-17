@@ -5,6 +5,8 @@ import GenTypeClass._
 
 import java.awt.Desktop
 
+import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
+
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
@@ -15,10 +17,6 @@ import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.sbt.osgi.SbtOsgi
 
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
-
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
-import sbtcrossproject.CrossPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
@@ -60,7 +58,8 @@ object build {
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
-  val scalajsProjectSettings = Seq[Sett](
+  val jsSettings = Def.settings(
+    platformSrcDirSetting("js"),
     scalacOptions += {
       val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
@@ -89,27 +88,6 @@ object build {
     mimaPreviousArtifacts := Set.empty,
   )
 
-  // avoid move files
-  object ScalazCrossType extends sbtcrossproject.CrossType {
-    override def projectDir(crossBase: File, projectType: String) =
-      crossBase / projectType
-
-    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
-      val dir = projectType match {
-        case JVMPlatform => "jvm"
-        case JSPlatform => "js"
-        case NativePlatform => "native"
-      }
-      crossBase / dir
-    }
-
-    def shared(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala"
-
-    override def sharedSrcDir(projectBase: File, conf: String) =
-      Some(shared(projectBase, conf))
-  }
-
   private val stdOptions = Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -136,23 +114,25 @@ object build {
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
-  private def Scala212 = "2.12.21"
-  private def Scala213 = "2.13.18"
-  private def Scala3 = "3.3.8"
+  def Scala212 = "2.12.21"
+  def Scala213 = "2.13.18"
+  def Scala3 = "3.3.8"
 
   val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
     Seq(Compile, Test).map { scope =>
-      (scope / unmanagedSourceDirectories) += {
-        val dir = Defaults.nameForSrc(scope.name)
-        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 12 =>
-            base / "scala-2.13-"
-          case _ =>
-            base / "scala-2.13+"
+      (scope / unmanagedSourceDirectories) ++= {
+        projectMatrixBaseDirectory.?.value.map { p =>
+          val base = p / "src" / Defaults.nameForSrc(scope.name)
+          val dir = CrossVersion.partialVersion(scalaVersion.value) match {
+            case Some((2, v)) if v <= 12 =>
+              "scala-2.13-"
+            case _ =>
+              "scala-2.13+"
+          }
+          (base / dir).getAbsoluteFile
         }
       }
     },
@@ -175,11 +155,6 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala212, Scala213, Scala3),
-    addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
-    addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
-    addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
     scalacOptions ++= stdOptions,
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v <= 12 =>
@@ -219,8 +194,6 @@ object build {
       (c / console / scalacOptions) --= unusedWarnOptions.value
     ),
 
-    scala213_pre_cross_setting,
-
     (Compile / doc / scalacOptions) ++= {
       val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
       Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
@@ -231,9 +204,11 @@ object build {
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
-        val dir = ScalazCrossType.shared(baseDirectory.value, "main")
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
-      }
+        projectMatrixBaseDirectory.?.value.map { p =>
+          val dir = p / "src" / "main" / "scala"
+          typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
+        }
+      }.flatten
     },
     checkGenTypeClasses := {
       val classes = genTypeClasses.value
@@ -270,10 +245,7 @@ object build {
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
-      releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonaRelease"),
       setNextVersion,
       setMimaVersion,
@@ -365,24 +337,23 @@ object build {
       }
     },
     (Compile / unmanagedSourceDirectories) += {
-      baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
+      (projectMatrixBaseDirectory.value / "jvm_js/src/main/scala/").getAbsoluteFile
     }
   )
 
-  private[this] val scala213_pre_cross_setting = {
-    // sbt wants `scala-2.13.0-M1`, `scala-2.13.0-M2`, ... (sbt/sbt#2819)
-    // @fommil tells me we could use sbt-sensible for this
-    (Compile / unmanagedSourceDirectories) ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2L, minor)) =>
-          Some((Compile / baseDirectory).value.getParentFile / s"src/main/scala-2.$minor")
-        case _               =>
-          None
+  private def platformSrcDirSetting(d: String) =
+    Seq(Compile, Test).map { x =>
+      x / unmanagedSourceDirectories += {
+        (projectMatrixBaseDirectory.value / d / "src" / Defaults.nameForSrc(x.name) / "scala").getAbsoluteFile
       }
     }
-  }
 
-  val nativeSettings = Seq(
+  val jvmSettings = Def.settings(
+    platformSrcDirSetting("jvm"),
+  )
+
+  val nativeSettings = Def.settings(
+    platformSrcDirSetting("native"),
     Compile / doc / scalacOptions --= {
       // TODO remove this workaround
       // https://github.com/scala-native/scala-native/issues/2503
