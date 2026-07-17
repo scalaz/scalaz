@@ -30,7 +30,7 @@ lazy val scalaz = Project(
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Def.uncached(Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value),
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -43,7 +43,13 @@ lazy val scalaz = Project(
   ScalaUnidoc / unidoc / unidocProjectFilter := {
     inProjects(all.map(_.jvm(rootScalaVersion): ProjectReference)*)
   },
-  Defaults.packageTaskSettings((Compile / packageDoc), (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(
+    Compile / packageDoc,
+    Def.task {
+      given FileConverter = fileConverter.value
+      (Compile / unidoc).value.flatMap(Mapper.allSubpaths)
+    }
+  ),
 ).aggregate(
   all.flatMap(_.allProjects().map(_._1: ProjectReference))*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -185,12 +191,12 @@ lazy val example = projectMatrix
     Def.settings(
       jvmSettings,
       jvm_js_settings,
-      TaskKey[Unit]("runAllMain") := {
+      TaskKey[Unit]("runAllMain") := Def.uncached {
         val r = (run / runner).value
-        val classpath = (Compile / fullClasspath).value
+        val classpath = (Compile / fullClasspath).value.map(_.data).map(fileConverter.value.toPath)
         val log = streams.value.log
         (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-          r.run(c, classpath.map(_.data), Nil, log)
+          r.run(c, classpath, Nil, log)
         )
       },
       notPublish,
@@ -233,7 +239,7 @@ lazy val scalacheckBinding = projectMatrix
   .settings(
     name := "scalaz-scalacheck-binding",
     Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0",
   )
   .dependsOn(core, iteratee)
   .jvmPlatform(
