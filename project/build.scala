@@ -19,7 +19,7 @@ import com.typesafe.sbt.osgi.SbtOsgi
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
 
 object build {
-  type Sett = Def.Setting[_]
+  type Sett = Def.Setting[?]
 
   val rootNativeId = "rootNative"
 
@@ -40,10 +40,10 @@ object build {
     enableCrossBuild = true
   )
 
-  lazy val setMimaVersion: ReleaseStep = { st: State =>
+  lazy val setMimaVersion: ReleaseStep = { (st: State) =>
     val extracted = Project.extract(st)
     val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
-    IO.write(extracted get releaseVersionFile, s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
+    IO.write(extracted.get(releaseVersionFile), s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
     reapply(Seq(ThisBuild / scalazMimaBasis := releaseV), st)
   }
 
@@ -304,7 +304,7 @@ object build {
     libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, _)) =>
         Seq(
-          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+          compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full))
         )
     }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
@@ -374,16 +374,22 @@ object build {
 
   lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
+  @transient
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
+  @transient
   lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
+  @transient
   lazy val genToSyntax = taskKey[String]("")
 
+  @transient
   lazy val showDoc = taskKey[Unit]("")
 
+  @transient
   lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
 
+  @transient
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
