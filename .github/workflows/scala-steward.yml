@@ -17,7 +17,7 @@ jobs:
       with:
         client-id: 89659
         private-key: ${{ secrets.SCALAZ_BOT_KEY }}
-    - uses: sbt/setup-sbt@66fb4376e81982c7d92a4074170846fff88e2e30 # v1.5.0
+    - uses: sbt/setup-sbt@6444f4c8111de4b9059c3975def104b03cfaa5f0 # v1.5.2
     - name: Launch Scala Steward
       uses: scala-steward-org/scala-steward-action@ff09222640622d474d0d9f93c04aefedd125b187 # v2.92.0
       with:
