@@ -14,7 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [rootJVM, rootJS, rootNative]
+        project: [JVM, JS, Native]
+        scala: [2_12, 2_13, 3]
         java: [17, 25]
     steps:
     - uses: actions/checkout@v7
@@ -22,50 +23,16 @@ jobs:
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
-    - run: |
-        ./sbt -v \
-        checkGenTypeClasses \
-        "project ${{ matrix.project }}" \
-        "Test/compile" \
-        "mimaReportBinaryIssues" \
-        $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
-    - run: |
-        ./sbt -v \
-        "project ${{ matrix.project }}" \
-        "test" \
-        "project /" \
-        $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; fi)
-    - run: |
-        case ${{ matrix.project }} in
-          "rootJVM")
-            ./sbt -v \
-               "project exampleJVM3" \
-               runAllMain \
-               "project exampleJVM2_13" \
-               runAllMain \
-               "project exampleJVM2_12" \
-               runAllMain
-            ;;
-          "rootJS")
-            ./sbt -v \
-               "project exampleJS3" \
-               runAllMain \
-               "project exampleJS2_13" \
-               runAllMain \
-               "project exampleJS2_12" \
-               runAllMain
-            ;;
-          "rootNative")
-            ./sbt -v \
-               "project exampleNative3" \
-               runAllMain \
-               "project exampleNative2_13" \
-               runAllMain \
-               "project exampleNative2_12" \
-               runAllMain
-            ;;
-          *)
-            echo "unknown project"
-            exit 1
-        esac
+    - run: ./sbt -v
+           checkGenTypeClasses
+           "...${{ matrix.project }}${{ matrix.scala }}/Test/compile"
+           "...${{ matrix.project }}${{ matrix.scala }}/mimaReportBinaryIssues"
+           $(if [[ "${{ matrix.project }}" == "JS" ]]; then echo "...${{ matrix.project }}${{ matrix.scala }}/Test/fastOptJS"; fi)
+    - run: ./sbt -v
+           "...${{ matrix.project }}${{ matrix.scala }}/test"
+           "project /"
+           $(if [[ "${{ matrix.project }}" == "JVM" ]]; then echo "publishLocal"; fi)
+    - run: ./sbt -v
+           "project example${{ matrix.project }}${{ matrix.scala }}"
+           runAllMain
     - run: rm -rf "$HOME/.ivy2/local" || true
