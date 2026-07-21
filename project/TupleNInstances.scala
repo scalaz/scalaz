@@ -32,7 +32,7 @@ private[std] trait Tuple${n}Functor[$tparams] extends Traverse[($tparams, *)] {
     val xs = (1 until n).map("x" + _).mkString(", ")
     val zs = (1 until n).map("z" + _).mkString(", ")
 
-s"""
+    s"""
 private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, *)] with Tuple${n}Functor[$tparams] {
   ${(1 until n).map(i => s"def _$i : Semigroup[A$i]").mkString("; ")}
 
@@ -65,7 +65,7 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, *)] wit
   def tupleNMonad(n: Int): String = {
     val tparams = (1 until n).map("A" + _).mkString(", ")
 
-s"""
+    s"""
 private[std] abstract class Tuple${n}Monad[$tparams] extends Monad[($tparams, *)] with Tuple${n}BindRec[$tparams] {
   ${(1 until n).map(i => s"override def _$i : Monoid[A$i]").mkString("; ")}
   def point[A](a: => A) = (${(1 until n).map(i => s"_$i.zero").mkString(", ")}, a)

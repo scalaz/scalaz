@@ -116,10 +116,10 @@ lazy val example = CrossProject(id = "example", base = file("example"))(JVMPlatf
  .jvmSettings(
     TaskKey[Unit]("runAllMain") := {
       val r = (run / runner).value
-      val classpath = (Compile / fullClasspath).value
+      val classpath = (Compile / fullClasspath).value.map(_.data)
       val log = streams.value.log
       (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-        r.run(c, classpath.map(_.data), Nil, log)
+        r.run(c, classpath, Nil, log)
       )
     },
   )

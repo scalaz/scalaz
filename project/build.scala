@@ -32,7 +32,7 @@ import sbtcrossproject.CrossPlugin.autoImport._
 import sbtdynver.DynVerPlugin.autoImport._
 
 object build {
-  type Sett = Def.Setting[_]
+  type Sett = Def.Setting[?]
 
   val rootNativeId = "rootNative"
 
@@ -56,18 +56,18 @@ object build {
   lazy val setMimaVersion: ReleaseStep = { (st: State) =>
     val extracted = Project.extract(st)
     val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
-    IO.write(extracted get releaseVersionFile, s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
+    IO.write(extracted.get(releaseVersionFile), s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
     reapply(Seq(ThisBuild / scalazMimaBasis := releaseV), st)
   }
 
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
-  private[this] val tagName = Def.setting{
+  private val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
-  private[this] val tagOrHash = Def.setting{
+  private val tagOrHash = Def.setting{
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
@@ -125,7 +125,7 @@ object build {
   private def Scala213 = "2.13.18"
   private def Scala3 = "3.3.8"
 
-  private[this] val buildInfoPackageName = "scalaz"
+  private val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     Seq(12, 13).flatMap { scalaV =>
@@ -179,9 +179,9 @@ object build {
     addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
     addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
     commands += Command.command("setVersionUseDynver") { state =>
-      val extracted = Project extract state
-      val out = extracted get dynverGitDescribeOutput
-      val date = extracted get dynverCurrentDate
+      val extracted = Project.extract(state)
+      val out = extracted.get(dynverGitDescribeOutput)
+      val date = extracted.get(dynverCurrentDate)
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
     scalacOptions ++= Seq(
@@ -331,7 +331,7 @@ object build {
       if (scalaBinaryVersion.value == "3") {
         Nil
       } else {
-        Seq(compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full))
+        Seq(compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full)))
       }
     }
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
@@ -443,16 +443,22 @@ object build {
 
   lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
+  @transient
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
+  @transient
   lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
+  @transient
   lazy val genToSyntax = taskKey[String]("")
 
+  @transient
   lazy val showDoc = taskKey[Unit]("")
 
+  @transient
   lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
 
+  @transient
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
