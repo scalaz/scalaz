@@ -186,7 +186,6 @@ object build {
       val date = extracted get dynverCurrentDate
       s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
     },
-    fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
