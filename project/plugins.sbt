@@ -17,9 +17,6 @@ addSbtPlugin("org.scala-native" % "sbt-scala-native" % scalaNativeVersion)
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.6")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.21")
 
-// https://github.com/sbt/sbt/issues/2217
-fullResolvers ~= {_.filterNot(_.name == "jcenter")}
-
 if (sys.env.isDefinedAt("GITHUB_ACTION")) {
   Def.settings(
     addSbtPlugin("net.virtual-void" % "sbt-hackers-digest" % "0.1.2")
