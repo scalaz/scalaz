@@ -31,8 +31,6 @@ import sbtcrossproject.CrossPlugin.autoImport._
 
 import sbtdynver.DynVerPlugin.autoImport._
 
-import xerial.sbt.Sonatype.autoImport._
-
 object build {
   type Sett = Def.Setting[_]
 
@@ -260,10 +258,7 @@ object build {
     },
 
     credentialsSetting,
-    publishTo := sonatypePublishToBundle.value,
-    sonatypeBundleDirectory := {
-      (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
-    },
+    publishTo := localStaging.value,
     Test / publishArtifact := false,
 
     // adapted from sbt-release defaults
@@ -275,11 +270,9 @@ object build {
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
-      releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
       releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
-      releaseStepCommandAndRemaining("sonatypeBundleRelease"),
+      releaseStepCommandAndRemaining("sonaRelease"),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
