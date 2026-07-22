@@ -69,8 +69,7 @@ sealed abstract class Maybe[A] {
     cata(_ => true, false)
 
   /** True if no underlying value is present */
-  final def isEmpty: Boolean =
-    cata(_ => false, true)
+  def isEmpty: Boolean
 
   final def map[B](f: A => B): Maybe[B] =
     cata(f andThen just[B], empty[B])
@@ -155,7 +154,9 @@ sealed abstract class Maybe[A] {
 
 object Maybe extends MaybeInstances {
 
-  final case class Empty[A] private() extends Maybe[A]
+  final case class Empty[A] private() extends Maybe[A] {
+    override def isEmpty: true = true
+  }
   object Empty {
     // https://github.com/scala/bug/issues/11953
     private[this] val value = new Empty[Nothing]
@@ -164,7 +165,9 @@ object Maybe extends MaybeInstances {
 
   // `get` is an intentional name as it is expected by the unapply
   // logic in the scalac pattern matcher.
-  final case class Just[A](get: A) extends Maybe[A]
+  final case class Just[A](get: A) extends Maybe[A] {
+    override def isEmpty: false = false
+  }
 
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {
