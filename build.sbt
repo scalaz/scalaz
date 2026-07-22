@@ -89,6 +89,16 @@ lazy val core = projectMatrix
     (Compile / sourceGenerators) += (Compile / sourceManaged).map{
       dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
     }.taskValue,
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Seq(
+            "-source:3.0-migration",
+          )
+        case _ =>
+          Nil
+      }
+    },
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
     buildInfoPackage := buildInfoPackageName,
     buildInfoObject := "ScalazBuildInfo",
