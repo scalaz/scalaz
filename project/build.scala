@@ -170,7 +170,6 @@ object build {
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((0 | 3, _)) =>
         Seq(
-          "-source", "3.0-migration",
           "-Ykind-projector",
         )
     }.toList.flatten,
