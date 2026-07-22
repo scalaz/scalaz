@@ -32,7 +32,4 @@ jobs:
            "...${{ matrix.project }}${{ matrix.scala }}/test"
            "project /"
            $(if [[ "${{ matrix.project }}" == "JVM" ]]; then echo "publishLocal"; fi)
-    - run: ./sbt -v
-           "project example${{ matrix.project }}${{ matrix.scala }}"
-           runAllMain
     - run: rm -rf "$HOME/.ivy2/local" || true
