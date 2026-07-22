@@ -27,9 +27,8 @@ jobs:
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
-    - uses: sbt/setup-sbt@6444f4c8111de4b9059c3975def104b03cfaa5f0 # v1.5.2
     - run: |
-        sbt -v \
+        ./sbt -v \
         checkGenTypeClasses \
         "project ${{ matrix.project }}" \
         "SetScala${{ matrix.scala }}" \
@@ -37,7 +36,7 @@ jobs:
         "mimaReportBinaryIssues" \
         $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
     - run: |
-        sbt -v \
+        ./sbt -v \
         "project ${{ matrix.project }}" \
         "SetScala${{ matrix.scala }}" \
         "test" \
