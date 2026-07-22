@@ -271,7 +271,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   // for binary compatibility
   private[scalaz] def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = {
     import scala.language.reflectiveCalls
-    val Array(method) = ArraySeq.getClass.getMethods.filter(_.getName == "apply").filter(_.getParameterCount == 1)
+    val Seq(method) = ArraySeq.getClass.getMethods.toSeq.filter(_.getName == "apply").filter(_.getParameterCount == 1)
     Functor[Arbitrary].map(arb[List[A]]){ list =>
       method.invoke(list).asInstanceOf[ArraySeq[A]]
     }

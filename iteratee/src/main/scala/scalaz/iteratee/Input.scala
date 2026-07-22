@@ -94,7 +94,7 @@ sealed abstract class InputInstances {
        , el = x => Applicative[G].map(f(x))(b => elInput(b))
        , eof = Applicative[G].point(eofInput[B])
      )
-    override def foldRight[A, B](fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
+     override def foldRight[A, B](fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
        empty = z
        , el = a => f(a, z)
        , eof = z

@@ -408,7 +408,7 @@ object ZipperTest extends SpecLite {
     r must_===(Some(elem))
   }
 
-  "findBy if given a function that returns None should not return anything" ! forAll { z: Zipper[Int] =>
+  "findBy if given a function that returns None should not return anything" ! forAll { (z: Zipper[Int]) =>
     z.findBy(z => None)(x => x == z.focus).isEmpty
   }
 

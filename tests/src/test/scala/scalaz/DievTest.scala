@@ -28,13 +28,13 @@ object DievTest extends SpecLite {
   // TODO: Use data table to test subtractInterval.
 
   "fromValuesSeq / toSet" ! forAll {
-    (set: Set[Int]) => Diev.fromValuesSeq(set.toSeq).toSet must_===(set)
+    (set: Set[Int]) => Diev.fromValuesSeq(set.toSeq).toSet() must_===(set)
   }
 
   "fromValuesSeq / toList" ! forAll {
     (list: List[Int]) => {
       val sortedList = list.toSet.toList.sorted
-      Diev.fromValuesSeq(list).toList must_===(sortedList)
+      Diev.fromValuesSeq(list).toList() must_===(sortedList)
     }
   }
 
