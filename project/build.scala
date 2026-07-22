@@ -131,7 +131,6 @@ object build {
       scalaBinaryVersion.value match {
         case "3" =>
           Seq(
-            "-source", "3.0-migration",
             "-Ykind-projector",
           )
         case _ =>

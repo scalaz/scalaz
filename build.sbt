@@ -91,6 +91,16 @@ lazy val core = projectMatrix
       Nil
     },
     name := "scalaz-core",
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Seq(
+            "-source:3.0-migration",
+          )
+        case _ =>
+          Nil
+      }
+    },
     (Compile / sourceGenerators) += (Compile / sourceManaged).map{
       dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
     }.taskValue,
