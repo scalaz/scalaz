@@ -1,6 +1,5 @@
 import build._
 
-import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossProject
@@ -92,8 +91,6 @@ lazy val concurrent = Project(
   standardSettings,
   name := ConcurrentName,
   typeClasses := TypeClass.concurrent,
-  osgiExport("scalaz.concurrent"),
-  OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
 ).dependsOn(
   coreJVM, effectJVM
 ).enablePlugins(MimaPlugin)
@@ -178,7 +175,7 @@ def scalacheckBindingProject(
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/src/main/scala"
       },
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion,
-      osgiExport("scalaz.scalacheck"))
+    )
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings)
