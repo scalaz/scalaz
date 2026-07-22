@@ -12,17 +12,7 @@ import sbtrelease.Utilities._
 
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
 
-import sbtbuildinfo.BuildInfoPlugin.autoImport._
-
-import com.typesafe.tools.mima.core.ProblemFilters
-import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
-import com.typesafe.tools.mima.core.InheritedNewAbstractMethodProblem
-import com.typesafe.tools.mima.plugin.MimaPlugin
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
-
-import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-
-import sbtdynver.DynVerPlugin.autoImport._
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
 
 object build {
   type Sett = Def.Setting[?]
@@ -50,8 +40,6 @@ object build {
     IO.write(extracted.get(releaseVersionFile), s"""\nThisBuild / build.scalazMimaBasis := "${releaseV}"\n""", append = true)
     reapply(Seq(ThisBuild / scalazMimaBasis := releaseV), st)
   }
-
-  val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lazyLines_!.head
 
@@ -116,28 +104,13 @@ object build {
       }
     },
     organization := "org.scalaz",
-    Compile / doc / sources := {
-      scalaBinaryVersion.value match {
-        case "3" =>
-          // TODO OutOfMemoryError
-          Nil
-        case _ =>
-          (Compile / doc / sources).value
-      }
-    },
-    commands += Command.command("setVersionUseDynver") { state =>
-      val extracted = Project.extract(state)
-      val out = extracted.get(dynverGitDescribeOutput)
-      val date = extracted.get(dynverCurrentDate)
-      s"""set ThisBuild / version := "${out.sonatypeVersion(date)}" """ :: state
-    },
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
       "-release:8",
       "-encoding", "UTF-8",
       "-feature",
-      "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+      "-language:implicitConversions", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,v)) if v >= 12 => Seq("-opt:l:method")
@@ -146,7 +119,10 @@ object build {
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v <= 12 =>
-          Seq("-Xfuture")
+          Seq(
+            "-Xfuture",
+            "-language:higherKinds",
+          )
         case _ =>
           Nil
       }
@@ -204,10 +180,9 @@ object build {
       val _ = (Compile / doc).value
       val out = (Compile / doc / target).value
       val index = out / "index.html"
-      if (index.exists()) Desktop.getDesktop.open(out / "index.html")
+      if (index.isFile) Desktop.getDesktop.open(index)
     },
 
-    credentialsSetting,
     publishTo := localStaging.value,
     Test / publishArtifact := false,
 
@@ -276,12 +251,11 @@ object build {
       fileConverter.value.toVirtualFile(LICENSE_txt.toPath)
     },
     // kind-projector plugin
-    kindProjectorVersion := "0.13.4",
     libraryDependencies ++= {
       if (scalaBinaryVersion.value == "3") {
         Nil
       } else {
-        Seq(compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full)))
+        Seq(compilerPlugin(("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full)))
       }
     }
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
@@ -309,15 +283,6 @@ object build {
 
   val nativeSettings = Def.settings(
     platformSrcDirSetting("native"),
-    Compile / doc / scalacOptions --= {
-      // TODO remove this workaround
-      // https://github.com/scala-native/scala-native/issues/2503
-      if (scalaBinaryVersion.value == "3") {
-        (Compile / doc / scalacOptions).value.filter(_.contains("-Xplugin"))
-      } else {
-        Nil
-      }
-    },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_native0.5_${scalaBinaryVersion.value}" % _
@@ -326,26 +291,6 @@ object build {
   )
 
   final val ConcurrentName = "scalaz-concurrent"
-
-  lazy val credentialsSetting = credentials ++= {
-    val name = "Sonatype Nexus Repository Manager"
-    val realm = "oss.sonatype.org"
-    (
-      sys.props.get("build.publish.user"),
-      sys.props.get("build.publish.password"),
-      sys.env.get("SONATYPE_USERNAME"),
-      sys.env.get("SONATYPE_PASSWORD")
-    ) match {
-      case (Some(user), Some(pass), _, _)  => Seq(Credentials(name, realm, user, pass))
-      case (_, _, Some(user), Some(pass))  => Seq(Credentials(name, realm, user, pass))
-      case _                           =>
-        val ivyFile = Path.userHome / ".ivy2" / ".credentials"
-        val m2File = Path.userHome / ".m2" / "credentials"
-        if (ivyFile.exists()) Seq(Credentials(ivyFile))
-        else if (m2File.exists()) Seq(Credentials(m2File))
-        else Nil
-    }
-  }
 
   lazy val licenseFile = settingKey[HashedVirtualFileRef]("The license file to include in packaged artifacts")
 
