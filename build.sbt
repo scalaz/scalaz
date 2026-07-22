@@ -1,7 +1,6 @@
 import build._
 
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
-import sbt.internal.ProjectMatrix
 
 val scalaVersions = Seq(Scala212, Scala213, Scala3)
 
@@ -31,7 +30,7 @@ lazy val scalaz = Project(
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Def.uncached(Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value),
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -44,7 +43,13 @@ lazy val scalaz = Project(
   ScalaUnidoc / unidoc / unidocProjectFilter := {
     inProjects(all.map(_.jvm(rootScalaVersion): ProjectReference)*)
   },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(
+    Compile / packageDoc,
+    Def.task {
+      given FileConverter = fileConverter.value
+      (Compile / unidoc).value.flatMap(Mapper.allSubpaths)
+    }
+  ),
 ).aggregate(
   all.flatMap(_.allProjects().map(_._1: ProjectReference))*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -215,9 +220,9 @@ lazy val example = projectMatrix
     Def.settings(
       jvmSettings,
       mimaPreviousArtifacts := Set.empty,
-      TaskKey[Unit]("runAllMain") := {
+      TaskKey[Unit]("runAllMain") := Def.uncached {
         val r = (run / runner).value
-        val classpath = (Compile / fullClasspath).value.map(_.data)
+        val classpath = (Compile / fullClasspath).value.map(_.data).map(fileConverter.value.toPath)
         val log = streams.value.log
         (Compile / discoveredMainClasses).value.sorted.foreach(c =>
           r.run(c, classpath, Nil, log)
@@ -264,7 +269,7 @@ def scalacheckBindingProject(
 
   def fullVersion(base: String) = base + "-scalacheck-" + versionSuffix
 
-  ProjectMatrix(id, file(base))
+  ProjectMatrix(id, file(base), this.getClass.getClassLoader)
     .defaultAxes()
     .settings(standardSettings)
     .settings(
@@ -280,7 +285,7 @@ def scalacheckBindingProject(
       (Compile / unmanagedSourceDirectories) += {
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/src/main/scala"
       },
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion,
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion,
     )
     .configure(dependsOnConcurrent)
     .dependsOn(core, iteratee)
@@ -352,7 +357,7 @@ lazy val tests = projectMatrix
         "-maxDiscardRatio", "50",
         "-minSuccessfulTests", minSuccessfulTests.value.toString
       )
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions*)
     }
   )
   .jvmPlatform(
