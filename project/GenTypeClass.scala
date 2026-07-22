@@ -187,8 +187,10 @@ object GenTypeClass {
         (FileStatus.Created, source)
       }
       log.debug("Contents: %s".format(updatedSource))
-      IO.delete(f)
-      IO.write(f, updatedSource)
+      if (status != FileStatus.NoChange) {
+        IO.delete(f)
+        IO.write(f, updatedSource)
+      }
       (status, f)
     }
 

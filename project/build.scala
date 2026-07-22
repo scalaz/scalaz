@@ -5,6 +5,8 @@ import GenTypeClass._
 
 import java.awt.Desktop
 
+import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
+
 import sbtrelease._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
@@ -20,18 +22,12 @@ import com.typesafe.tools.mima.core.InheritedNewAbstractMethodProblem
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
-import sbtcrossproject.CrossPlugin.autoImport._
 
 import sbtdynver.DynVerPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[?]
-
-  val rootNativeId = "rootNative"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -47,7 +43,7 @@ object build {
       Classpaths.getPublishTo(value)
       newState
     },
-    enableCrossBuild = true
+    enableCrossBuild = false
   )
 
   lazy val setMimaVersion: ReleaseStep = { (st: State) =>
@@ -68,7 +64,8 @@ object build {
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
-  val scalajsProjectSettings = Seq[Sett](
+  val scalajsProjectSettings = Def.settings(
+    platformSrcDirSetting("js"),
     scalacOptions += {
       val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
@@ -97,60 +94,30 @@ object build {
     mimaPreviousArtifacts := Set.empty
   )
 
-  // avoid move files
-  object ScalazCrossType extends sbtcrossproject.CrossType {
-    override def projectDir(crossBase: File, projectType: String) =
-      crossBase / projectType
+  def Scala212 = "2.12.21"
+  def Scala213 = "2.13.18"
+  def Scala3 = "3.3.8"
 
-    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
-      val dir = projectType match {
-        case JVMPlatform => "jvm"
-        case JSPlatform => "js"
-        case NativePlatform => "native"
-      }
-      crossBase / dir
-    }
-
-    def shared(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala"
-
-    override def sharedSrcDir(projectBase: File, conf: String) =
-      Some(shared(projectBase, conf))
-  }
-
-  private def Scala212 = "2.12.21"
-  private def Scala213 = "2.13.18"
-  private def Scala3 = "3.3.8"
-
-  private val buildInfoPackageName = "scalaz"
+  val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     Seq(12, 13).flatMap { scalaV =>
-      Seq((Compile, "main"), (Test, "test")).map { case (scope, dir) =>
-        (scope / unmanagedSourceDirectories) += {
-          val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
-          CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((x, y)) if ((x == 2) && (y >= scalaV)) || (x >= 3) =>
-              base / s"scala-2.${scalaV}+"
-            case _ =>
-              base / s"scala-2.${scalaV}-"
+      Seq(Compile, Test).map { scope =>
+        (scope / unmanagedSourceDirectories) ++= {
+          projectMatrixBaseDirectory.?.value.map { p =>
+            val base = p / "src" / Defaults.nameForSrc(scope.name)
+            val dir = CrossVersion.partialVersion(scalaVersion.value) match {
+              case Some((x, y)) if ((x == 2) && (y >= scalaV)) || (x >= 3) =>
+                s"scala-2.${scalaV}+"
+              case _ =>
+                s"scala-2.${scalaV}-"
+            }
+            (base / dir).getAbsoluteFile
           }
         }
       }
     },
     organization := "org.scalaz",
-    Seq(Compile, Test).map { scope =>
-      (scope / unmanagedSourceDirectories) += {
-        val dir = Defaults.nameForSrc(scope.name)
-        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 12 =>
-            base / "scala-2.13-"
-          case _ =>
-            base / "scala-2.13+"
-        }
-      }
-    },
     Compile / doc / sources := {
       scalaBinaryVersion.value match {
         case "3" =>
@@ -170,11 +137,6 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala212, Scala213, Scala3),
-    addCommandAlias("SetScala2_12", s"++ ${Scala212}! -v"),
-    addCommandAlias("SetScala2_13", s"++ ${Scala213}! -v"),
-    addCommandAlias("SetScala3", s"++ ${Scala3}! -v"),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project.extract(state)
       val out = extracted.get(dynverGitDescribeOutput)
@@ -221,13 +183,16 @@ object build {
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
-        val dir = name.value match {
+        name.value match {
           case ConcurrentName =>
-            (Compile / scalaSource).value
+            val dir = (Compile / scalaSource).value
+            typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
           case _ =>
-            ScalazCrossType.shared(baseDirectory.value, "main")
+            projectMatrixBaseDirectory.?.value.map { p =>
+              val dir = p / "src" / "main" / "scala"
+              typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
+            }.toSeq.flatten
         }
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
       }
     },
     checkGenTypeClasses := {
@@ -267,7 +232,6 @@ object build {
       commitReleaseVersion,
       tagRelease,
       publishSignedArtifacts,
-      releaseStepCommandAndRemaining(s"+ ${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("sonaRelease"),
       setNextVersion,
       setMimaVersion,
@@ -343,7 +307,19 @@ object build {
     }
   )
 
-  val nativeSettings = Seq(
+  private def platformSrcDirSetting(d: String) =
+    Seq(Compile, Test).map { x =>
+      x / unmanagedSourceDirectories += {
+        (projectMatrixBaseDirectory.value / d / "src" / Defaults.nameForSrc(x.name) / "scala").getAbsoluteFile
+      }
+    }
+
+  val jvmSettings = Def.settings(
+    platformSrcDirSetting("jvm"),
+  )
+
+  val nativeSettings = Def.settings(
+    platformSrcDirSetting("native"),
     Compile / doc / scalacOptions --= {
       // TODO remove this workaround
       // https://github.com/scala-native/scala-native/issues/2503
@@ -360,58 +336,7 @@ object build {
     }
   )
 
-  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings)
-    .settings(
-      mimaBinaryIssueFilters ++= {
-        import com.typesafe.tools.mima.core._
-        import com.typesafe.tools.mima.core.ProblemFilters._
-        Nil
-      },
-      name := "scalaz-core",
-      (Compile / sourceGenerators) += (Compile / sourceManaged).map{
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      }.taskValue,
-      buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := buildInfoPackageName,
-    )
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
-    .jsSettings(scalajsProjectSettings)
-    .jvmSettings(
-      typeClasses := TypeClass.core
-    )
-    .nativeSettings(
-      nativeSettings
-    )
-
   final val ConcurrentName = "scalaz-concurrent"
-
-  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings)
-    .settings(
-      name := "scalaz-effect",
-    )
-    .dependsOn(core)
-    .enablePlugins(MimaPlugin)
-    .jsSettings(scalajsProjectSettings)
-    .jvmSettings(
-      typeClasses := TypeClass.effect
-    )
-    .nativeSettings(
-      nativeSettings
-    )
-
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(standardSettings)
-    .settings(
-      name := "scalaz-iteratee",
-    )
-    .dependsOn(core, effect)
-    .enablePlugins(MimaPlugin)
-    .jsSettings(scalajsProjectSettings)
-    .nativeSettings(
-      nativeSettings
-    )
 
   lazy val credentialsSetting = credentials ++= {
     val name = "Sonatype Nexus Repository Manager"
