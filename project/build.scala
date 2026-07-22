@@ -5,8 +5,6 @@ import GenTypeClass._
 
 import java.awt.Desktop
 
-import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
-
 import sbtrelease._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
@@ -55,7 +53,7 @@ object build {
 
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lazyLines_!.head
 
   private val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
@@ -127,16 +125,6 @@ object build {
           (Compile / doc / sources).value
       }
     },
-    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
-      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
-      val buildInfoDir = "sbt-buildinfo"
-      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
-      } else {
-        f.relativeTo((Compile / sourceManaged).value).get.getPath
-      }
-      (f, path)
-    },
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project.extract(state)
       val out = extracted.get(dynverGitDescribeOutput)
@@ -146,6 +134,7 @@ object build {
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
+      "-release:8",
       "-encoding", "UTF-8",
       "-feature",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
@@ -198,7 +187,7 @@ object build {
     checkGenTypeClasses := {
       val classes = genTypeClasses.value
       if(classes.exists(_._1 != FileStatus.NoChange))
-        sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
+        sys.error(classes.groupBy(_._1).view.filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toMap.toString)
     },
     typeClasses := Seq(),
     genToSyntax := {
@@ -284,7 +273,7 @@ object build {
     licenseFile := {
       val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
       if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
-      LICENSE_txt
+      fileConverter.value.toVirtualFile(LICENSE_txt.toPath)
     },
     // kind-projector plugin
     kindProjectorVersion := "0.13.4",
@@ -358,7 +347,7 @@ object build {
     }
   }
 
-  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+  lazy val licenseFile = settingKey[HashedVirtualFileRef]("The license file to include in packaged artifacts")
 
   lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
