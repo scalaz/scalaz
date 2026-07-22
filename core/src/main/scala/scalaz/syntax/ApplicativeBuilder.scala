@@ -54,16 +54,16 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
       def |@|[E](ee: M[E]): ApplicativeBuilder5[E] = ⊛(ee)
 
-    def parApply[Z](f: (A, B, C, D) => Z)(implicit ap: Apply.Par[M]): M[Z] =
-      Tag.unwrap(ap.apply4(
-                   Tag[M[A], Parallel](a),
-                   Tag[M[B], Parallel](b),
-                   Tag[M[C], Parallel](c),
-                   Tag[M[D], Parallel](d)
-                 )(f))
+      def parApply[Z](f: (A, B, C, D) => Z)(implicit ap: Apply.Par[M]): M[Z] =
+        Tag.unwrap(ap.apply4(
+                     Tag[M[A], Parallel](a),
+                     Tag[M[B], Parallel](b),
+                     Tag[M[C], Parallel](c),
+                     Tag[M[D], Parallel](d)
+                   )(f))
 
-    def parTupled(implicit ap: Apply.Par[M]): M[(A, B, C, D)] =
-      parApply(Tuple4.apply)
+      def parTupled(implicit ap: Apply.Par[M]): M[(A, B, C, D)] =
+        parApply(Tuple4.apply)
 
       sealed abstract class ApplicativeBuilder5[E] {
         val e: M[E]
