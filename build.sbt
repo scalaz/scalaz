@@ -195,6 +195,28 @@ lazy val example = projectMatrix
     standardSettings,
     name := "scalaz-example",
     Compile / compile / scalacOptions -= "-Xlint:adapted-args",
+    Test / sourceGenerators += Def.task {
+      val dir = (Test / sourceManaged).value
+      val values = (Compile / discoveredMainClasses).value.sorted
+      assert(values.nonEmpty, "discoveredMainClasses is empty")
+      val properties = values.map { t =>
+        s"""  property("${t}") = Prop { ${t}.main(Array.empty[String]) ; true } """
+      }.mkString("\n")
+
+      val src = s"""package scalaz
+        |
+        |import org.scalacheck.Prop
+        |
+        |object ExampleSpec extends org.scalacheck.Properties("ExampleSpec") {
+        |
+        |$properties
+        |
+        |}""".stripMargin
+
+      val f = dir / "ExampleSpec.scala"
+      IO.write(f, src)
+      Seq(f)
+    }.taskValue,
   )
   .jvmPlatform(
     scalaVersions,
@@ -229,6 +251,7 @@ lazy val example = projectMatrix
     scalaVersions,
     Def.settings(
       nativeSettings,
+      evictionErrorLevel := Level.Warn,
       commands += Command.command("runAllMain") { state1 =>
         val extracted = Project.extract(state1)
         val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
@@ -238,7 +261,7 @@ lazy val example = projectMatrix
     ),
   )
   .dependsOn(
-    iteratee
+    scalacheckBinding
   )
 
 lazy val scalacheckBinding = projectMatrix
