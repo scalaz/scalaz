@@ -22,7 +22,7 @@ jobs:
     - uses: actions/setup-java@v5
       with:
         java-version: ${{matrix.java}}
-        distribution: adopt
+        distribution: temurin
     - run: ./sbt -v
            checkGenTypeClasses
            "...${{ matrix.project }}${{ matrix.scala }}/Test/compile"
