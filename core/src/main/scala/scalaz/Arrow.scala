@@ -68,7 +68,28 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
     new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
 
-object Arrow {
+sealed abstract class ArrowInstances0 {
+
+  implicit def arrowDivide[F[_, _], A](implicit A0: Arrow[F], S0: Semigroup[A]): Divide[F[?, A]] = new ArrowDivide[F, A] {
+    implicit def A: Arrow[F] = A0
+    implicit def S: Semigroup[A] = S0
+  }
+}
+
+abstract class ArrowInstances extends ArrowInstances0 {
+
+  implicit def arrowApply[F[_, _], A](implicit A0: Arrow[F]): Apply[F[A, ?]] = new ArrowApply[F, A] {
+    implicit def A: Arrow[F] = A0
+  }
+
+  implicit def arrowDecidable[F[_, _], A](implicit A0: Arrow[F], C0: Choice[F], M0: Monoid[A]): Decidable[F[?, A]] = new ArrowDecidable[F, A] {
+    implicit def A: Arrow[F] = A0
+    implicit def C: Choice[F] = C0
+    implicit def M: Monoid[A] = M0
+  }
+}
+
+object Arrow extends ArrowInstances {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
   import Isomorphism._
@@ -91,4 +112,34 @@ trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[
   override def arr[A, B](f: A => B): F[A, B] =
     iso.from(G.arr(f))
   ////
+}
+
+private trait ArrowApply[F[_, _], A] extends Apply[F[A, ?]] {
+  implicit def A: Arrow[F]
+
+  def map[B, C](fa: F[A, B])(f: B => C): F[A, C] = A.compose(A.arr(f), fa)
+
+  def ap[B,C](fa: => F[A, B])(f: => F[A, B => C]): F[A, C] =
+    A.mapsnd(A.combine(f, fa))(t => t._1(t._2))
+}
+
+private trait ArrowDecidable[F[_, _], A] extends Decidable[F[?, A]] {
+  implicit def A: Arrow[F]
+  implicit def C: Choice[F]
+  implicit def M: Monoid[A]
+
+  def choose2[Z, A1, A2](a1: =>F[A1, A], a2: =>F[A2, A])(f: Z => (A1 \/ A2)): F[Z, A] =
+    A.mapfst(C.choice(a1, a2))(f)
+  def divide2[A1, A2, Z](a1: => F[A1, A],a2: => F[A2, A])(f: Z => (A1, A2)): F[Z, A] =
+    A.compose(A.arr((t: (A, A)) => M.append(t._1, t._2)), A.compose(A.splitA(a1, a2), A.arr(f)))
+  def conquer[A1]: F[A1, A] = A.arr((_: A1) => M.zero)
+}
+
+private trait ArrowDivide[F[_, _], A0] extends Divide[F[?, A0]] {
+  implicit def A: Arrow[F]
+  implicit def S: Semigroup[A0]
+
+  def contramap[A, B](r: F[A, A0])(f: B => A): F[B, A0] = A.mapfst(r)(f)
+  def divide2[A1, A2, Z](a1: =>F[A1, A0], a2: =>F[A2, A0])(f: Z => (A1, A2)): F[Z, A0] =
+    A.compose(A.arr((t: (A0, A0)) => S.append(t._1, t._2)), A.compose(A.splitA(a1, a2), A.arr(f)))
 }
