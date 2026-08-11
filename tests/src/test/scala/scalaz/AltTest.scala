@@ -48,5 +48,4 @@ class AltTest extends SpecLite {
       Default[GTree[String]].default must_==(GLeaf(""))
     }
   }
-
 }
