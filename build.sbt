@@ -272,7 +272,7 @@ lazy val scalacheckBinding = projectMatrix
   .settings(
     name := "scalaz-scalacheck-binding",
     Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.20.0",
   )
   .dependsOn(core, iteratee)
   .jvmPlatform(
