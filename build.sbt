@@ -224,7 +224,7 @@ lazy val example = projectMatrix
     standardSettings,
     name := "scalaz-example",
     notPublish,
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0" % Test,
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.20.0" % Test,
     Test / sourceGenerators += Def.task {
       val dir = (Test / sourceManaged).value
       val values = (Compile / discoveredMainClasses).value.sorted
