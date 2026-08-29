@@ -124,12 +124,20 @@ object build {
       }
     },
     scalacOptions ++= {
+      if (scalaVersion.value.startsWith("3.3")) {
+        Seq("-Ykind-projector")
+      } else if (scalaBinaryVersion.value == "3") {
+        Seq("-Xkind-projector")
+      } else {
+        Nil
+      }
+    },
+    scalacOptions ++= {
       val common = "implicitConversions,existentials"
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((0 | 3, _)) =>
           Seq(
             "-Wconf:msg=Implicit parameters should be provided with a:error",
-            "-Ykind-projector",
             s"-language:$common",
           )
         case _ =>
