@@ -19,7 +19,7 @@ jobs:
         java: [17, 25]
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-java@v5
+    - uses: actions/setup-java@v6
       with:
         java-version: ${{matrix.java}}
         distribution: temurin
