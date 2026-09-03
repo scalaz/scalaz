@@ -83,7 +83,7 @@ object BifunctorUsage {
     // For example, if we have a list of a type for which we have a
     // bifunctor, we can get a bimap that operates on every item in the
     // list.
-    val bff = Functor[List] bicompose Bifunctor[\/]
+    val bff = Functor[List].bicompose[\/]
     val bfres = bff.bimap[String, Int, String, Int](List("asdf".left, 2.right, "qwer".left, 4.right))(_.toUpperCase, _+1)
     assert(bfres === List("ASDF".left, 3.right, "QWER".left, 5.right))
 
