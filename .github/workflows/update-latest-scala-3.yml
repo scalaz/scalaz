@@ -24,7 +24,6 @@ jobs:
            "/metadata/versioning/versions//version/text()"
            maven-metadata.xml |
            grep -v NIGHTLY |
-           grep -v RC |
            sort |
            tail -1 > .github/scala_3_latest.txt
     - id: push
