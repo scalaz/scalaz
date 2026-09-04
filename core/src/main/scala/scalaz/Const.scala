@@ -93,7 +93,7 @@ sealed abstract class ConstInstances0 extends ConstInstances1 {
       val A: Semigroup[A] = implicitly
     }
 
-  implicit def constInstance1[C: Semigroup]: Apply[Const[C, *]] with Divide[Const[C, *]] =
+  implicit def constInstance1[C: Semigroup]: Apply[Const[C, *]] & Divide[Const[C, *]] =
     new ConstApplyDivide[C] {
       val C: Semigroup[C] = implicitly
     }
@@ -110,7 +110,7 @@ sealed abstract class ConstInstances extends ConstInstances0 {
       val A: Monoid[A] = implicitly
     }
 
-  implicit def constInstance2[C: Monoid]: Applicative[Const[C, *]] with Divisible[Const[C, *]] =
+  implicit def constInstance2[C: Monoid]: Applicative[Const[C, *]] & Divisible[Const[C, *]] =
     new ConstApplicativeDivisible[C] {
       val C: Monoid[C] = implicitly
     }

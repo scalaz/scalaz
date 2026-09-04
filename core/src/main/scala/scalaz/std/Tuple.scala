@@ -58,7 +58,7 @@ sealed trait TupleInstances0 {
 
 sealed trait TupleInstances1 extends TupleInstances0 {
   /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Traverse[(A1, *)] with Comonad[(A1, *)] = new Tuple2Functor[A1] with Comonad[(A1, *)] {
+  implicit def tuple2Instance[A1]: Traverse[(A1, *)] & Comonad[(A1, *)] = new Tuple2Functor[A1] with Comonad[(A1, *)] {
     override def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
@@ -207,7 +207,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
       def _8: Band[A8] = A8
     }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+  implicit val tuple1Instance: Traverse[Tuple1] & Monad[Tuple1] & Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))

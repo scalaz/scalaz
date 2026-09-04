@@ -47,10 +47,10 @@ sealed abstract class CokleisliInstances0 {
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, *]] with BindRec[Cokleisli[F, R, *]] =
+  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, *]] & BindRec[Cokleisli[F, R, *]] =
     new CokleisliMonad[F, R] {}
 
-  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, *, *]] with ProChoice[Cokleisli[F, *, *]] =
+  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, *, *]] & ProChoice[Cokleisli[F, *, *]] =
     new CokleisliArrow[F] {
       override def F = F0
     }

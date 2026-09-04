@@ -39,9 +39,9 @@ object Associative {
   ////
   import Isomorphism._
 
-  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Associative[G] with Bifunctor[G]): Associative[F] =
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Associative[G] & Bifunctor[G]): Associative[F] =
     new IsomorphismAssociative[F, G] {
-      override def G: Associative[G] with Bifunctor[G] = E
+      override def G: Associative[G] & Bifunctor[G] = E
       override def iso: F <~~> G = D
     }
 

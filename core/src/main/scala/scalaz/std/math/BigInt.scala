@@ -3,7 +3,7 @@ package std
 package math
 
 trait BigInts {
-  implicit val bigIntInstance: Monoid[BigInt] with Enum[BigInt] with Show[BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
+  implicit val bigIntInstance: Monoid[BigInt] & Enum[BigInt] & Show[BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
     override def show(f: BigInt): Cord = Cord(shows(f))
     override def shows(f: BigInt) = f.toString
 
@@ -23,7 +23,7 @@ trait BigInts {
 
   import Tags.Multiplication
 
-  implicit val bigIntMultiplication: Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] = new Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
+  implicit val bigIntMultiplication: Monoid[BigInt @@ Multiplication] & Order[BigInt @@ Multiplication] & Show[BigInt @@ Multiplication] = new Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
     override def show(f: BigInt @@ Multiplication): Cord = Cord(shows(f))
     override def shows(f: BigInt @@ Multiplication) = f.toString
 
