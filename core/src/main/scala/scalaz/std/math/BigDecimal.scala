@@ -3,7 +3,7 @@ package std
 package math
 
 trait BigDecimalInstances {
-  implicit val bigDecimalInstance: Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] {
+  implicit val bigDecimalInstance: Monoid[BigDecimal] & Enum[BigDecimal] & Show[BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] {
     override def show(f: BigDecimal): Cord = Cord(shows(f))
     override def shows(f: BigDecimal) = f.toString
 

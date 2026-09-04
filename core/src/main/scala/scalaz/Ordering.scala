@@ -27,7 +27,7 @@ sealed abstract class OrderingInstances {
 
   import Ordering._
 
-  implicit val orderingInstance: Enum[Ordering] with Show[Ordering] with Monoid[Ordering] = new Enum[Ordering] with Show[Ordering] with Monoid[Ordering] {
+  implicit val orderingInstance: Enum[Ordering] & Show[Ordering] & Monoid[Ordering] = new Enum[Ordering] with Show[Ordering] with Monoid[Ordering] {
     def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match {
       case (LT, LT)      => EQ
       case (LT, EQ | GT) => LT

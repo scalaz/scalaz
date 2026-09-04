@@ -238,7 +238,7 @@ sealed abstract class DequeueInstances {
     def append(a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
   }
 
-  implicit val dequeueInstances: Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] with Alt[Dequeue] =
+  implicit val dequeueInstances: Traverse[Dequeue] & IsEmpty[Dequeue] & MonadPlus[Dequeue] & Alt[Dequeue] =
     new Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] with Alt[Dequeue] {
       override def foldRight[A,B](fa: Dequeue[A], b: => B)(f: (A, => B) =>B): B = fa.foldRight(b)((a,b) => f(a,b))
       override def foldLeft[A,B](fa: Dequeue[A], b: B)(f: (B,A)=>B): B = fa.foldLeft(b)(f)

@@ -168,7 +168,7 @@ sealed abstract class TreeInstances {
   implicit val treeIsCovariant: IsCovariant[Tree] =
     IsCovariant.force[Tree]
 
-  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] {
+  implicit val treeInstance: Traverse1[Tree] & Monad[Tree] & Comonad[Tree] & Align[Tree] & Zip[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] {
     def point[A](a: => A): Tree[A] = Tree.Leaf(a)
     def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa cobind f
     def copoint[A](p: Tree[A]): A = p.rootLabel

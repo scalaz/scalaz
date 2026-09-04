@@ -180,7 +180,7 @@ object Isomorphism extends Isomorphisms
 import Isomorphism._
 
 trait IsomorphismAssociative[F[_, _], G[_, _]] extends Associative[F] {
-  implicit def G: Associative[G] with Bifunctor[G] // TODO: is this needed? (I think so)
+  implicit def G: Associative[G] & Bifunctor[G] // TODO: is this needed? (I think so)
 
   def iso: F <~~> G
 

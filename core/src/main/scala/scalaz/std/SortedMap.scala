@@ -77,7 +77,7 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def sortedMapInstance[K: scala.Ordering]: Traverse[SortedMap[K, *]] with IsEmpty[SortedMap[K, *]] with Bind[SortedMap[K, *]] with Align[SortedMap[K, *]] =
+  implicit def sortedMapInstance[K: scala.Ordering]: Traverse[SortedMap[K, *]] & IsEmpty[SortedMap[K, *]] & Bind[SortedMap[K, *]] & Align[SortedMap[K, *]] =
     new Traverse[SortedMap[K, *]] with IsEmpty[SortedMap[K, *]] with Bind[SortedMap[K, *]] with SortedMapFoldable[K] with Align[SortedMap[K, *]] {
       def empty[V] = SortedMap.empty[K, V]
       def plus[V](a: SortedMap[K, V], b: => SortedMap[K, V]) = a ++ b

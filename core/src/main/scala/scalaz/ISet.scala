@@ -690,7 +690,7 @@ sealed abstract class ISetInstances {
     cord"ISet($content)"
   }
 
-  implicit def setMonoid[A: Order]: Monoid[ISet[A]] with SemiLattice[ISet[A]] =
+  implicit def setMonoid[A: Order]: Monoid[ISet[A]] & SemiLattice[ISet[A]] =
     new Monoid[ISet[A]] with SemiLattice[ISet[A]] {
       def zero: ISet[A] =
         empty[A]
