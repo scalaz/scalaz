@@ -87,7 +87,7 @@ object build {
     Seq("-Ywarn-unused:imports")
   }
 
-  val Scala213 = "2.13.18"
+  val Scala213 = "3.9.0"
   val Scala3 = sys.props.getOrElse("scalaz_scala3_version", "3.9.0")
 
   val buildInfoPackageName = "scalaz"
