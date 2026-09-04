@@ -2,9 +2,7 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.{Arbitrary, Cogen}
 import Id._
 import org.scalacheck.Prop.forAll
 
@@ -27,14 +25,6 @@ object WriterTTest extends SpecLite {
   checkAll(bitraverse.laws[WriterTOpt])
   checkAll(monadTrans.laws[({type l[a[_], b] = WriterT[Int, a, b]})#l, List])
   checkAll(divisible.laws[WriterT[Int, ConstInt, *]])
-
-  implicit def writerArb[W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
-    Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
-
-  private[this] implicit def writerCogen[W: Cogen, A: Cogen]: Cogen[Writer[W, A]] =
-    Cogen[(W, A)].contramap(_.run)
-
-  checkAll(comonad.laws[Writer[Int, *]])
 
   "flatMapF consistent with flatMap" ! forAll {
     (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>

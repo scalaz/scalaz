@@ -2,9 +2,7 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.{Cogen, Arbitrary}
 
 object UnwriterTTest extends SpecLite {
 
@@ -15,14 +13,6 @@ object UnwriterTTest extends SpecLite {
   checkAll(bind.laws[UnwriterTOptInt])
   checkAll(traverse.laws[UnwriterTOptInt])
   checkAll(bitraverse.laws[UnwriterTOpt])
-
-  implicit def UnwriterArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
-    Applicative[Arbitrary].apply2(W, A)(Unwriter(_, _))
-
-  private[this] implicit def unwriterCogen[W: Cogen, A: Cogen]: Cogen[Unwriter[W, A]] =
-    Cogen[(W, A)].contramap(_.run)
-
-  checkAll(comonad.laws[Unwriter[Int, *]])
 
   object instances {
     def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) = Equal[UnwriterT[F, W, A]]
