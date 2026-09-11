@@ -50,6 +50,7 @@ object KleisliTest extends SpecLite {
     def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, *]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, A, *], A]
     def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, *]]
+    def nondeterminism[F[_] : Nondeterminism, A] = Nondeterminism[Kleisli[F, A, *]]
     def alt[F[_] : Alt : Applicative, A] = Alt[Kleisli[F, A, *]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, *, *]]
@@ -64,6 +65,7 @@ object KleisliTest extends SpecLite {
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
+    def functor[F[_] : Nondeterminism, A] = Functor[Kleisli[F, A, *]]
     def functor[F[_] : Monad, A] = Functor[Kleisli[F, A, *]]
     def functor[F[_] : Bind, A] = Functor[Kleisli[F, A, *]]
     def functor[F[_] : Apply, A] = Functor[Kleisli[F, A, *]]
@@ -72,6 +74,8 @@ object KleisliTest extends SpecLite {
     def functor[F[_] : Monad: BindRec, A] = Functor[Kleisli[F, A, *]]
     def functor[F[_] : Applicative: BindRec, A] = Functor[Kleisli[F, A, *]]
     def functor[F[_] : ApplicativePlus: BindRec, A] = Functor[Kleisli[F, A, *]]
+    def functor[F[_] : Nondeterminism: BindRec, A] = Functor[Kleisli[F, A, *]]
+    def nondeterminism[F[_] : Nondeterminism: Zip, A] = Nondeterminism[Kleisli[F, A, *]]
     def apply[F[_] : Monad, A] = Apply[Kleisli[F, A, *]]
     def apply[F[_] : Bind, A] = Apply[Kleisli[F, A, *]]
     def apply[F[_] : BindRec, A] = Apply[Kleisli[F, A, *]]
@@ -80,6 +84,7 @@ object KleisliTest extends SpecLite {
     def apply[F[_] : Applicative: BindRec, A] = Apply[Kleisli[F, A, *]]
     def apply[F[_] : ApplicativePlus: BindRec, A] = Apply[Kleisli[F, A, *]]
     def applicative[F[_] : Monad, A] = Applicative[Kleisli[F, A, *]]
+    def applicative[F[_] : Nondeterminism: BindRec, A] = Applicative[Kleisli[F, A, *]]
     def bind[F[_] : BindRec, A] = Bind[Kleisli[F, A, *]]
     def bind[F[_] : Monad: BindRec, A] = Bind[Kleisli[F, A, *]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, *]]
@@ -93,6 +98,7 @@ object KleisliTest extends SpecLite {
     def strong[F[_]: Applicative] = Strong[Kleisli[F, *, *]]
     def strong[F[_]: Bind] = Strong[Kleisli[F, *, *]]
     def strong[F[_]: Monad] = Strong[Kleisli[F, *, *]]
+    def strong[F[_]: Nondeterminism] = Strong[Kleisli[F, *, *]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, *, *]]
     def compose[F[_]: Monad] = Compose[Kleisli[F, *, *]]
     def divisible[A, F[_] : Decidable] = Divisible[Kleisli[F, A, *]]
