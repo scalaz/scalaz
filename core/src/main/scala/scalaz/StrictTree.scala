@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import std.vector.{vectorInstance, vectorMonoid}
 
@@ -430,26 +431,35 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
     val root = EqualStackElem(a1, a2)
     val stack = mutable.Stack[EqualStackElem](root)
 
-    while (stack.nonEmpty) {
-      val here = stack.head
-      if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
-        val aNext = here.aSubIterator.hasNext
-        val bNext = here.bSubIterator.hasNext
-        (aNext, bNext) match {
-          case (true, true) =>
-            val childA = here.aSubIterator.next()
-            val childB = here.bSubIterator.next()
-            val nextStackElem = EqualStackElem(childA, childB)
-            stack.push(nextStackElem)
-          case (false, false) =>
-            stack.pop()
-          case _ =>
-            return false
+    @tailrec
+    def loop(): Boolean = {
+      if (stack.nonEmpty) {
+        val here = stack.head
+        if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
+          val aNext = here.aSubIterator.hasNext
+          val bNext = here.bSubIterator.hasNext
+          (aNext, bNext) match {
+            case (true, true) =>
+              val childA = here.aSubIterator.next()
+              val childB = here.bSubIterator.next()
+              val nextStackElem = EqualStackElem(childA, childB)
+              stack.push(nextStackElem)
+              loop()
+            case (false, false) =>
+              stack.pop()
+              loop()
+            case _ =>
+              false
+          }
+        } else {
+          false
         }
-      } else return false
+      } else {
+        true
+      }
     }
 
-    true
+    loop()
   }
 }
 
