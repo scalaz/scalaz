@@ -34,7 +34,7 @@ sealed abstract class Tree[A] {
   /** A 2D String representation of this Tree. */
   def drawTree(implicit sh: Show[A]): String = {
     val reversedLines = draw.run
-    val first = new StringBuilder(reversedLines.head.toString.reverse)
+    val first = new java.lang.StringBuilder(reversedLines.head.toString.reverse)
     val rest = reversedLines.tail
     rest.foldLeft(first) { (acc, elem) =>
       acc.append("\n").append(elem.toString.reverse)
@@ -54,24 +54,24 @@ sealed abstract class Tree[A] {
     * Uses reversed StringBuilders for performance, because they are
     * prepended to.
     **/
-  private def draw(implicit sh: Show[A]): Trampoline[Vector[StringBuilder]] = {
+  private def draw(implicit sh: Show[A]): Trampoline[Vector[java.lang.StringBuilder]] = {
     import Trampoline._
     val branch = " -+" // "+- ".reverse
     val stem = " -`" // "`- ".reverse
     val trunk = "  |" // "|  ".reverse
 
-    def drawSubTrees(s: EStream[Tree[A]]): Trampoline[Vector[StringBuilder]] = s match {
+    def drawSubTrees(s: EStream[Tree[A]]): Trampoline[Vector[java.lang.StringBuilder]] = s match {
       case ts if ts.isEmpty       => 
-        done(Vector.empty[StringBuilder])
+        done(Vector.empty[java.lang.StringBuilder])
       case t ##:: ts if ts.isEmpty =>
-        suspend(t.draw).map(subtree => new StringBuilder("|") +: shift(stem, "   ", subtree))
+        suspend(t.draw).map(subtree => new java.lang.StringBuilder("|") +: shift(stem, "   ", subtree))
       case t ##:: ts               => for {
                                        subtree <- suspend(t.draw)
                                        otherSubtrees <- suspend(drawSubTrees(ts))
-                                     } yield new StringBuilder("|") +: (shift(branch, trunk, subtree) ++ otherSubtrees)
+                                     } yield new java.lang.StringBuilder("|") +: (shift(branch, trunk, subtree) ++ otherSubtrees)
     }
 
-    def shift(first: String, other: String, s: Vector[StringBuilder]): Vector[StringBuilder] = {
+    def shift(first: String, other: String, s: Vector[java.lang.StringBuilder]): Vector[java.lang.StringBuilder] = {
       var i = 0
       while (i < s.length) {
         if (i == 0) s(i).append(first)
@@ -82,7 +82,7 @@ sealed abstract class Tree[A] {
     }
 
     drawSubTrees(subForest).map { subtrees =>
-      new StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
+      new java.lang.StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
     }
   }
 

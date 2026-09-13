@@ -213,7 +213,7 @@ object Diev {
 
     def toIList: IList[A] = foldRight[IList[A]](INil())(_ :: _)
 
-    override def toString(): String = intervals.foldLeft(new StringBuilder().append("("))(_.append(_)).append(")").toString
+    override def toString(): String = intervals.foldLeft(new java.lang.StringBuilder().append("("))(_.append(_)).append(")").toString
   }
 
   def empty[A](implicit E: Enum[A]): Diev[A] = DieVector()
