@@ -56,11 +56,12 @@ object DievInterval {
   def fixIntervalOrder[A](interval: (A, A))(implicit E: Enum[A]): (A, A) = if (interval._2 < interval._1) interval.swap else interval
 }
 
-trait DievImplementation {
-  import syntax.std.option._
-  import std.anyVal._
-  import DievInterval._
-  protected[this] case class DieVector[A](intervals: Vector[(A, A)] = Vector())(implicit EA: Enum[A]) extends Diev[A] {
+object Diev {
+  private case class DieVector[A](intervals: Vector[(A, A)] = Vector())(implicit EA: Enum[A]) extends Diev[A] {
+    import syntax.std.option._
+    import std.anyVal._
+    import DievInterval._
+
     val liftedIntervals = intervals.lift
 
     private[this] sealed abstract class SearchResult
@@ -214,21 +215,17 @@ trait DievImplementation {
 
     override def toString(): String = intervals.foldLeft(new StringBuilder().append("("))(_.append(_)).append(")").toString
   }
-}
 
-object Diev extends DievInstances {
   def empty[A](implicit E: Enum[A]): Diev[A] = DieVector()
 
   def fromValuesSeq[A](values: Seq[A])(implicit E: Enum[A]): Diev[A] = values.foldLeft(empty[A])(_ + _)
 
   def fromIntervalsSeq[A](intervals: Seq[(A, A)])(implicit E: Enum[A]): Diev[A] = intervals.foldLeft(empty[A])(_ + _)
-}
 
-sealed abstract class DievInstances extends DievImplementation {
-  import std.tuple._, std.vector._
-
-  implicit def dievEqual[A: Equal]: Equal[Diev[A]] =
+  implicit def dievEqual[A: Equal]: Equal[Diev[A]] = {
+    import std.tuple._
     Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(using std.vector.vectorEqual[(A, A)])
+  }
 
   implicit def dievMonoid[A: Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
     def append(f1: Diev[A], f2: => Diev[A]) = f1 ++ f2
@@ -236,6 +233,9 @@ sealed abstract class DievInstances extends DievImplementation {
     def zero: Diev[A] = new DieVector[A]()
   }
 
-  implicit def dievShow[A: Show]: Show[Diev[A]] =
+  implicit def dievShow[A: Show]: Show[Diev[A]] = {
+    import std.tuple._
+    import std.vector._
     (diev: Diev[A]) => Show[Vector[(A, A)]].show(diev.intervals)
+  }
 }
