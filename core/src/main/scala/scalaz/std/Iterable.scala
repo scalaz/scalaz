@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scala.annotation.tailrec
 import scala.collection.immutable.Seq
 
 trait IterableInstances {
@@ -16,16 +17,24 @@ trait IterableInstances {
       val i1 = a1.iterator
       val i2 = a2.iterator
 
-      while (i1.hasNext && i2.hasNext) {
-        val a1 = i1.next()
-        val a2 = i2.next()
+      @tailrec
+      def loop(): Ordering = {
+        if (i1.hasNext && i2.hasNext) {
+          val a1 = i1.next()
+          val a2 = i2.next()
 
-        val o = A.order(a1, a2)
-        if (o != EQ) {
-          return o
+          A.order(a1, a2) match {
+            case EQ =>
+              loop()
+            case o =>
+              o
+          }
+        } else {
+          anyVal.booleanInstance.order(i1.hasNext, i2.hasNext)
         }
       }
-      anyVal.booleanInstance.order(i1.hasNext, i2.hasNext)
+
+      loop()
     }
   }
 
