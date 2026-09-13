@@ -1,6 +1,6 @@
 package scalaz
 
-sealed abstract class Isomorphisms {
+object Isomorphism {
 
   /**Isomorphism for arrows of kind * -> * -> * */
   trait Iso[Arr[_, _], A, B] {
@@ -180,8 +180,6 @@ sealed abstract class Isomorphisms {
   def naturalCommutative[F[_], G[_]](i: F <~> G): G <~> F = i.flip
 
 }
-
-object Isomorphism extends Isomorphisms
 
 import Isomorphism._
 
