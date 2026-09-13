@@ -19,31 +19,8 @@ sealed abstract class IndexedStateT[S1, S2, F[_], A] { self =>
   def run(initial: S1)(implicit F: Bind[F]): F[(S2, A)] = apply(initial)
 
   /** Run and return the final value and state in the context of `F` */
-  def runRec(initial: S1)(implicit F: BindRec[F]): F[(S2, A)] = {
-
-    abstract class Eval {
-      type S0
-      val s0: S0
-      val st: IndexedStateT[S0, S2, F, A]
-
-      @tailrec
-      final def step: F[Eval \/ (S2, A)] = st match {
-        case Wrap(f) => F.map(f(s0))(\/.right)
-        case FlatMap(Wrap(f), g) => F.map(f(s0)){ case (sx, x) => \/.left(Eval(g(sx, x), sx)) }
-        case FlatMap(FlatMap(f, g), h) => Eval(f.flatMapS((sx, x) => g(sx, x).flatMapS(h)), s0).step
-      }
-    }
-
-    object Eval {
-      def apply[S](f: IndexedStateT[S, S2, F, A], s: S): Eval = new Eval {
-        type S0 = S
-        val s0 = s
-        val st = f
-      }
-    }
-
-    F.tailrecM(Eval(this, initial))(_.step)
-  }
+  def runRec(initial: S1)(implicit F: BindRec[F]): F[(S2, A)] =
+    F.tailrecM(IndexedStateT.Eval(this, initial))(_.step)
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
   def runZero(implicit S1: Monoid[S1], F: Bind[F]): F[(S2, A)] =
@@ -150,6 +127,32 @@ object IndexedStateT extends StateTInstances with StateTFunctions {
 
   def apply[S1, S2, F[_], A](f: S1 => F[(S2, A)]): IndexedStateT[S1, S2, F, A] =
     Wrap(f)
+
+  private sealed abstract class Eval[S2, F[_], A] {
+    type S0
+    protected val s0: S0
+    protected val st: IndexedStateT[S0, S2, F, A]
+
+    @tailrec
+    final def step(implicit F: BindRec[F]): F[Eval[S2, F, A] \/ (S2, A)] = st match {
+      case Wrap(f) =>
+        F.map(f(s0))(\/.right)
+      case FlatMap(Wrap(f), g) =>
+        F.map(f(s0)) {
+          case (sx, x) => -\/(Eval(g(sx, x), sx))
+        }
+      case FlatMap(FlatMap(f, g), h) =>
+        Eval(f.flatMapS((sx, x) => g(sx, x).flatMapS(h)), s0).step
+    }
+  }
+
+  private object Eval {
+    def apply[S, S2, F[_], A](f: IndexedStateT[S, S2, F, A], s: S): Eval[S2, F, A] = new Eval[S2, F, A] {
+      type S0 = S
+      override val s0 = s
+      override val st = f
+    }
+  }
 }
 
 //
