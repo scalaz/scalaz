@@ -57,19 +57,25 @@ object DievInterval {
 }
 
 object Diev {
+  private object DieVector {
+    private sealed abstract class SearchResult
+    private final case class Coincidence(position: Int) extends SearchResult
+    private final case class Between(before: Option[Int], after: Option[Int]) extends SearchResult
+  }
+
   private case class DieVector[A](intervals: Vector[(A, A)] = Vector())(implicit EA: Enum[A]) extends Diev[A] {
     import syntax.std.option._
     import std.anyVal._
     import DievInterval._
+    import DieVector._
 
     val liftedIntervals = intervals.lift
 
-    private[this] sealed abstract class SearchResult
-    private[this] sealed case class Coincidence(position: Int) extends SearchResult
-    private[this] sealed case class Between(before: Option[Int], after: Option[Int]) extends SearchResult {
-      def adjacentBefore(interval: (A, A)): Option[Int] = before.filter{pos => intervals(pos)._2.succ === interval._1}
-      def adjacentAfter(interval: (A, A)): Option[Int] = after.filter{pos => intervals(pos)._1.pred === interval._2}
-    }
+    private def adjacentBefore(between: DieVector.Between, interval: (A, A)): Option[Int] =
+      between.before.filter{pos => intervals(pos)._2.succ === interval._1}
+
+    private def adjacentAfter(between: DieVector.Between, interval: (A, A)): Option[Int] =
+      between.after.filter{pos => intervals(pos)._1.pred === interval._2}
 
     private def construct(prefixCount: Int, middle: Vector[(A, A)], suffixStart: Int): Diev[A] = {
       DieVector(intervals.take(prefixCount) ++ middle ++ intervals.drop(suffixStart))
@@ -117,7 +123,7 @@ object Diev {
           construct(startPosition, Vector((intervals(startPosition)._1.min(correctedInterval._1), intervals(endPosition)._2.max(correctedInterval._2))), endPosition + 1)
         }
         case (Coincidence(startPosition), between@Between(_, after)) => {
-          val adjacentAfterResult = between.adjacentAfter(correctedInterval)
+          val adjacentAfterResult = adjacentAfter(between, correctedInterval)
           construct(
             startPosition,
             Vector((intervals(startPosition)._1.min(correctedInterval._1), adjacentAfterResult.map(intervals(_)._2).getOrElse(correctedInterval._2))),
@@ -125,7 +131,7 @@ object Diev {
           )
         }
         case (earlyBound@ Between(before, after), Coincidence(endPosition)) => {
-          val adjacentBeforeResult = earlyBound.adjacentBefore(correctedInterval)
+          val adjacentBeforeResult = adjacentBefore(earlyBound, correctedInterval)
           construct(
             adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
             Vector((adjacentBeforeResult.map(intervals(_)._1).getOrElse(correctedInterval._1), intervals(endPosition)._2.max(correctedInterval._2))),
@@ -134,8 +140,8 @@ object Diev {
         }
         //(Between(None,Some(0)),Between(Some(0),Some(1)))
         case (earlyBound@ Between(before, after), lateBound@Between(_, otherAfter)) => {
-          val adjacentBeforeResult = earlyBound.adjacentBefore(correctedInterval)
-          val adjacentAfterResult = lateBound.adjacentAfter(correctedInterval)
+          val adjacentBeforeResult = adjacentBefore(earlyBound, correctedInterval)
+          val adjacentAfterResult = adjacentAfter(lateBound, correctedInterval)
           construct(
             adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
             Vector((adjacentBeforeResult.map(intervals(_)._1).getOrElse(correctedInterval._1), adjacentAfterResult.map(intervals(_)._2).getOrElse(correctedInterval._2))),
