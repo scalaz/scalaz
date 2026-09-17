@@ -243,7 +243,6 @@ lazy val example = projectMatrix
     scalaVersions,
     Def.settings(
       nativeSettings,
-      evictionErrorLevel := Level.Warn,
       commands += Command.command("runAllMain") { state1 =>
         val extracted = Project.extract(state1)
         val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
@@ -284,7 +283,6 @@ lazy val scalacheckBinding = projectMatrix
     scalaVersions,
     Def.settings(
       nativeSettings,
-      evictionErrorLevel := Level.Warn,
     )
   )
 
@@ -332,7 +330,6 @@ lazy val tests = projectMatrix
     scalaVersions,
     Def.settings(
       nativeSettings,
-      evictionErrorLevel := Level.Warn,
       minSuccessfulTests := 33,
     )
   )
