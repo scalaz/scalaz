@@ -2,6 +2,7 @@ package scalaz
 
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicReference
+import scala.annotation.tailrec
 
 /** Like [[scala.collection.immutable.LazyList]], but doesn't save
   * computed values.  As such, it can be used to represent similar
@@ -52,9 +53,15 @@ sealed abstract class EphemeralStream[A] {
   }
 
   def dropWhile(p: A => Boolean): EphemeralStream[A] = {
-    var these: EphemeralStream[A] = this
-    while (!these.isEmpty && p(these.head())) these = these.tail()
-    these
+    @tailrec
+    def loop(these: EphemeralStream[A]): EphemeralStream[A] = {
+      if(!these.isEmpty && p(these.head())) {
+        loop(these.tail())
+      } else {
+        these
+      }
+    }
+    loop(this)
   }
 
   def ++(e: => EphemeralStream[A]): EphemeralStream[A] =
@@ -224,13 +231,17 @@ sealed abstract class EphemeralStreamInstances {
       if(i < 0)
         None
       else{
-        var n = i
-        var these = fa
-        while (!these.isEmpty && n > 0){
-          n -= 1
-          these = these.tail()
+        @tailrec
+        def loop(n: Int, these: EphemeralStream[A]): Option[A] = {
+          if (!these.isEmpty && n > 0) {
+            loop(n - 1, these.tail())
+          } else if (these.isEmpty) {
+            None
+          } else {
+            Some(these.head())
+          }
         }
-        if (these.isEmpty) None else Some(these.head())
+        loop(i, fa)
       }
     }
     def tailrecM[A, B](a: A)(f: A => EphemeralStream[A \/ B]): EphemeralStream[B] = {
