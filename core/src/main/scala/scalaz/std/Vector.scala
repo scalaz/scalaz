@@ -60,15 +60,15 @@ trait VectorInstances extends VectorInstances0 {
     }
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
-      var i = fa.length
-      var r = z
-      while (i > 0) {
-        i -= 1
-        // force and copy the value of r to ensure correctness
-        val w = r
-        r = f(fa(i), w)
+      @tailrec
+      def loop(i: Int, r: B): B = {
+        if (i >= 0) {
+          loop(i - 1, f(fa(i), r))
+        } else {
+          r
+        }
       }
-      r
+      loop(fa.length - 1, z)
     }
 
     def alignWith[A, B, C](f: A \&/ B => C): (Vector[A], Vector[B]) => Vector[C] = { (as, bs) =>
