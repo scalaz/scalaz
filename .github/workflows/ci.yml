@@ -15,12 +15,17 @@ jobs:
         scala: [2_13, 3]
         java: [17, 25]
     steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+    - uses: actions/checkout@v7.0.1
+    - run: |
+        gh extension install github/gh-actions-lock
+        gh actions-lock --verify
+      env:
+        GH_TOKEN: ${{ github.token }}
+    - uses: actions/setup-java@v6.2.0
       with:
         java-version: ${{matrix.java}}
         distribution: zulu
-    - uses: coursier/cache-action@v9
+    - uses: coursier/cache-action@v9.0.1
     - run: ./sbt -v
            -Dcheck_build_file_imports
            checkGenTypeClasses
@@ -30,7 +35,7 @@ jobs:
            "...${{ matrix.project }}${{ matrix.scala }}/test"
            "project /"
            $(if [[ "${{ matrix.project }}" == "JVM" ]]; then echo "publishLocal"; fi)
-    - uses: mikepenz/action-junit-report@a16be3a69023e9bd7e748ede768b3282ea7b30ce # v6.7.1
+    - uses: mikepenz/action-junit-report@v6.7.1
       if: always()
       with:
         report_paths: '**/test-reports/*.xml'
@@ -47,12 +52,12 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+    - uses: actions/checkout@v7.0.1
+    - uses: actions/setup-java@v6.2.0
       with:
         java-version: 25
         distribution: zulu
-    - uses: coursier/cache-action@v9
+    - uses: coursier/cache-action@v9.0.1
     - id: scala_3_version
       run: echo "value=$(cat .github/scala_3_latest.txt)" >> $GITHUB_OUTPUT
     - run: ./sbt -v
@@ -63,15 +68,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+    - uses: actions/checkout@v7.0.1
+    - uses: actions/setup-java@v6.2.0
       with:
         java-version: 25
         distribution: zulu
-    - uses: actions/setup-node@v7
+    - uses: actions/setup-node@v7.1.0
       with:
         node-version: 26
-    - uses: coursier/cache-action@v9
+    - uses: coursier/cache-action@v9.0.1
     - run: ./sbt -v
            -Dscala_js_wasm
            rootJS/Test/compile
