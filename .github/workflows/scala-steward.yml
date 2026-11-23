@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Generate token
       id: generate_token
-      uses: actions/create-github-app-token@v3.3.0
+      uses: actions/create-github-app-token@v3.4.0
       with:
         client-id: 89659
         private-key: ${{ secrets.SCALAZ_BOT_KEY }}
