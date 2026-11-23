@@ -12,7 +12,7 @@ workflows:
         - 'test-summary/action@v2'
     '.github/workflows/scala-steward.yml':
         - 'actions/create-github-app-token@v3.3.0'
-        - 'sbt/setup-sbt@v1.5.14'
+        - 'sbt/setup-sbt@v1.5.15'
         - 'scala-steward-org/scala-steward-action@v2.97.0'
 dependencies:
     'actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9':
@@ -82,9 +82,9 @@ dependencies:
         commit: 'sha1-a16be3a69023e9bd7e748ede768b3282ea7b30ce'
         owner_id: 1476232
         repo_id: 330384746
-    'sbt/setup-sbt@v1.5.14':
-        ref: 'v1.5.14'
-        commit: 'sha1-67d461eba2c4753196c230e02da850757ba4775e'
+    'sbt/setup-sbt@v1.5.15':
+        ref: 'v1.5.15'
+        commit: 'sha1-7e114eae4f32ec3f93c851c2793376a77f384409'
         owner_id: 1158012
         repo_id: 818716839
         uses:
