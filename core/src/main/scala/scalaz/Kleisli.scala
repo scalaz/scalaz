@@ -146,6 +146,12 @@ sealed abstract class KleisliInstances9 extends KleisliInstances10 {
       def zip[A, B](a: => Kleisli[F, R, A], b: => Kleisli[F, R, B]) =
         Kleisli(r => F.zip(a(r), b(r)))
     }
+  
+  implicit def kleisliNondeterminism[F[_], R](implicit F0: Nondeterminism[F]): Nondeterminism[Kleisli[F, R, *]] =
+    new KleisliNondeterminism[F, R] {
+      def F = F0
+    }
+
 }
 
 sealed abstract class KleisliInstances8 extends KleisliInstances9 {
@@ -366,6 +372,20 @@ private trait KleisliBindRec[F[_], R] extends BindRec[Kleisli[F, R, *]] with Kle
 
 private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, *]] with KleisliApplicative[F, R] with KleisliBind[F, R] {
   implicit def F: Monad[F]
+}
+
+
+private trait KleisliNondeterminism[F[_], R] extends Nondeterminism[Kleisli[F, R, *]] with KleisliMonad[F, R]{
+  implicit def F: Nondeterminism[F]
+
+  def chooseAny[A](head: Kleisli[F, R, A], tail: IList[Kleisli[F, R, A]]): Kleisli[F, R, (A, IList[Kleisli[F, R, A]])] =
+    Kleisli { r =>
+      F.map(F.chooseAny(head(r), tail.map(_(r)))) {
+        case (chosen, notChosen) =>
+          (chosen, notChosen.map(fa => Kleisli(_ => fa)))
+      }
+    }
+
 }
 
 private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, *], R] with KleisliApplicative[F, R] with KleisliMonad[F, R] {
